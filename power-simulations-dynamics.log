@@ -1,0 +1,48 @@
+┌ Warning: 2023-07-17T19:03:01.260 [117387:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Info: 2023-07-17T19:03:01.261 [117387:1]: The reference Bus has a Source connected to it. The frequency reference model will change to ConstantFrequency
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/frequency_reference.jl:70
+┌ Info: 2023-07-17T19:03:01.261 [117387:1]: Pre-Initializing Simulation States
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:265
+┌ Info: 2023-07-17T19:03:01.261 [117387:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
+└ @ PowerSystems /home/sunash/.julia/packages/PowerSystems/cPv4x/src/base.jl:407
+┌ Info: 2023-07-17T19:03:01.262 [117387:1]: PowerFlow solve converged, the results have been stored in the system
+└ @ PowerFlows /home/sunash/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
+┌ Info: 2023-07-17T19:03:01.262 [117387:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
+└ @ PowerSystems /home/sunash/.julia/packages/PowerSystems/cPv4x/src/base.jl:407
+┌ Info: 2023-07-17T19:03:01.263 [117387:1]: Residual from initial guess: max = 4.107825191113079e-11 at 16, total = 4.091927640362657e-10
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:101
+┌ Info: 2023-07-17T19:03:01.263 [117387:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:68
+┌ Info: 2023-07-17T19:03:01.263 [117387:1]: Attaching Perturbations
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:296
+┌ Info: 2023-07-17T19:03:01.263 [117387:1]: Simulations status = BUILT
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:426
+┌ Info: 2023-07-17T19:03:01.263 [117387:1]: 
+│  ───────────────────────────────────────────────────────────────────────────────
+│                                                      Time          Allocations  
+│                                                ───────────────   ───────────────
+│                 Total measured:                    3.92ms             492KiB    
+│ 
+│  Section                               ncalls     time    %tot     alloc    %tot
+│  ───────────────────────────────────────────────────────────────────────────────
+│  Build Simulation                           1   3.90ms  100.0%    491KiB  100.0%
+│    Line Transform to Dynamic                1   1.16ms   29.8%   20.7KiB    4.2%
+│    Build Simulation Inputs                  1    872μs   22.3%   61.1KiB   12.5%
+│      Wrap Branches                          1    115μs    2.9%   2.41KiB    0.5%
+│      Wrap Dynamic Injectors                 1    255μs    6.5%   30.7KiB    6.2%
+│      Calculate MM, DAE_vector, Tota...      1   23.5μs    0.6%   1.86KiB    0.4%
+│      Wrap Static Injectors                  1   59.5μs    1.5%   3.91KiB    0.8%
+│    Pre-initialization                       1    862μs   22.1%    168KiB   34.2%
+│      Power Flow solution                    1    507μs   13.0%   62.1KiB   12.6%
+│      Initialize Static Injectors            1   51.4μs    1.3%   3.16KiB    0.6%
+│      Initialize Dynamic Injectors           1    255μs    6.5%   95.4KiB   19.4%
+│      Initialize Dynamic Branches            1   19.6μs    0.5%      384B    0.1%
+│    Calculate Jacobian                       1    365μs    9.3%    154KiB   31.3%
+│    Make Model Function                      1   6.54μs    0.2%      768B    0.2%
+│    Initial Condition NLsolve refine...      1    247μs    6.3%   60.9KiB   12.4%
+│    Build Perturbations                      1   66.1μs    1.7%   4.52KiB    0.9%
+│    Make DiffEq Problem                      1    257μs    6.6%   11.5KiB    2.3%
+│  ───────────────────────────────────────────────────────────────────────────────
+│ 
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:451
