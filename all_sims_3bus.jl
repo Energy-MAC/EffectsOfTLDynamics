@@ -27,7 +27,7 @@ end
 function choose_disturbance(sys, dist)
     if dist == "CRC"
         # Control reference change
-        g = get_component(DynamicInverter, sys, "generator-102-1")
+        g = get_component(DynamicInverter, sys, "generator-103-1")
         crc = ControlReferenceChange(1.0, g, :V_ref, 0.95)
     elseif dist == "NetworkSwitch"
         # NetworkSwitch
@@ -195,13 +195,13 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     sim = build_sim(sys, tspan, perturbation, dyn_lines)
     show_states_initial_value(sim)
     # execute simulation
-    exec = execute_sim(sim, p)
+    #exec = execute_sim(sim, p)
     # read results
-    results = results_sim(sim)
-    return results
+    #results = results_sim(sim)
+    return sim
 end
 
-file_name = "test_sys.json"
+file_name = "threebus_sys.json"
 t_max = 2.0
 
 # "CRC"
@@ -222,18 +222,28 @@ maxiters = Int(1e10)
 p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, abstol, reltol, maxiters)
 
 line_model_1 = "Algebraic"
-results_alg = run_experiment(file_name, t_max, dist, line_model_1, p)
+results_alg, sim = run_experiment(file_name, t_max, dist, line_model_1, p);
 
 line_model_2 = "Dynamic"
-results_dyn = run_experiment(file_name, t_max, dist, line_model_2, p)
+results_dyn, dyn_sim = run_experiment(file_name, t_max, dist, line_model_2, p);
 
 line_model_3 = "Multi-Segment Dynamic"
-results_ms_dyn = run_experiment(file_name, t_max, dist, line_model_3, p)
+results_ms_dyn, seg_sim = run_experiment(file_name, t_max, dist, line_model_3, p);
 
-vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
+vr_alg = get_state_series(results_alg, ("generator-103-1", :vr_filter));
 plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
-vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
+vr_dyn = get_state_series(results_dyn, ("generator-103-1", :vr_filter));
 plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
-vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
+vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-103-1", :vr_filter));
 plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.999, 1.01))
 plot!(xlims=(0.999, 1.02))
+
+
+line_model_1 = "Algebraic"
+sim = run_experiment(file_name, t_max, dist, line_model_1, p);
+
+line_model_2 = "Dynamic"
+dyn_sim = run_experiment(file_name, t_max, dist, line_model_2, p);
+
+line_model_3 = "Multi-Segment Dynamic"
+seg_sim = run_experiment(file_name, t_max, dist, line_model_3, p);
