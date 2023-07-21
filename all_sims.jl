@@ -1,3 +1,5 @@
+using Pkg;
+Pkg.activate(".")
 using PowerSystems
 using PowerSimulationsDynamics
 using Sundials
@@ -17,7 +19,7 @@ struct ExpParams
     b_km::Float64
 end
 
-function choose_disturbance(dist)
+function choose_disturbance(sys, dist)
     if dist == "CRC"
         # Control reference change
         g = get_component(DynamicInverter, sys, "generator-102-1")
@@ -155,7 +157,7 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     # "CRC"
     # "NetworkSwitch"
     # "InfBusChange"
-    perturbation = choose_disturbance(dist)
+    perturbation = choose_disturbance(sys, dist)
 
     # choose line model
     if line_model == "Algebraic"
@@ -220,6 +222,6 @@ plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
 vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
 plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
 vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.99, 1.5))
+plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.99, 1.05))
 
 
