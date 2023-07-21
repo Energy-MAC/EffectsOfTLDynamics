@@ -6,6 +6,7 @@ using Sundials
 using Plots
 using PowerNetworkMatrices
 using SparseArrays
+using OrdinaryDiffEq
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
@@ -17,6 +18,9 @@ struct ExpParams
     x_km::Float64
     g_km::Float64
     b_km::Float64
+    abstol::Float64
+    reltol::Float64
+    maxiters::Int
 end
 
 function choose_disturbance(sys, dist)
@@ -40,7 +44,7 @@ end
 
 function build_sim(sys, tspan, perturbation, dyn_lines)
     sim = PSID.Simulation(
-           ResidualModel, #Type of model used
+           MassMatrixModel, #Type of model used
            sys, #system
            pwd(), #folder to output results
            tspan, #time span
@@ -50,11 +54,13 @@ function build_sim(sys, tspan, perturbation, dyn_lines)
     return sim
 end
 
-function execute_sim(sim)
+function execute_sim(sim, p)
     exec = PSID.execute!(
            sim, #simulation structure
-           IDA(), #Sundials DAE Solver
-           dtmax = 0.02, #Arguments: Maximum timestep allowed
+           Rodas4(), #Sundials DAE Solver
+           dtmax = 1e-4, #0.02, #Arguments: Maximum timestep allowed
+           abstol = p.abstol,
+           maxiters = p.maxiters,
        );
        return exec
 end
@@ -188,14 +194,18 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     sim = build_sim(sys, tspan, perturbation, dyn_lines)
     show_states_initial_value(sim)
     # execute simulation
-    exec = execute_sim(sim)
+    exec = execute_sim(sim, p)
     # read results
     results = results_sim(sim)
     return results
 end
 
 file_name = "test_sys.json"
-t_max = 30.0
+t_max = 2.0
+
+# "CRC"
+# "NetworkSwitch"
+# "InfBusChange"
 dist = "CRC"
 
 Z_c = 380 # Ω
@@ -204,9 +214,11 @@ x_km = 0.488 # Ω/km
 g_km = 0 # S/km
 b_km = 3.371e-6 # S/km
 l = 100 #km
-N = 10
-
-p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km)
+N = 1
+abstol = 1e-13
+reltol = 1e-10
+maxiters = Int(1e10)
+p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, abstol, reltol, maxiters)
 
 line_model_1 = "Algebraic"
 results_alg = run_experiment(file_name, t_max, dist, line_model_1, p)
@@ -222,6 +234,5 @@ plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
 vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
 plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
 vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.99, 1.05))
-
-
+plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.999, 1.01))
+plot!(xlims=(0.999, 1.01))
