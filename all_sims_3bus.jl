@@ -223,9 +223,9 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     show_states_initial_value(sim)
     # execute simulation
     exec = execute_sim(sim, p)
-    read results
+    # read results
     results = results_sim(sim)
-    return sim
+    return results, sim
 end
 
 file_name = "threebus_sys.json"
@@ -264,13 +264,3 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
 vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-103-1", :vr_filter));
 plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.999, 1.01))
 plot!(xlims=(0.999, 1.02))
-
-
-line_model_1 = "Algebraic"
-sim = run_experiment(file_name, t_max, dist, line_model_1, p);
-
-line_model_2 = "Dynamic"
-dyn_sim = run_experiment(file_name, t_max, dist, line_model_2, p);
-
-line_model_3 = "Multi-Segment Dynamic"
-seg_sim = run_experiment(file_name, t_max, dist, line_model_3, p);
