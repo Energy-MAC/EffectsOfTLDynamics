@@ -71,6 +71,32 @@ function results_sim(sim)
     return results
 end
 
+function build_new_impedance_model(sys, p::ExpParams)
+    Z_c = p.Z_c # Ω
+    r_km = p.r_km # Ω/km
+    x_km = p.x_km # Ω/km
+    z_km = r_km + im*x_km # Ω/km
+    
+    g_km = p.g_km # S/km
+    b_km = p.b_km # S/km
+    y_km = g_km + im*b_km
+    
+    z_km_pu = z_km/Z_c
+    y_km_pu = y_km*Z_c
+    
+    l = p.l #km
+    γ = sqrt(z_km*y_km)
+    z_ll = z_km_pu*l*(sinh(γ*l)/(γ*l))
+    y_ll = y_km_pu/2*l*(tanh(γ*l)/(γ*l))
+
+        for l in get_components(Line, sys)
+            l.r = real(z_ll)
+            l.x = imag(z_ll)
+            l.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
+        end
+    return sys
+end
+
 function build_seg_model(sys_segs, p::ExpParams)
     Z_c = p.Z_c # Ω
     r_km = p.r_km # Ω/km
@@ -152,8 +178,6 @@ function build_seg_model(sys_segs, p::ExpParams)
     return sys_segs
 end
 
-
-
 function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     # build system
     sys = System(joinpath(pwd(), file_name));
@@ -187,17 +211,20 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
         return error("Unknown line model")
     end
 
+    
     # build segments model
     if (multi_segment == true)
         sys = build_seg_model(sys, p)
+    else
+        sys = build_new_impedance_model(sys, p)
     end
     # build simulation
     sim = build_sim(sys, tspan, perturbation, dyn_lines)
     show_states_initial_value(sim)
     # execute simulation
-    #exec = execute_sim(sim, p)
-    # read results
-    #results = results_sim(sim)
+    exec = execute_sim(sim, p)
+    read results
+    results = results_sim(sim)
     return sim
 end
 
