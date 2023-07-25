@@ -17,7 +17,7 @@ struct ExpParams
     b_km::Float64
 end
 
-function choose_disturbance(dist)
+function choose_disturbance(dist, sys)
     if dist == "CRC"
         # Control reference change
         g = get_component(DynamicInverter, sys, "generator-102-1")
@@ -155,7 +155,7 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     # "CRC"
     # "NetworkSwitch"
     # "InfBusChange"
-    perturbation = choose_disturbance(dist)
+    perturbation = choose_disturbance(dist, sys)
 
     # choose line model
     if line_model == "Algebraic"
@@ -183,43 +183,58 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
         sys = build_seg_model(sys, p)
     end
     # build simulation
-    sim = build_sim(sys, tspan, perturbation, dyn_lines)
-    show_states_initial_value(sim)
+    sim = build_sim(sys, tspan, perturbation, dyn_lines);
+    show_states_initial_value(sim);
     # execute simulation
-    exec = execute_sim(sim)
+    exec = execute_sim(sim);
     # read results
-    results = results_sim(sim)
-    return results
+    results = results_sim(sim);
+    return results, sim
 end
 
-file_name = "test_sys.json"
-t_max = 30.0
-dist = "CRC"
 
-Z_c = 380 # Ω
-r_km = 0.05 # Ω/km
-x_km = 0.488 # Ω/km
-g_km = 0 # S/km
-b_km = 3.371e-6 # S/km
-l = 100 #km
-N = 10
+# Define function to build simulation using multi-seg dynamic lines
+function get_ms_dyn_sim(file_name, t_max, dist, p::ExpParams)
+    sys = System(joinpath(pwd(), file_name));
+    tspan = (0.0, t_max)
+    perturbation = choose_disturbance(dist, sys)
+    sys = build_seg_model(sys, p)
+    sim = build_sim(sys, tspan, perturbation, true);
+#    show_states_initial_value(sim);
+    return sim
+end
 
-p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km)
+# file_name = "test_sys.json"
+# t_max = 30.0
+# dist = "CRC"
 
-line_model_1 = "Algebraic"
-results_alg = run_experiment(file_name, t_max, dist, line_model_1, p)
+# Z_c = 380 # Ω
+# r_km = 0.05 # Ω/km
+# x_km = 0.488 # Ω/km
+# g_km = 0 # S/km
+# b_km = 3.371e-6 # S/km
+# l = 100 #km
+# N = 10
 
-line_model_2 = "Dynamic"
-results_dyn = run_experiment(file_name, t_max, dist, line_model_2, p)
+# p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km)
 
-line_model_3 = "Multi-Segment Dynamic"
-results_ms_dyn = run_experiment(file_name, t_max, dist, line_model_3, p)
+# line_model_1 = "Algebraic"
+# results_alg, sim_alg = run_experiment(file_name, t_max, dist, line_model_1, p)
+# stb_alg = small_signal_analysis(sim_alg)
 
-vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
-plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
-vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
-plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
-vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.99, 1.5))
+# line_model_2 = "Dynamic"
+# results_dyn, sim_dyn = run_experiment(file_name, t_max, dist, line_model_2, p)
+# stb_dyn = small_signal_analysis(sim_dyn)
+
+# line_model_3 = "Multi-Segment Dynamic"
+# results_ms_dyn, sim_ms_dyn = run_experiment(file_name, t_max, dist, line_model_3, p)
+# stb_ms_dyn = small_signal_analysis(sim_ms_dyn)
+
+# vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
+# plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
+# vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
+# plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
+# vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
+# plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.99, 1.5))
 
 
