@@ -1,5 +1,5 @@
-using Pkg;
-Pkg.activate(".")
+module EffectsOfTLDynamics
+
 using PowerSystems
 using PowerSimulationsDynamics
 using Sundials
@@ -8,21 +8,9 @@ using PowerNetworkMatrices
 using SparseArrays
 using OrdinaryDiffEq
 
+
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
-
-struct ExpParams
-    N::Int
-    l::Float64
-    Z_c::Float64
-    r_km::Float64
-    x_km::Float64
-    g_km::Float64
-    b_km::Float64
-    abstol::Float64
-    reltol::Float64
-    maxiters::Int
-end
 
 function choose_disturbance(sys, dist)
     if dist == "CRC"
@@ -228,53 +216,4 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     return results, sim
 end
 
-file_name = "threebus_sys.json"
-t_max = 2.0
-
-# "CRC"
-# "NetworkSwitch"
-# "InfBusChange"
-dist = "CRC"
-
-Z_c = 380 # Ω
-r_km = 0.05 # Ω/km
-x_km = 0.488 # Ω/km
-g_km = 0 # S/km
-b_km = 3.371e-6 # S/km
-l = 100 #km
-N = 10
-abstol = 1e-13
-reltol = 1e-10
-maxiters = Int(1e10)
-p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, abstol, reltol, maxiters)
-
-line_model_1 = "Algebraic"
-results_alg, sim = run_experiment(file_name, t_max, dist, line_model_1, p);
-
-line_model_2 = "Dynamic"
-results_dyn, dyn_sim = run_experiment(file_name, t_max, dist, line_model_2, p);
-
-line_model_3 = "Multi-Segment Dynamic"
-results_ms_dyn, seg_sim = run_experiment(file_name, t_max, dist, line_model_3, p);
-
-vr_alg = get_state_series(results_alg, ("BUS 1", :Vm));
-plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
-vr_dyn = get_state_series(results_dyn, ("generator-103-1", :vr_filter));
-plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
-vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-103-1", :vr_filter));
-plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.999, 1.01))
-plot!(xlims=(0.999, 1.02))
-
-
-sys = System(joinpath(pwd(), file_name));
-tspan = (0.0, t_max)
-perturbation = choose_disturbance(sys, "CRC")
-sys = build_new_impedance_model(sys, p)
-sim = build_sim(sys, tspan, perturbation, false)
-x = small_signal_analysis(sim)
-
-dsim = build_sim(sys, tspan, perturbation, true)
-
-dx = small_signal_analysis(dsim)
-
-exec = execute_sim(dsim, p) 
+end
