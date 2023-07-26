@@ -228,39 +228,39 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     return results, sim
 end
 
-file_name = "threebus_sys.json"
-t_max = 2.0
+# file_name = "threebus_sys.json"
+# t_max = 2.0
 
-# "CRC"
-# "NetworkSwitch"
-# "InfBusChange"
-dist = "CRC"
+# # "CRC"
+# # "NetworkSwitch"
+# # "InfBusChange"
+# dist = "CRC"
 
-Z_c = 380 # Ω
-r_km = 0.05 # Ω/km
-x_km = 0.488 # Ω/km
-g_km = 0 # S/km
-b_km = 3.371e-6 # S/km
-l = 100 #km
-N = 10
-abstol = 1e-13
-reltol = 1e-10
-maxiters = Int(1e10)
-p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, abstol, reltol, maxiters)
+# Z_c = 380 # Ω
+# r_km = 0.05 # Ω/km
+# x_km = 0.488 # Ω/km
+# g_km = 0 # S/km
+# b_km = 3.371e-6 # S/km
+# l = 100 #km
+# N = 10
+# abstol = 1e-13
+# reltol = 1e-10
+# maxiters = Int(1e10)
+# p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, abstol, reltol, maxiters)
 
-line_model_1 = "Algebraic"
-results_alg, sim = run_experiment(file_name, t_max, dist, line_model_1, p);
+# line_model_1 = "Algebraic"
+# results_alg, sim = run_experiment(file_name, t_max, dist, line_model_1, p);
 
-line_model_2 = "Dynamic"
-results_dyn, dyn_sim = run_experiment(file_name, t_max, dist, line_model_2, p);
+# line_model_2 = "Dynamic"
+# results_dyn, dyn_sim = run_experiment(file_name, t_max, dist, line_model_2, p);
 
-line_model_3 = "Multi-Segment Dynamic"
-results_ms_dyn, seg_sim = run_experiment(file_name, t_max, dist, line_model_3, p);
+# line_model_3 = "Multi-Segment Dynamic"
+# results_ms_dyn, seg_sim = run_experiment(file_name, t_max, dist, line_model_3, p);
 
-vr_alg = get_state_series(results_alg, ("generator-103-1", :vr_filter));
-plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
-vr_dyn = get_state_series(results_dyn, ("generator-103-1", :vr_filter));
-plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
-vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-103-1", :vr_filter));
-plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.999, 1.01))
-plot!(xlims=(0.999, 1.02))
+# vr_alg = get_state_series(results_alg, ("generator-103-1", :vr_filter));
+# plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
+# vr_dyn = get_state_series(results_dyn, ("generator-103-1", :vr_filter));
+# plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
+# vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-103-1", :vr_filter));
+# plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.999, 1.01))
+# plot!(xlims=(0.999, 1.02))

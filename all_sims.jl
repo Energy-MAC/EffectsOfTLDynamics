@@ -202,16 +202,6 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
 end
 
 
-# Define function to build simulation using multi-seg dynamic lines
-function get_ms_dyn_sim(file_name, t_max, dist, p::ExpParams)
-    sys = System(joinpath(pwd(), file_name));
-    tspan = (0.0, t_max)
-    perturbation = choose_disturbance(dist, sys)
-    sys = build_seg_model(sys, p)
-    sim = build_sim(sys, tspan, perturbation, true);
-#    show_states_initial_value(sim);
-    return sim
-end
 
 # file_name = "test_sys.json"
 # t_max = 30.0
