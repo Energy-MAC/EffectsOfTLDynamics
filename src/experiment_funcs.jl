@@ -12,28 +12,30 @@ function choose_disturbance(sys, dist, p)
     pp = p.perturbation_params
     
     if dist == "BIC"
-        b_change = BranchImpedanceChange(pp.t_fault, Line, pp.branch_impedance_change_params.line_name, pp.branch_impedance_change_params.multiplier)
+        dist_struct = BranchImpedanceChange(pp.t_fault, Line, pp.branch_impedance_change_params.line_name, pp.branch_impedance_change_params.multiplier)
     elseif dist == "GenTrip"
         g = get_component(pp.gen_trip.source_type, sys, pp.gen_trip.gen_name)
-        g_trip = GeneratorTrip(pp.t_fault, g)
+        dist_struct = GeneratorTrip(pp.t_fault, g)
     elseif dist == "CRC"
         # Control reference change
         g = get_component(pp.crc_params.source_type, sys, pp.crc_params.gen_name)
-        crc = ControlReferenceChange(pp.t_fault, g, pp.crc_params.var_to_change, pp.crc_params.ref_value)
-    elseif dist == "NetworkSwitch"
-        # NetworkSwitch
-        yb = Ybus(sys).data
-        new_yb = yb/1.0
-        ns = NetworkSwitch(pp.t_fault, new_yb)
+        dist_struct = ControlReferenceChange(pp.t_fault, g, pp.crc_params.var_to_change, pp.crc_params.ref_value)
+    elseif dist == "LoadChange"
+        # Load change
+        l = get_component(pp.load_change.load_type, sys, pp.load_change.load_name)
+        dist_struct = LoadChange(pp.t_fault, l, pp.load_change.var_to_change, pp.load_change.ref_value)
+    elseif dist == "LoadTrip"
+        # Load trip
+        l = get_component(pp.load_trip.load_type, sys, pp.load_trip.load_name)
+        dist_struct = LoadTrip(pp.t_fault, l)
     elseif dist == "InfBusChange"
         # Source bus voltage change
         s_device = first(get_components(Source, sys))
-        s_change = SourceBusVoltageChange(pp.t_fault, s_device, :V_ref, 1.048)
-    elseif
-    
+        dist_struct = SourceBusVoltageChange(pp.t_fault, s_device, pp.source_bus_voltage_change_params.var_to_change, pp.source_bus_voltage_change_params.ref_value)
     else
         return error("Unknown disturbance")
     end
+    return dist_struct
 end
 
 function build_sim(sys, tspan, perturbation, dyn_lines)

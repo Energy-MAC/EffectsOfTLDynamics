@@ -1,7 +1,9 @@
 using Parameters
 using PowerSimulationsDynamics
+using PowerSystems
 
 const PSID = PowerSimulationsDynamics
+const PSY = PowerSystems
 
 mutable struct SimParams
     abstol::Float64
@@ -14,12 +16,12 @@ end
 
 @with_kw mutable struct PerturbationParams
     t_fault::Float64
-    branch_impedance_change_params::BranchImpedanceChange=nothing
-    gen_trip::GeneratorTrip=nothing
-    crc_params::ControlReferenceChange=nothing
-    load_change::LoadChange=nothing
-    load_trip::LoadTrip=nothing
-    source_bus_voltage_change_params::SourceBusVoltageChange=nothing
+    branch_impedance_change_params::BICParam=nothing
+    gen_trip::GenTrip=nothing
+    crc_params::CRCParam=nothing
+    load_change::LCParam=nothing
+    load_trip::LTParam=nothing
+    source_bus_voltage_change_params::SBVCParam=nothing
 end
 
 mutable struct BICParam
@@ -38,6 +40,24 @@ mutable struct CRCParam
     var_to_change::Symbol
     ref_value::Float64
 end
+
+mutable struct LCParam
+    load_type::Type{T<:PSY.ElectricalLoad}
+    load_name::String
+    var_to_change::Symbol
+    ref_value::Float64
+end
+
+mutable struct LTParam
+    load_type::Type{T<:PSY.ElectricalLoad}
+    load_name::String
+end
+
+mutable struct SBVCParam
+    var_to_change::Symbol
+    ref_value::Float64
+end
+
 mutable struct ExpParams
     N::Int
     l::Float64
@@ -54,3 +74,9 @@ end
 export SimParams
 export PerturbationParams
 export ExpParams
+export BICParam
+export GenTrip
+export CRCParam
+export LCParam
+export LTParam
+export SBVCParam
