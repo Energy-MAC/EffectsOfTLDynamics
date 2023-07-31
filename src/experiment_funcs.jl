@@ -5,24 +5,32 @@ using PowerNetworkMatrices
 using SparseArrays
 using OrdinaryDiffEq
 
-
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-function choose_disturbance(sys, dist)
-    if dist == "CRC"
+function choose_disturbance(sys, dist, p)
+    pp = p.perturbation_params
+    
+    if dist == "BIC"
+        b_change = BranchImpedanceChange(pp.t_fault, Line, pp.branch_impedance_change_params.line_name, pp.branch_impedance_change_params.multiplier)
+    elseif dist == "GenTrip"
+        g = get_component(pp.gen_trip.source_type, sys, pp.gen_trip.gen_name)
+        g_trip = GeneratorTrip(pp.t_fault, g)
+    elseif dist == "CRC"
         # Control reference change
-        g = get_component(DynamicInverter, sys, "generator-103-1")
-        crc = ControlReferenceChange(0.25, g, :V_ref, 0.95)
+        g = get_component(pp.crc_params.source_type, sys, pp.crc_params.gen_name)
+        crc = ControlReferenceChange(pp.t_fault, g, pp.crc_params.var_to_change, pp.crc_params.ref_value)
     elseif dist == "NetworkSwitch"
         # NetworkSwitch
         yb = Ybus(sys).data
         new_yb = yb/1.0
-        ns = NetworkSwitch(0.25, new_yb)
+        ns = NetworkSwitch(pp.t_fault, new_yb)
     elseif dist == "InfBusChange"
         # Source bus voltage change
         s_device = first(get_components(Source, sys))
-        s_change = SourceBusVoltageChange(0.25, s_device, :V_ref, 1.048)
+        s_change = SourceBusVoltageChange(pp.t_fault, s_device, :V_ref, 1.048)
+    elseif
+    
     else
         return error("Unknown disturbance")
     end

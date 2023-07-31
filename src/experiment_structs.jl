@@ -1,11 +1,13 @@
 using Parameters
 using PowerSimulationsDynamics
 
+const PSID = PowerSimulationsDynamics
+
 mutable struct SimParams
     abstol::Float64
     reltol::Float64
     maxiters::Int
-    dtmax::FLoat64
+    dtmax::Float64
     solver::String
     t_max::Float64
 end
@@ -20,6 +22,22 @@ end
     source_bus_voltage_change_params::SourceBusVoltageChange=nothing
 end
 
+mutable struct BICParam
+    line_name::String
+    multiplier::Float64
+end
+
+mutable struct GenTrip
+    source_type::Type{T<:PSID.DynamicInjection}
+    gen_name::String
+end
+
+mutable struct CRCParam
+    source_type::Type{T<:PSID.DynamicInjection}
+    gen_name::String
+    var_to_change::Symbol
+    ref_value::Float64
+end
 mutable struct ExpParams
     N::Int
     l::Float64
