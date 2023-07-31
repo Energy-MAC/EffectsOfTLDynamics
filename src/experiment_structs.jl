@@ -5,7 +5,7 @@ using PowerSystems
 const PSID = PowerSimulationsDynamics
 const PSY = PowerSystems
 
-mutable struct SimParams
+@with_kw mutable struct SimParams
     abstol::Float64
     reltol::Float64
     maxiters::Int
@@ -17,48 +17,48 @@ end
 @with_kw mutable struct PerturbationParams
     t_fault::Float64
     branch_impedance_change_params::BICParam=nothing
-    gen_trip::GenTrip=nothing
+    gen_trip_params::GenTripParam=nothing
     crc_params::CRCParam=nothing
-    load_change::LCParam=nothing
-    load_trip::LTParam=nothing
+    load_change_params::LCParam=nothing
+    load_trip_params::LTParam=nothing
     source_bus_voltage_change_params::SBVCParam=nothing
 end
 
-mutable struct BICParam
+@with_kw mutable struct BICParam
     line_name::String
     multiplier::Float64
 end
 
-mutable struct GenTrip
+@with_kw mutable struct GenTripParam
     source_type::Type{T<:PSID.DynamicInjection}
     gen_name::String
 end
 
-mutable struct CRCParam
+@with_kw mutable struct CRCParam
     source_type::Type{T<:PSID.DynamicInjection}
     gen_name::String
     var_to_change::Symbol
     ref_value::Float64
 end
 
-mutable struct LCParam
-    load_type::Type{T<:PSY.ElectricalLoad}
+@with_kw mutable struct LCParam
+    load_type::Type{T<:PSY.ElectricLoad}
     load_name::String
     var_to_change::Symbol
     ref_value::Float64
 end
 
-mutable struct LTParam
-    load_type::Type{T<:PSY.ElectricalLoad}
+@with_kw mutable struct LTParam
+    load_type::Type{T<:PSY.ElectricLoad}
     load_name::String
 end
 
-mutable struct SBVCParam
+@with_kw mutable struct SBVCParam
     var_to_change::Symbol
     ref_value::Float64
 end
 
-mutable struct ExpParams
+@with_kw mutable struct ExpParams
     N::Int
     l::Float64
     Z_c::Float64
@@ -75,7 +75,7 @@ export SimParams
 export PerturbationParams
 export ExpParams
 export BICParam
-export GenTrip
+export GenTripParam
 export CRCParam
 export LCParam
 export LTParam

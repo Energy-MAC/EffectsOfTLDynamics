@@ -8,13 +8,13 @@ using OrdinaryDiffEq
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-function choose_disturbance(sys, dist, p)
+function choose_disturbance(sys, dist, p::ExpParams)
     pp = p.perturbation_params
     
     if dist == "BIC"
         dist_struct = BranchImpedanceChange(pp.t_fault, Line, pp.branch_impedance_change_params.line_name, pp.branch_impedance_change_params.multiplier)
     elseif dist == "GenTrip"
-        g = get_component(pp.gen_trip.source_type, sys, pp.gen_trip.gen_name)
+        g = get_component(pp.gen_trip_params.source_type, sys, pp.gen_trip_params.gen_name)
         dist_struct = GeneratorTrip(pp.t_fault, g)
     elseif dist == "CRC"
         # Control reference change
@@ -22,11 +22,11 @@ function choose_disturbance(sys, dist, p)
         dist_struct = ControlReferenceChange(pp.t_fault, g, pp.crc_params.var_to_change, pp.crc_params.ref_value)
     elseif dist == "LoadChange"
         # Load change
-        l = get_component(pp.load_change.load_type, sys, pp.load_change.load_name)
-        dist_struct = LoadChange(pp.t_fault, l, pp.load_change.var_to_change, pp.load_change.ref_value)
+        l = get_component(pp.load_change_params.load_type, sys, pp.load_change_params.load_name)
+        dist_struct = LoadChange(pp.t_fault, l, pp.load_change_params.var_to_change, pp.load_change_params.ref_value)
     elseif dist == "LoadTrip"
         # Load trip
-        l = get_component(pp.load_trip.load_type, sys, pp.load_trip.load_name)
+        l = get_component(pp.load_trip_params.load_type, sys, pp.load_trip_params.load_name)
         dist_struct = LoadTrip(pp.t_fault, l)
     elseif dist == "InfBusChange"
         # Source bus voltage change
