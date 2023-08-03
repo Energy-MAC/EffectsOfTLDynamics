@@ -25,8 +25,8 @@ export default_lc_params
 export default_lt_params
 export default_sbvc_params
 
+export get_default_perturbation
+
 include("experiment_funcs.jl")
-include("experiment_structs.jl")
-include("default_perturbs.jl")
 
 end

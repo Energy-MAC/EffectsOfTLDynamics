@@ -1,0 +1,66 @@
+┌ Warning: 2023-08-02T16:59:11.658 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Warning: 2023-08-02T16:59:11.659 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Warning: 2023-08-02T16:59:11.659 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Warning: 2023-08-02T16:59:11.659 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Warning: 2023-08-02T16:59:11.659 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Warning: 2023-08-02T16:59:11.659 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Warning: 2023-08-02T16:59:11.659 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Warning: 2023-08-02T16:59:11.659 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Warning: 2023-08-02T16:59:11.659 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Warning: 2023-08-02T16:59:11.660 [32244:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /home/sunash/.julia/packages/InfrastructureSystems/XFCqE/src/validation.jl:51
+┌ Info: 2023-08-02T16:59:11.660 [32244:1]: The reference Bus has a Source connected to it. The frequency reference model will change to ConstantFrequency
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/frequency_reference.jl:70
+┌ Info: 2023-08-02T16:59:11.660 [32244:1]: Pre-Initializing Simulation States
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:265
+┌ Info: 2023-08-02T16:59:11.660 [32244:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
+└ @ PowerSystems /home/sunash/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
+┌ Info: 2023-08-02T16:59:11.661 [32244:1]: PowerFlow solve converged, the results have been stored in the system
+└ @ PowerFlows /home/sunash/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
+┌ Info: 2023-08-02T16:59:11.661 [32244:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
+└ @ PowerSystems /home/sunash/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
+┌ Info: 2023-08-02T16:59:11.662 [32244:1]: Residual from initial guess: max = 4.883871085326064e-10 at 52, total = 2.0248755810918096e-9
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:101
+┌ Info: 2023-08-02T16:59:11.662 [32244:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:68
+┌ Info: 2023-08-02T16:59:11.662 [32244:1]: Attaching Perturbations
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:296
+┌ Info: 2023-08-02T16:59:11.663 [32244:1]: Simulations status = BUILT
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:426
+┌ Info: 2023-08-02T16:59:11.663 [32244:1]: 
+│  ───────────────────────────────────────────────────────────────────────────────
+│                                                      Time          Allocations  
+│                                                ───────────────   ───────────────
+│                 Total measured:                    4.66ms            1.23MiB    
+│ 
+│  Section                               ncalls     time    %tot     alloc    %tot
+│  ───────────────────────────────────────────────────────────────────────────────
+│  Build Simulation                           1   4.65ms  100.0%   1.23MiB  100.0%
+│    Line Transform to Dynamic                1   1.73ms   37.1%    174KiB   13.8%
+│    Build Simulation Inputs                  1    794μs   17.1%    106KiB    8.4%
+│      Wrap Branches                          1    203μs    4.4%   16.4KiB    1.3%
+│      Wrap Dynamic Injectors                 1    224μs    4.8%   30.7KiB    2.4%
+│      Calculate MM, DAE_vector, Tota...      1   28.6μs    0.6%   8.38KiB    0.7%
+│      Wrap Static Injectors                  1   41.8μs    0.9%   3.91KiB    0.3%
+│    Pre-initialization                       1   1.32ms   28.3%    462KiB   36.7%
+│      Power Flow solution                    1   1.05ms   22.6%    354KiB   28.1%
+│      Initialize Static Injectors            1   32.8μs    0.7%   3.16KiB    0.3%
+│      Initialize Dynamic Injectors           1    183μs    3.9%   94.5KiB    7.5%
+│      Initialize Dynamic Branches            1   20.9μs    0.4%   3.75KiB    0.3%
+│    Calculate Jacobian                       1    243μs    5.2%    224KiB   17.8%
+│    Make Model Function                      1   6.97μs    0.1%   1.03KiB    0.1%
+│    Initial Condition NLsolve refine...      1    312μs    6.7%    245KiB   19.4%
+│    Build Perturbations                      1   26.9μs    0.6%   4.57KiB    0.4%
+│    Make DiffEq Problem                      1    191μs    4.1%   33.2KiB    2.6%
+│  ───────────────────────────────────────────────────────────────────────────────
+│ 
+└ @ PowerSimulationsDynamics /home/sunash/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:451

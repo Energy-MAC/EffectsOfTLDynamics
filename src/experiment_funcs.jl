@@ -5,10 +5,13 @@ using PowerNetworkMatrices
 using SparseArrays
 using OrdinaryDiffEq
 
+include("ExperimentStructs.jl")
+using .ExperimentStructs
+
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-function choose_disturbance(sys, dist, p::ExpParams)
+function choose_disturbance(sys, dist::String, p::ExpParams)
     pp = p.perturbation_params
     
     if dist == "BIC"
@@ -38,9 +41,16 @@ function choose_disturbance(sys, dist, p::ExpParams)
     return dist_struct
 end
 
-function build_sim(sys, tspan, perturbation, dyn_lines)
+function build_sim(sys, tspan::Tuple{Float64, Float64}, perturbation, dyn_lines::Bool, p::ExpParams)
+    if p.sim_params.solver == "Rodas4"
+        model = MassMatrixModel
+    elseif p.sim_params.solver == "IDA"
+        model = ResidualModel
+    else
+        return error("Unknown solver")
+    end
     sim = PSID.Simulation(
-           MassMatrixModel, #Type of model used
+           model, #Type of model used
            sys, #system
            pwd(), #folder to output results
            tspan, #time span
@@ -50,13 +60,20 @@ function build_sim(sys, tspan, perturbation, dyn_lines)
     return sim
 end
 
-function execute_sim(sim, p)
+function execute_sim!(sim, p::ExpParams)
+    if p.sim_params.solver == "Rodas4"
+        solver = Rodas4()
+    elseif p.sim_params.solver == "IDA"
+        solver = IDA()
+    else
+        return error("Unknown solver")
+    end
     exec = PSID.execute!(
            sim, #simulation structure
-           Rodas4(), #Sundials DAE Solver
-           dtmax = 1e-4, #0.02, #Arguments: Maximum timestep allowed
-           abstol = p.abstol,
-           maxiters = p.maxiters,
+           solver, #Sundials DAE Solver
+           dtmax = p.sim_params.dtmax, #0.02, #Arguments: Maximum timestep allowed
+           abstol = p.sim_params.abstol,
+           maxiters = p.sim_params.maxiters,
        );
        return exec
 end
@@ -66,7 +83,7 @@ function results_sim(sim)
     return results
 end
 
-function build_new_impedance_model(sys, p::ExpParams)
+function build_new_impedance_model!(sys, p::ExpParams)
     Z_c = p.Z_c # Ω
     r_km = p.r_km # Ω/km
     x_km = p.x_km # Ω/km
@@ -92,7 +109,7 @@ function build_new_impedance_model(sys, p::ExpParams)
     return sys
 end
 
-function build_seg_model(sys_segs, p::ExpParams)
+function build_seg_model!(sys_segs, p::ExpParams)
     Z_c = p.Z_c # Ω
     r_km = p.r_km # Ω/km
     x_km = p.x_km # Ω/km
@@ -173,17 +190,17 @@ function build_seg_model(sys_segs, p::ExpParams)
     return sys_segs
 end
 
-function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
+function run_experiment(file_name::String, line_model::String, p::ExpParams)
     # build system
     sys = System(joinpath(pwd(), file_name));
 
     # Simulation time span
-    tspan = (0.0, t_max)
+    tspan = (0.0, p.sim_params.t_max)
 
     # "CRC"
     # "NetworkSwitch"
     # "InfBusChange"
-    perturbation = choose_disturbance(sys, dist)
+    perturbation = choose_disturbance(sys, p.perturbation, p)
 
     # choose line model
     if line_model == "Algebraic"
@@ -209,15 +226,15 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     
     # build segments model
     if (multi_segment == true)
-        sys = build_seg_model(sys, p)
+        sys = build_seg_model!(sys, p)
     else
-        sys = build_new_impedance_model(sys, p)
+        sys = build_new_impedance_model!(sys, p)
     end
     # build simulation
-    sim = build_sim(sys, tspan, perturbation, dyn_lines)
+    sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
     show_states_initial_value(sim)
     # execute simulation
-    exec = execute_sim(sim, p)
+    exec = execute_sim!(sim, p)
     # read results
     results = results_sim(sim)
     return results, sim
