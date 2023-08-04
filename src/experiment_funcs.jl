@@ -101,10 +101,10 @@ function build_new_impedance_model!(sys, p::ExpParams)
     z_ll = z_km_pu*l*(sinh(γ*l)/(γ*l))
     y_ll = y_km_pu/2*l*(tanh(γ*l/2)/(γ*l/2))
 
-        for l in get_components(Line, sys)
-            l.r = real(z_ll)
-            l.x = imag(z_ll)
-            l.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
+        for ll in get_components(Line, sys)
+            ll.r = real(z_ll)
+            ll.x = imag(z_ll)
+            ll.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
         end
     return sys
 end
@@ -132,9 +132,9 @@ function build_seg_model!(sys_segs, p::ExpParams)
     z_seg_pu = z_km_pu*l_prime*(sinh(γ*l_prime)/(γ*l_prime))
     y_seg_pu = y_km_pu/2*l_prime*(tanh(γ*l_prime/2)/(γ*l_prime/2))
 
-    for l in collect(get_components(Line, sys_segs))
-        bus_from = l.arc.from
-        bus_to = l.arc.to
+    for ll in collect(get_components(Line, sys_segs))
+        bus_from = ll.arc.from
+        bus_to = ll.arc.to
         # Create a bunch of Bus
         start_bus = bus_from
         for b_ix in 1:N - 1
@@ -153,16 +153,16 @@ function build_seg_model!(sys_segs, p::ExpParams)
             add_component!(sys_segs, bus_to_create)
             end_bus = bus_to_create
             line_to_create = Line(
-                name = l.name * "_segment_" * string(b_ix),
+                name = ll.name * "_segment_" * string(b_ix),
                 available = true,
-                active_power_flow = l.active_power_flow,
-                reactive_power_flow = l.reactive_power_flow,
+                active_power_flow = ll.active_power_flow,
+                reactive_power_flow = ll.reactive_power_flow,
                 arc = Arc(from = start_bus, to = end_bus),
                 r = real(z_seg_pu),
                 x = imag(z_seg_pu),
                 b = (from = imag(y_seg_pu)/2, to = imag(y_seg_pu)/2),
-                rate = l.rate,
-                angle_limits = l.angle_limits,
+                rate = ll.rate,
+                angle_limits = ll.angle_limits,
             )
             add_component!(sys_segs, line_to_create)
             # println(get_name(line_to_create))
@@ -170,21 +170,21 @@ function build_seg_model!(sys_segs, p::ExpParams)
             start_bus = end_bus
         end
         line_to_create = Line(
-                name = l.name * "_segment_" * string(N),
+                name = ll.name * "_segment_" * string(N),
                 available = true,
-                active_power_flow = l.active_power_flow,
-                reactive_power_flow = l.reactive_power_flow,
+                active_power_flow = ll.active_power_flow,
+                reactive_power_flow = ll.reactive_power_flow,
                 arc = Arc(from = start_bus, to = bus_to),
                 r = real(z_seg_pu),
                 x = imag(z_seg_pu),
                 b = (from = imag(y_seg_pu)/2, to = imag(y_seg_pu)/2),
-                rate = l.rate,
-                angle_limits = l.angle_limits,
+                rate = ll.rate,
+                angle_limits = ll.angle_limits,
         )
         add_component!(sys_segs, line_to_create)
         # println(get_name(line_to_create))
         # println("Bus From: $(line_to_create.arc.from.name), Bus To: $(line_to_create.arc.to.name)")
-        remove_component!(sys_segs, l)
+        remove_component!(sys_segs, ll)
     end
     
     return sys_segs

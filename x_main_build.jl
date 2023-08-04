@@ -1,10 +1,11 @@
+cd(@__DIR__)
 using PowerSystems
 using PowerSimulationsDynamics
 
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-sys = System(joinpath(pwd(), "OMIB_new.raw"))
+sys = System(joinpath(pwd(), "OMIB.raw"))
 
 slack_bus = [b for b in get_components(Bus, sys) if get_bustype(b) == BusTypes.REF][1]
 
@@ -73,4 +74,4 @@ for g in get_components(Generator, sys)
     add_component!(sys, case_inv, g)
 end
 
-to_json(sys, joinpath(pwd(), "test_sys.json"), force = true)
+to_json(sys, joinpath(pwd(), "OMIB.json"), force = true)

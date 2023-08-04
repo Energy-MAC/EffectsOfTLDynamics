@@ -199,7 +199,7 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
     return results, sys
 end
 
-file_name = "test_sys.json"
+file_name = "OMIB.json"
 t_max = 2.0
 
 # "CRC"
@@ -233,7 +233,7 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 
 line_model_3 = "Multi-Segment Dynamic"
 
-for N in [1]
+for N in [2]
     print(N)
     p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, abstol, reltol, maxiters)
     
