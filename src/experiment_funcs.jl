@@ -99,7 +99,7 @@ function build_new_impedance_model!(sys, p::ExpParams)
     l = p.l #km
     γ = sqrt(z_km*y_km)
     z_ll = z_km_pu*l*(sinh(γ*l)/(γ*l))
-    y_ll = y_km_pu/2*l*(tanh(γ*l)/(γ*l))
+    y_ll = y_km_pu/2*l*(tanh(γ*l/2)/(γ*l/2))
 
         for l in get_components(Line, sys)
             l.r = real(z_ll)
@@ -125,12 +125,12 @@ function build_seg_model!(sys_segs, p::ExpParams)
     l = p.l #km
     γ = sqrt(z_km*y_km)
     z_ll = z_km_pu*l*(sinh(γ*l)/(γ*l))
-    y_ll = y_km_pu/2*l*(tanh(γ*l)/(γ*l))
+    y_ll = y_km_pu/2*l*(tanh(γ*l/2)/(γ*l/2))
     N = p.N
     l_prime = l/N
 
     z_seg_pu = z_km_pu*l_prime*(sinh(γ*l_prime)/(γ*l_prime))
-    y_seg_pu = y_km_pu/2*l_prime*(tanh(γ*l_prime)/(γ*l_prime))
+    y_seg_pu = y_km_pu/2*l_prime*(tanh(γ*l_prime/2)/(γ*l_prime/2))
 
     for l in collect(get_components(Line, sys_segs))
         bus_from = l.arc.from
