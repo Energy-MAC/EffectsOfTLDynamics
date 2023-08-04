@@ -17,7 +17,7 @@ sim_p = SimParams(
     t_max = 2.0,
 )
 
-file_name = "test_sys.json"
+file_name = "OMIB.json"
 
 # "BIC"
 # "GenTrip"
@@ -33,7 +33,7 @@ x_km = 0.488 # Ω/km
 g_km = 0 # S/km
 b_km = 3.371e-6 # S/km
 l = 1000 #km
-N = 1
+N = nothing
 t_fault = 0.25
 perturbation_params = get_default_perturbation(t_fault, perturbation)
 p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, sim_p, perturbation, perturbation_params)
@@ -52,15 +52,14 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 
 line_model_3 = "Multi-Segment Dynamic"
 
-for N in [1]
-    print(N)
-    p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, abstol, reltol, maxiters)
-    
+for n in [2]
+    print(n)
+    p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
-    results_ms_dyn, seg_sys = run_experiment(file_name, t_max, dist, line_model_3, p)
+    results_ms_dyn, seg_sys = run_experiment(file_name, line_model_3, p)
 
     vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)"))
+    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)"))
 end
 
 plot!(xlims=(0, 1))
