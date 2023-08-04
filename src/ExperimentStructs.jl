@@ -79,17 +79,17 @@ default_sbvc_params = SBVCParam(:V_ref, 1.048)
 
 function get_default_perturbation(t_fault::Float64, perturbation::String)
     if perturbation == "BIC"
-        perturbation_struct = PerturbationParams(t_fault, branch_impedance_change_params = default_bic_params)
+        perturbation_struct = PerturbationParams(t_fault, default_bic_params, nothing, nothing, nothing, nothing, nothing)
     elseif perturbation == "GenTrip"
-        perturbation_struct = PerturbationParams(t_fault, gen_trip_params = default_gen_trip_params)
+        perturbation_struct = PerturbationParams(t_fault, nothing, default_gen_trip_params, nothing, nothing, nothing, nothing)
     elseif perturbation == "CRC"
         perturbation_struct = PerturbationParams(t_fault, nothing, nothing, default_crc_params, nothing, nothing, nothing)
     elseif perturbation == "LoadChange"
-        perturbation_struct = PerturbationParams(t_fault, load_change_params = default_lc_params)
+        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, default_lc_params, nothing, nothing)
     elseif perturbation == "LoadTrip"
-        perturbation_struct = PerturbationParams(t_fault, load_trip_params = default_lt_params)
+        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, nothing, default_lt_params, nothing)
     elseif perturbation == "InfBusChange"
-        perturbation_struct = PerturbationParams(t_fault, source_bus_voltage_change_params = default_sbvc_params)
+        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, nothing, nothing, default_sbvc_params)
     else
         return error("Unknown perturbation")
     end
