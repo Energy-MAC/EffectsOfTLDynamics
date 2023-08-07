@@ -52,7 +52,8 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 
 line_model_3 = "Multi-Segment Dynamic"
 
-for n in [10]
+
+for n in [1, 5, 10, 25, 50]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
@@ -62,4 +63,4 @@ for n in [10]
     display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)"))
 end
 
-plot!(xlims=(0, 1))
+plot!(xlims=(0.24, 0.275))
