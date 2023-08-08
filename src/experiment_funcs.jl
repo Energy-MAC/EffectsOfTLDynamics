@@ -129,8 +129,8 @@ function build_seg_model!(sys_segs, p::ExpParams)
     N = p.N
     l_prime = l/N
 
-    z_seg_pu = z_km_pu*l_prime*(sinh(γ*l_prime)/(γ*l_prime))
-    y_seg_pu = y_km_pu/2*l_prime*(tanh(γ*l_prime/2)/(γ*l_prime/2))
+    z_seg_pu = z_km_pu*l_prime#*(sinh(γ*l_prime)/(γ*l_prime))
+    y_seg_pu = y_km_pu*l_prime#*(tanh(γ*l_prime/2)/(γ*l_prime/2))
 
     for ll in collect(get_components(Line, sys_segs))
         bus_from = ll.arc.from
