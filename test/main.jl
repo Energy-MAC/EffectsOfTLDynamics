@@ -53,7 +53,7 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 line_model_3 = "Multi-Segment Dynamic"
 
 
-for n in [50]
+for n in [1, 5, 10, 15, 20, 25]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
