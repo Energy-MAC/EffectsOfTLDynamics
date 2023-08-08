@@ -32,7 +32,7 @@ r_km = 0.05 # Ω/km
 x_km = 0.488 # Ω/km
 g_km = 0 # S/km
 b_km = 3.371e-6 # S/km
-l = 1000 #km
+l = 100 #km
 N = nothing
 t_fault = 0.25
 perturbation_params = get_default_perturbation(t_fault, perturbation)
@@ -53,7 +53,7 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 line_model_3 = "Multi-Segment Dynamic"
 
 
-for n in [1, 5, 10, 15, 20, 25]
+for n in [1, 2, 3, 4, 5, 10, 15]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
@@ -63,4 +63,5 @@ for n in [1, 5, 10, 15, 20, 25]
     display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)"))
 end
 
-plot!(xlims=(0.24, 0.3))
+plot!(xlims=(0.249, 0.255))
+plot!(ylims=(0.98, 0.99))
