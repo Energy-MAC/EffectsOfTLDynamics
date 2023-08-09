@@ -127,6 +127,7 @@ function build_seg_model!(sys_segs, p::ExpParams)
     z_ll = z_km_pu*l*(sinh(γ*l)/(γ*l))
     y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
     N = p.N
+    M = p.M
     l_prime = l/N
 
     z_seg_pu = z_km_pu*l_prime#*(sinh(γ*l_prime)/(γ*l_prime))
@@ -137,7 +138,7 @@ function build_seg_model!(sys_segs, p::ExpParams)
         bus_to = ll.arc.to
         # Create a bunch of Bus
         start_bus = bus_from
-        for b_ix in 1:N - 1
+        for b_ix in 1 : N - 1
             println(b_ix)
             bus_to_create = Bus(
                 number = 1000000000 + 100000*bus_from.number + 100*bus_to.number + b_ix,
@@ -152,36 +153,40 @@ function build_seg_model!(sys_segs, p::ExpParams)
             )
             add_component!(sys_segs, bus_to_create)
             end_bus = bus_to_create
-            line_to_create = Line(
-                name = ll.name * "_segment_" * string(b_ix),
-                available = true,
-                active_power_flow = ll.active_power_flow,
-                reactive_power_flow = ll.reactive_power_flow,
-                arc = Arc(from = start_bus, to = end_bus),
-                r = real(z_seg_pu),
-                x = imag(z_seg_pu),
-                b = (from = 0, to = imag(y_seg_pu)),
-                rate = ll.rate,
-                angle_limits = ll.angle_limits,
-            )
-            add_component!(sys_segs, line_to_create)
+            for m in 1 : M
+                line_to_create = Line(
+                    name = ll.name * "_segment_" * string(b_ix) * "_branch_" * string(m),
+                    available = true,
+                    active_power_flow = ll.active_power_flow,
+                    reactive_power_flow = ll.reactive_power_flow,
+                    arc = Arc(from = start_bus, to = end_bus),
+                    r = real(z_seg_pu)/M,
+                    x = imag(z_seg_pu)/M,
+                    b = (from = 0, to = imag(y_seg_pu)/M),
+                    rate = ll.rate,
+                    angle_limits = ll.angle_limits,
+                )
+                add_component!(sys_segs, line_to_create)
+            end
             # println(get_name(line_to_create))
             # println("Bus From: $(line_to_create.arc.from.name), Bus To: $(line_to_create.arc.to.name)")
             start_bus = end_bus
         end
-        line_to_create = Line(
-                name = ll.name * "_segment_" * string(N),
-                available = true,
-                active_power_flow = ll.active_power_flow,
-                reactive_power_flow = ll.reactive_power_flow,
-                arc = Arc(from = start_bus, to = bus_to),
-                r = real(z_seg_pu),
-                x = imag(z_seg_pu),
-                b = (from = 0, to = imag(y_seg_pu)),
-                rate = ll.rate,
-                angle_limits = ll.angle_limits,
-        )
-        add_component!(sys_segs, line_to_create)
+        for m in 1 : M
+            line_to_create = Line(
+                    name = ll.name * "_segment_" * string(N) * "_branch_" * string(m),
+                    available = true,
+                    active_power_flow = ll.active_power_flow,
+                    reactive_power_flow = ll.reactive_power_flow,
+                    arc = Arc(from = start_bus, to = bus_to),
+                    r = real(z_seg_pu)/M,
+                    x = imag(z_seg_pu)/M,
+                    b = (from = 0, to = imag(y_seg_pu)/M),
+                    rate = ll.rate,
+                    angle_limits = ll.angle_limits,
+            )
+            add_component!(sys_segs, line_to_create)
+        end
         # println(get_name(line_to_create))
         # println("Bus From: $(line_to_create.arc.from.name), Bus To: $(line_to_create.arc.to.name)")
         remove_component!(sys_segs, ll)

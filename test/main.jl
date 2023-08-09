@@ -34,9 +34,10 @@ g_km = 0 # S/km
 b_km = 3.371e-6 # S/km
 l = 100 #km
 N = nothing
+M = 1
 t_fault = 0.25
 perturbation_params = get_default_perturbation(t_fault, perturbation)
-p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, sim_p, perturbation, perturbation_params)
+p = ExpParams(N, M, l, Z_c, r_km, x_km, g_km, b_km, sim_p, perturbation, perturbation_params)
 
 line_model_1 = "Algebraic"
 results_alg, sys = run_experiment(file_name, line_model_1, p);
@@ -53,14 +54,14 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 line_model_3 = "Multi-Segment Dynamic"
 
 
-for n in [1, 2, 3, 4, 5, 10, 15]
+for n in [1, 2, 3, 4, 5]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
     results_ms_dyn, seg_sys = run_experiment(file_name, line_model_3, p)
 
     vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)"))
+    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)"))
 end
 
 plot!(xlims=(0.249, 0.255))

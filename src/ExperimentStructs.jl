@@ -59,6 +59,7 @@ end
 
 @with_kw mutable struct ExpParams
     N::Union{Int, Nothing}
+    M::Union{Int, Nothing}
     l::Float64
     Z_c::Float64
     r_km::Float64
