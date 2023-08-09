@@ -5,7 +5,9 @@ using PowerSimulationsDynamics
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-sys = System(joinpath(pwd(), "WSCC 9 bus.raw"))
+file_name = "WSCC 9 bus.raw"
+
+sys = System(joinpath(pwd(), file_name))
 
 slack_bus = [b for b in get_components(Bus, sys) if get_bustype(b) == BusTypes.REF][1]
 
@@ -20,6 +22,44 @@ inf_source = Source(
        )
 
 add_component!(sys, inf_source)
+
+#Define machine
+# Create the machine
+machine_oneDoneQ() = OneDOneQMachine(
+    0.0, #R
+    1.3125, #Xd
+    1.2578, #Xq
+    0.1813, #Xd_p
+    0.25, #Xq_p
+    5.89, #Td0_p
+    0.6, #Tq0_p
+)
+
+# Shaft
+shaft_no_damping() = SingleMass(
+    3.01, #H (M = 6.02 -> H = M/2)
+    0.0, #D
+)
+
+# AVR: Type I: Resembles a DC1 AVR
+avr_type1() = AVRTypeI(
+    20.0, #Ka - Gain
+    0.01, #Ke
+    0.063, #Kf
+    0.2, #Ta
+    0.314, #Te
+    0.35, #Tf
+    0.001, #Tr
+    (min = -5.0, max = 5.0),
+    0.0039, #Ae - 1st ceiling coefficient
+    1.555, #Be - 2nd ceiling coefficient
+)
+
+#No TG
+tg_none() = TGFixed(1.0) #efficiency
+
+#No PSS
+pss_none() = PSSFixed(0.0) #Vs
 
 #Define converter as an AverageConverter
 converter_high_power() = AverageConverter(rated_voltage = 138.0, rated_current = 100.0)
@@ -59,19 +99,37 @@ filt() = LCLFilter(lf = 0.08, rf = 0.003, cf = 0.074, lg = 0.2, rg = 0.01)
 #filt() = LCFilter(lf = 0.08, rf = 0.003, cf = 0.074)
 
 for g in get_components(Generator, sys)
-    case_inv = DynamicInverter(
-        "generator-102-1",
-        1.0, # ω_ref,
-        converter_high_power(), #converter
-        outer_control(), #outer control
-        inner_control(), #inner control voltage source
-        dc_source_lv(), #dc source
-        pll(), #pll
-        filt(), #filter
-    )
-
-#Attach the dynamic inverter to the system
-    add_component!(sys, case_inv, g)
+    #Find the generator at bus 102
+    if get_number(get_bus(g)) == 2
+        #Create the dynamic generator
+        case_gen = DynamicGenerator(
+            get_name(g),
+            1.0, # ω_ref,
+            machine_oneDoneQ(), #machine
+            shaft_no_damping(), #shaft
+            avr_type1(), #avr
+            tg_none(), #tg
+            pss_none(), #pss
+        )
+        #Attach the dynamic generator to the system by
+        # specifying the dynamic and static components
+        add_component!(sys, case_gen, g)
+        #Find the generator at bus 103
+    elseif get_number(get_bus(g)) == 3
+        #Create the dynamic inverter
+        case_inv = DynamicInverter(
+            get_name(g),
+            1.0, # ω_ref,
+            converter_high_power(), #converter
+            outer_control(), #outer control
+            inner_control(), #inner control voltage source
+            dc_source_lv(), #dc source
+            pll(), #pll
+            filt(), #filter
+        )
+        #Attach the dynamic inverter to the system
+        add_component!(sys, case_inv, g)
+    end
 end
 
-to_json(sys, joinpath(pwd(), "OMIB.json"), force = true)
+to_json(sys, joinpath(pwd(), "9bus.json"), force = true)

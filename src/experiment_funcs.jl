@@ -162,7 +162,7 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     arc = Arc(from = start_bus, to = end_bus),
                     r = real(z_seg_pu)/M,
                     x = imag(z_seg_pu)/M,
-                    b = (from = 0, to = imag(y_seg_pu)/M),
+                    b = (from = imag(y_seg_pu), to = 0),
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
                 )
@@ -181,7 +181,7 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     arc = Arc(from = start_bus, to = bus_to),
                     r = real(z_seg_pu)/M,
                     x = imag(z_seg_pu)/M,
-                    b = (from = 0, to = imag(y_seg_pu)/M),
+                    b = (from = imag(y_seg_pu), to = 0),
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
             )
