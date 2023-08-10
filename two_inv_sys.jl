@@ -1,93 +1,130 @@
-# Want to build an inverter vs inverter system and find an equilibrium point using powerflow on the nonlinear system. Then take this equilibrium point and do a linearization around it separately. 
+
 include("all_sims.jl")
+include("extra_functions.jl")
 using PowerSystems
 using InfrastructureSystems
 using PowerSimulationsDynamics
-using PlotlyJS
 
+PSID = PowerSimulationsDynamics;
 
-file_name = "test_sys.json";
-sys = System(joinpath(pwd(), file_name));
+sys = get_modified_twobus_sys();
 
-inv = get_component(DynamicInverter, sys, "generator-102-1"); # Get first inverter
-inv2 = deepcopy(inv); # Create second inverter 
-inv2.name = "generator-101-1"; # Rename second inverter
-
-inv_static = get_component(StaticInjection, sys, "generator-102-1"); # Get static injection associated with first inverter
-inv2_static = deepcopy(inv_static); # Copy for second inverter
-inv2_static.name = "generator-101-1"; # Rename static injection to match dynamic component 
-inv2_static.dynamic_injector = inv2; # assign second inverter dynamic injector to second inverter static injection object 
-inv2_static.time_series_container = InfrastructureSystems.TimeSeriesContainer(); # To fix an error I was getting 
-
-
-inf_bus = get_component(Source, sys, "InfBus"); # Get the infinite bus 
-
-inv2_static.bus = inf_bus.bus; # Use the bus info from inf bus to update the bus of inv2 
-# inv2_static.bus.bustype = BusTypes.SLACK; # May need to change bus type?
-
-add_component!(sys, inv2_static) # add the second inverter 
-remove_component!(sys,inf_bus) # remove the infinite bus source 
-
-# # Build sim - algebraic lines
-# sim = Simulation(
-#     MassMatrixModel,
-#         sys,
-#         pwd(),
-#         (0.0, 20.0);
-#     )
-
-# show_states_initial_value(sim);
-
-# # Build sim - dynamic lines
-# sim_dyn = Simulation(
-#     MassMatrixModel,
-#         sys,
-#         pwd(),
-#         (0.0, 20.0);
-#         all_lines_dynamic = true
-#     )
-
-# show_states_initial_value(sim_dyn);
-
-# Do time series simulation
-tmax = 10.0;
-tspan = (0.0, tmax);
+t_max = 5.0;
+tspan = (0.0, t_max);
 dist = "CRC";
 perturbation = choose_disturbance(sys, dist);
 
+# Define line parameters 
+Z_c = 380; # Ω
+r_km = 0.05; # Ω/km
+x_km = 0.488; # Ω/km
+g_km = 0; # S/km
+b_km = 3.371e-6; # S/km
 abstol = 1e-13;
 reltol = 1e-10;
 maxiters = Int(1e10);
-p = ExpParams(0,0,0,0,0,0,0,abstol, reltol, maxiters);
 
-# ALGEBRAIC 
-sim_alg = build_sim(sys, tspan, perturbation, false);
-execute_sim(sim_alg, p);
-results_alg = results_sim(sim_alg);
-stb_alg = small_signal_analysis(sim_alg);
-summary_eigenvalues(stb_alg)
+l = 100; # line length km
+N = 2; # number of segments 
 
+## - try to extract initial state values
+p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km,abstol, reltol, maxiters)
+og_sys_copy = deepcopy(sys) # need to do this bc building seg model modifies sys 
+sys_ms = build_seg_model(og_sys_copy, p)
+sim = build_sim(sys_ms, tspan, perturbation, true);
 
-# DYN LINES 
-sim_dyn = build_sim(sys, tspan, perturbation, true);
-execute_sim(sim_dyn, p);
-results_dyn = results_sim(sim_dyn);
-stb_dyn = small_signal_analysis(sim_dyn);
-summary_eigenvalues(stb_dyn)
+show_states_initial_value(sim)
 
-vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
-plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
+### ---- Do small signal analysis on MS lines 
 
-# PLOT RESULTS 
+plot_N_vs_xth_largest_λ_for_Ls(2, sys, Lrange, Nrange, Z_c, r_km, x_km, g_km, b_km,abstol, reltol, maxiters, perturbation, tspan)
 
-vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
-plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
-xlims!(0.995,1.01)
+plot_all_eigs_for_Ns(sys, Nrange, Z_c, r_km, x_km, g_km, b_km,abstol, reltol, maxiters, perturbation, tspan)
+
+Lseg = 50;
+Lrange = 100:50:500;
+plot_nonzero_eig_fixed_Lseg_for_Ls(2, Lseg, sys, Lrange, Z_c, r_km, x_km, g_km, b_km,abstol, reltol, maxiters, perturbation, tspan)
 
 
-plotlyjs()
-plot()
-plot!(real(stb_alg.eigenvalues), imag(stb_alg.eigenvalues), seriestype=:scatter, label="algebraic")
-plot!(real(stb_dyn.eigenvalues), imag(stb_dyn.eigenvalues), seriestype=:scatter, label="dynamic")
-xlabel!("Real")
-ylabel!("Imag")
+
+function print_initial_states(sim)
+    # get a list of states 
+    inputs = sim.inputs
+    global_state_map = PSID.make_global_state_map(inputs)
+
+    for device in PSID.get_dynamic_injectors(inputs)
+        states = PSY.get_states(device)
+        name = PSY.get_name(device)
+        println(name)
+        println("====================")
+        global_index = global_state_map[name]
+        for s in states
+            print(s, " ", round(sim.x0_init[global_index[s]]; digits = 4), "\n")
+        end
+        println("====================")
+    end
+    dyn_branches = PSID.get_dynamic_branches(inputs)
+    if !isempty(dyn_branches)
+        for br in dyn_branches
+            states = PSY.get_states(br)
+            name = PSY.get_name(br)
+            global_index = global_state_map[name]
+            x0_br = Dict{Symbol, Float64}()
+            for (i, s) in enumerate(states)
+                print(s, " ", round(sim.x0_init[global_index[s]]; digits = 5), "\n")
+            end
+        end
+    end
+    return
+
+    # # get their value at t=0
+    # init_val = x[2][1]; 
+
+end
+
+
+
+
+
+# # ALGEBRAIC 
+# sim_alg = build_sim(sys, tspan, perturbation, false);
+# show_states_initial_value(sim_alg)
+# # execute_sim(sim_alg, p);
+# # results_alg = results_sim(sim_alg);
+# stb_alg = small_signal_analysis(sim_alg);
+# summary_eigenvalues(stb_alg)
+
+# # DYN LINES 
+# sim_dyn = build_sim(sys, tspan, perturbation, true);
+# show_states_initial_value(sim_dyn)
+# # execute_sim(sim_dyn, p);
+# # results_dyn = results_sim(sim_dyn);
+# stb_dyn = small_signal_analysis(sim_dyn);
+# summary_eigenvalues(stb_dyn)
+
+
+
+# # PLOT RESULTS 
+# vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
+# plot()
+# plot!(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
+
+# vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
+# plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
+
+# vr_ms = get_state_series(results_ms, ("generator-102-1", :vr_filter))
+# display(plot!(vr_ms, xlabel = "time", ylabel = "vr p.u.", label = "vr_$(N)"))
+
+# end
+
+# xlims!(0.995,1.3)
+
+
+# # Plot eigenvalues 
+# #plotlyjs()
+# plot()
+# plot!(real(stb_alg.eigenvalues), imag(stb_alg.eigenvalues), seriestype=:scatter, label="algebraic")
+# plot!(real(stb_dyn.eigenvalues), imag(stb_dyn.eigenvalues), seriestype=:scatter, label="dynamic")
+# xlabel!("Real")
+# ylabel!("Imag")
+
