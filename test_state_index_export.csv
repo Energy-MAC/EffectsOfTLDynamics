@@ -1,0 +1,4 @@
+V_1,Dict(:R => 1, :I => 3)
+generator-102-1,Dict(:vi_filter => 23, :γd_ic => 12, :vq_pll => 17, :γq_ic => 13, :ir_filter => 24, :ξd_ic => 10, :ϕd_ic => 14, :ε_pll => 18, :ir_cnv => 20, :vr_filter => 22, :ω_oc => 8, :ξq_ic => 11, :vd_pll => 16, :q_oc => 9, :ϕq_ic => 15, :θ_pll => 19, :θ_oc => 7, :ii_cnv => 21, :ii_filter => 25)
+BUS 1-BUS 2-i_1_segment_1,Dict(:Il_I => 6, :Il_R => 5)
+V_2,Dict(:R => 2, :I => 4)
