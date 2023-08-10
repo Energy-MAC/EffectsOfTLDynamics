@@ -82,9 +82,9 @@ end
 
 line = get_component(Line, sys, "BUS 1-BUS 2-i_1")
 z = line.r + im*line.x
-y = line.b.from + line.b.to
+y = im*(line.b.from + line.b.to)
 l = 100 #km, defined outside
-sol = nlsolve(f, [0.01 + im*0.5, 0 + im*3])
+sol = nlsolve(f, [0.01 + im*0.12, 0 + im*0.06])
 if sol.x_converged == false
     error("Impedance calc error")
 end

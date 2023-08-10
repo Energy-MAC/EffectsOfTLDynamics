@@ -28,16 +28,16 @@ function choose_disturbance(sys, dist)
     if dist == "CRC"
         # Control reference change
         g = get_component(DynamicInverter, sys, "generator-103-1")
-        crc = ControlReferenceChange(1.0, g, :V_ref, 0.95)
+        crc = ControlReferenceChange(0.25, g, :V_ref, 0.95)
     elseif dist == "NetworkSwitch"
         # NetworkSwitch
         yb = Ybus(sys).data
         new_yb = yb/1.0
-        ns = NetworkSwitch(1.0, new_yb)
+        ns = NetworkSwitch(0.25, new_yb)
     elseif dist == "InfBusChange"
         # Source bus voltage change
         s_device = first(get_components(Source, sys))
-        s_change = SourceBusVoltageChange(1.0, s_device, :V_ref, 1.048)
+        s_change = SourceBusVoltageChange(0.25, s_device, :V_ref, 1.048)
     else
         return error("Unknown disturbance")
     end
@@ -257,10 +257,24 @@ end
 # line_model_3 = "Multi-Segment Dynamic"
 # results_ms_dyn, seg_sim = run_experiment(file_name, t_max, dist, line_model_3, p);
 
-# vr_alg = get_state_series(results_alg, ("generator-103-1", :vr_filter));
-# plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
-# vr_dyn = get_state_series(results_dyn, ("generator-103-1", :vr_filter));
-# plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
-# vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-103-1", :vr_filter));
-# plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.999, 1.01))
-# plot!(xlims=(0.999, 1.02))
+vr_alg = get_state_series(results_alg, ("BUS 1", :Vm));
+plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
+vr_dyn = get_state_series(results_dyn, ("generator-103-1", :vr_filter));
+plot!(vr_dyn, xlabel = "time", ylabel = "vr", label = "vr_dyn")
+vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-103-1", :vr_filter));
+plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)", xlims=(0.999, 1.01))
+plot!(xlims=(0.999, 1.02))
+
+
+sys = System(joinpath(pwd(), file_name));
+tspan = (0.0, t_max)
+perturbation = choose_disturbance(sys, "CRC")
+sys = build_new_impedance_model(sys, p)
+sim = build_sim(sys, tspan, perturbation, false)
+x = small_signal_analysis(sim)
+
+dsim = build_sim(sys, tspan, perturbation, true)
+
+dx = small_signal_analysis(dsim)
+
+exec = execute_sim(dsim, p) 

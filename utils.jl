@@ -1,5 +1,5 @@
-using Pkg;
-Pkg.activate(".")
+module EffectsOfTLDynamics
+
 using PowerSystems
 using PowerSimulationsDynamics
 using Sundials
@@ -8,26 +8,14 @@ using PowerNetworkMatrices
 using SparseArrays
 using OrdinaryDiffEq
 
+
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
-
-struct ExpParams
-    N::Int
-    l::Float64
-    Z_c::Float64
-    r_km::Float64
-    x_km::Float64
-    g_km::Float64
-    b_km::Float64
-    abstol::Float64
-    reltol::Float64
-    maxiters::Int
-end
 
 function choose_disturbance(sys, dist)
     if dist == "CRC"
         # Control reference change
-        g = get_component(DynamicInverter, sys, "generator-102-1")
+        g = get_component(DynamicInverter, sys, "generator-103-1")
         crc = ControlReferenceChange(0.25, g, :V_ref, 0.95)
     elseif dist == "NetworkSwitch"
         # NetworkSwitch
@@ -69,6 +57,32 @@ end
 function results_sim(sim)
     results = read_results(sim)
     return results
+end
+
+function build_new_impedance_model(sys, p::ExpParams)
+    Z_c = p.Z_c # Ω
+    r_km = p.r_km # Ω/km
+    x_km = p.x_km # Ω/km
+    z_km = r_km + im*x_km # Ω/km
+    
+    g_km = p.g_km # S/km
+    b_km = p.b_km # S/km
+    y_km = g_km + im*b_km
+    
+    z_km_pu = z_km/Z_c
+    y_km_pu = y_km*Z_c
+    
+    l = p.l #km
+    γ = sqrt(z_km*y_km)
+    z_ll = z_km_pu*l*(sinh(γ*l)/(γ*l))
+    y_ll = y_km_pu/2*l*(tanh(γ*l)/(γ*l))
+
+        for l in get_components(Line, sys)
+            l.r = real(z_ll)
+            l.x = imag(z_ll)
+            l.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
+        end
+    return sys
 end
 
 function build_seg_model(sys_segs, p::ExpParams)
@@ -185,62 +199,21 @@ function run_experiment(file_name, t_max, dist, line_model, p::ExpParams)
         return error("Unknown line model")
     end
 
+    
     # build segments model
     if (multi_segment == true)
         sys = build_seg_model(sys, p)
+    else
+        sys = build_new_impedance_model(sys, p)
     end
     # build simulation
-    sim = build_sim(sys, tspan, perturbation, dyn_lines);
-    show_states_initial_value(sim);
+    sim = build_sim(sys, tspan, perturbation, dyn_lines)
+    show_states_initial_value(sim)
     # execute simulation
     exec = execute_sim(sim, p)
     # read results
     results = results_sim(sim)
-    return results, sys
+    return results, sim
 end
 
-file_name = "OMIB.json"
-t_max = 2.0
-
-# line_model_1 = "Algebraic"
-# results_alg, sim_alg = run_experiment(file_name, t_max, dist, line_model_1, p)
-# stb_alg = small_signal_analysis(sim_alg)
-
-Z_c = 380 # Ω
-r_km = 0.05 # Ω/km
-x_km = 0.488 # Ω/km
-g_km = 0 # S/km
-b_km = 3.371e-6 # S/km
-l = 1000 #km
-N = 1
-abstol = 1e-13
-reltol = 1e-10
-maxiters = Int(1e10)
-p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, abstol, reltol, maxiters)
-
-line_model_1 = "Algebraic"
-results_alg, sys = run_experiment(file_name, t_max, dist, line_model_1, p);
-
-line_model_2 = "Dynamic"
-results_dyn, dyn_sys = run_experiment(file_name, t_max, dist, line_model_2, p);
-
-vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
-# sim_time, vr_alg = get_voltage_magnitude_series(results_alg, 1)
-plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
-vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
-plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
-
-line_model_3 = "Multi-Segment Dynamic"
-
-for N in [2]
-    print(N)
-    p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km, abstol, reltol, maxiters)
-    
-    results_ms_dyn, seg_sys = nothing, nothing
-    results_ms_dyn, seg_sys = run_experiment(file_name, t_max, dist, line_model_3, p)
-
-    vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(N)"))
 end
-
-plot!(xlims=(0, 1))
