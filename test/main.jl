@@ -18,7 +18,7 @@ sim_p = SimParams(
 )
 # "OMIB.json"
 # "9bus.json"
-file_name = "9bus.json"
+file_name = "OMIB.json"
 
 # "BIC"
 # "GenTrip"
@@ -71,7 +71,7 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 
 line_model_3 = "Multi-Segment Dynamic"
 
-for n in [25]
+for n in [10]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
@@ -81,5 +81,5 @@ for n in [25]
     display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)"))
 end
 
-plot!(xlims=(0.24, 2))
-plot!(ylims=(0.9,1))
+plot!(xlims=(0.24, 0.5))
+plot!(ylims=(0.8,0.95))

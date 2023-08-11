@@ -237,7 +237,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     end
     # build simulation
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
-    show_states_initial_value(sim)
+    # show_states_initial_value(sim)
     # execute simulation
     exec = execute_sim!(sim, p)
     # read results
