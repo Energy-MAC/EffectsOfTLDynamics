@@ -17,9 +17,9 @@ sim_p = SimParams(
     t_max = 2.0,
 )
 
-# "OMIB.json"
+# "SIIB.json"
 # "9bus.json"
-file_name = "9bus.json"
+file_name = "../data/json_data/9bus.json"
 
 # "BIC"
 # "GenTrip"
@@ -27,7 +27,7 @@ file_name = "9bus.json"
 # "LoadChange"
 # "LoadTrip"
 # "InfBusChange"
-perturbation = "CRC"
+perturbation = "InfBusChange"
 
 M = 1
 # Z_c, r_km, x_km, g_km, b_km = get_line_parameters(data_file, M)
@@ -52,27 +52,12 @@ results_dyn, dyn_sys = run_experiment(file_name, line_model_2, p);
 vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
 vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
 
-using PlotlyJS, LaTeXStrings
-
-trace1 = scatter(
-    x = vr_alg[1],
-    y = vr_alg[2],
-    mode = "lines",
-)
-
-layout = Layout(
-    xaxis_title = L"$\text{time} (s)$",
-    yaxis_title = L"$V_f [\text{p.u.}$"
-)
-
-plot(trace1)
-
 plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
 plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 
 line_model_3 = "Multi-Segment Dynamic"
 
-for n in [20]
+for n in [2, 3, 4, 5, 10]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
@@ -85,4 +70,4 @@ end
 plot!(xlims=(0.24, 2))
 plot!(ylims=(0.8,1))
 plot!(legend = true)
-plot!(legend=:outertopright)
+plot!(legend=:bottomright)
