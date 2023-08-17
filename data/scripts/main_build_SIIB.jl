@@ -5,7 +5,7 @@ using PowerSimulationsDynamics
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-sys = System(joinpath(pwd(), "WSCC 9 bus.raw"))
+sys = System(joinpath(pwd(), "../raw_data/OMIB.raw"))
 
 slack_bus = [b for b in get_components(Bus, sys) if get_bustype(b) == BusTypes.REF][1]
 
@@ -56,7 +56,6 @@ pll() = KauraPLL(
 
 #Define an LCL filter:
 filt() = LCLFilter(lf = 0.08, rf = 0.003, cf = 0.074, lg = 0.2, rg = 0.01)
-#filt() = LCFilter(lf = 0.08, rf = 0.003, cf = 0.074)
 
 for g in get_components(Generator, sys)
     case_inv = DynamicInverter(
@@ -74,4 +73,4 @@ for g in get_components(Generator, sys)
     add_component!(sys, case_inv, g)
 end
 
-to_json(sys, joinpath(pwd(), "OMIB.json"), force = true)
+to_json(sys, joinpath(pwd(), "../json_data/SIIB.json"), force = true)
