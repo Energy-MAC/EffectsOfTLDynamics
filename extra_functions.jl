@@ -87,10 +87,10 @@ function save_current_fig();
 end
 
 function get_modified_twobus_sys();
-    file_name = "test_sys.json";
+    file_name = "OMIB.json";
     sys = System(joinpath(pwd(), file_name));
 
-    inv = get_component(DynamicInverter, sys, "generator-102-1"); # Get first inverter
+    inv = get_component(DynamicInjection, sys, "generator-102-1"); # Get first inverter
     inv2 = deepcopy(inv); # Create second inverter 
     inv2.name = "generator-101-1"; # Rename second inverter
 
@@ -100,12 +100,13 @@ function get_modified_twobus_sys();
     inv2_static.dynamic_injector = inv2; # assign second inverter dynamic injector to second inverter static injection object 
     inv2_static.time_series_container = InfrastructureSystems.TimeSeriesContainer(); # To fix an error I was getting 
 
-    inf_bus = get_component(Source, sys, "InfBus"); # Get the infinite bus 
-    inv2_static.bus = inf_bus.bus; # Use the bus info from inf bus to update the bus of inv2 
-    # inv2_static.bus.bustype = BusTypes.SLACK; # May need to change bus type?
+    inf_source = get_component(Source, sys, "InfBus"); # Get the infinite bus 
+    inv2_static.bus = inf_source.bus; # Use the bus info from inf bus to update the bus of inv2 
+    inv2_static.bus.bustype = BusTypes.SLACK; # May need to change bus type?
 
-    add_component!(sys, inv2_static); # add the second inverter 
-    remove_component!(sys,inf_bus); # remove the infinite bus source 
+    add_component!(sys, inv2_static); # add the second inverter
+    add_component!(sys, inv2) 
+    remove_component!(sys,inf_source); # remove the infinite bus source 
 
     return sys 
 end

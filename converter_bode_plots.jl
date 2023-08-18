@@ -1,4 +1,5 @@
-include("all_sims.jl")
+
+include("src/experiment_funcs.jl")
 include("extra_functions.jl")
 using PowerSystems
 using InfrastructureSystems
@@ -6,13 +7,17 @@ using InvertedIndices
 using ControlSystems
 using LinearAlgebra
 
-sys = get_modified_twobus_sys(); # get inv vs inv system 
+file_name = "twobus_2inv.json";
+sys = System(joinpath(pwd(), file_name));
 
-# Define sim parameters
-t_max = 5.0;
-tspan = (0.0, t_max);
-dist = "CRC";
-perturbation = choose_disturbance(sys, dist);
+sim_p = SimParams(
+    abstol = 1e13, # should this be -13? 
+    reltol = 1e10,
+    maxiters = Int(1e10),
+    dtmax = 1e-4,
+    solver = "Rodas4",
+    t_max = 2.0,
+)
 
 # Define line parameters 
 Z_c = 380; # Ω
@@ -20,24 +25,48 @@ r_km = 0.05; # Ω/km
 x_km = 0.488; # Ω/km
 g_km = 0; # S/km
 b_km = 3.371e-6; # S/km
-abstol = 1e-13;
-reltol = 1e-10;
-maxiters = Int(1e10);
+# abstol = 1e-13;
+# reltol = 1e-10;
+# maxiters = Int(1e10);
+perturbation_type = "CRC"
+
+t_fault = 0.25
+default_crc_params = CRCParam(DynamicInverter, "generator-102-1", :V_ref, 0.95)
+perturbation_params = PerturbationParams(t_fault, nothing, nothing, default_crc_params, nothing, nothing, nothing)
+
+g = get_component(DynamicInjection, sys, "generator-102-1")
+crc = ControlReferenceChange(1.0, g, :P_ref, 0.95)
 
 l = 50; # line length km
 
-Nrange = [1,2,3,4,5,6,7,8,9,10];
-
+Nrange = [5];
+M = 1;
 #LsegRange = [10, 20, 25, 50, 100];
 results = zeros(length(Nrange), 6);
 j = 1;
-for N = Nrange;
 
-    ## - try to extract initial state values
-    p = ExpParams(N, l, Z_c, r_km, x_km, g_km, b_km,abstol, reltol, maxiters)
+og_sys_copy = deepcopy(sys)
+
+sim = PSID.Simulation(
+           MassMatrixModel, #Type of model used
+           og_sys_copy, #system
+           pwd(), #folder to output results
+           (0.0, 2.0), #time span
+           crc, #Type of perturbation
+           all_lines_dynamic = true
+       )
+
+
+ssig = small_signal_analysis(sim)
+
+for N = Nrange;
+    
+    p = ExpParams(N, M, l, Z_c, r_km, x_km, g_km, b_km, sim_p, perturbation_type, perturbation_params)
     og_sys_copy = deepcopy(sys) # need to do this bc building seg model modifies sys 
-    sys_ms = build_seg_model(og_sys_copy, p)
-    sim = build_sim(sys_ms, tspan, perturbation, true);
+
+    sys_ms = build_seg_model!(og_sys_copy, p)
+    dist = choose_disturbance(og_sys_copy, perturbation_type, p)
+    sim = build_sim(sys_ms, (0.0,2.0), dist, true, p);
     s = small_signal_analysis(sim);
 
     J = s.reduced_jacobian;
@@ -135,6 +164,7 @@ for N = Nrange;
     j += 1
 
 end
+
 results
 xax = Nrange;
 
