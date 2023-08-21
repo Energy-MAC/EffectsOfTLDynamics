@@ -22,7 +22,7 @@
         },
         {
             "type": "DynamicInverter",
-            "count": 1
+            "count": 2
         },
         {
             "type": "Line",
@@ -33,16 +33,12 @@
             "count": 1
         },
         {
-            "type": "Source",
-            "count": 1
-        },
-        {
             "type": "StandardLoad",
             "count": 3
         },
         {
             "type": "ThermalStandard",
-            "count": 2
+            "count": 3
         },
         {
             "type": "Transformer2W",

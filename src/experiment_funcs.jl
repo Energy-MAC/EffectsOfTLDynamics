@@ -227,7 +227,6 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     else
         return error("Unknown line model")
     end
-
     
     # build segments model
     if (multi_segment == true)
@@ -238,8 +237,10 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     # build simulation
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
     # show_states_initial_value(sim)
+    
     # execute simulation
     exec = execute_sim!(sim, p)
+    
     # read results
     results = results_sim(sim)
     return results, sim

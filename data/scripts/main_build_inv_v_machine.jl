@@ -1,25 +1,12 @@
 cd(@__DIR__)
 using PowerSystems
 using PowerSimulationsDynamics
+using InfrastructureSystems
 
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-sys = System(joinpath(pwd(), "../raw_data/WSCC_9bus.raw"))
-
-slack_bus = [b for b in get_components(Bus, sys) if get_bustype(b) == BusTypes.REF][1]
-
-inf_source = Source(
-           name = "InfBus", #name
-           available = true, #availability
-           active_power = 0.0,
-           reactive_power = 0.0,
-           bus = slack_bus, #bus
-           R_th = 0.0, #Rth
-           X_th = 5e-6, #Xth
-       )
-
-add_component!(sys, inf_source)
+sys = System(joinpath(pwd(), "../raw_data/OMIB.raw"))
 
 #Define machine
 # Create the machine
@@ -60,7 +47,10 @@ tg_none() = TGFixed(1.0) #efficiency
 pss_none() = PSSFixed(0.0) #Vs
 
 #Define converter as an AverageConverter
-converter_high_power() = AverageConverter(rated_voltage = 138.0, rated_current = 100.0)
+converter_high_power() = AverageConverter(
+    rated_voltage = 138.0, 
+    rated_current = 100.0
+    )
 
 #Define Outer Control as a composition of Virtual Inertia + Reactive Power Droop
 outer_control() = OuterControl(
@@ -83,7 +73,9 @@ inner_control() = VoltageModeControl(
 )
 
 #Define DC Source as a FixedSource:
-dc_source_lv() = FixedDCSource(voltage = 600.0)
+dc_source_lv() = FixedDCSource(
+    voltage = 600.0
+    )
 
 #Define a Frequency Estimator as a PLL based on Vikram Kaura and Vladimir Blaskoc 1997 paper:
 pll() = KauraPLL(
@@ -94,12 +86,19 @@ pll() = KauraPLL(
 
 #Define an LCL filter:
 filt() = LCLFilter(lf = 0.08, rf = 0.003, cf = 0.074, lg = 0.2, rg = 0.01)
-#filt() = LCFilter(lf = 0.08, rf = 0.003, cf = 0.074)
+
+# build static component for gen1
+gen2 = get_component(Generator, sys, "generator-102-1")
+gen1 = deepcopy(gen2);
+gen1.name = "generator-101-1";
+bus1 = get_component(Bus, sys, "BUS 1")
+gen1.bus = bus1
+gen1.time_series_container = InfrastructureSystems.TimeSeriesContainer(); 
+# Add gen1 to sys
+add_component!(sys, gen1)
 
 for g in get_components(Generator, sys)
-    #Find the generator at bus 102
-    if get_number(get_bus(g)) == 2
-        #Create the dynamic generator
+    if get_number(get_bus(g)) == 101;
         case_gen = DynamicGenerator(
             get_name(g),
             1.0, # ω_ref,
@@ -109,27 +108,25 @@ for g in get_components(Generator, sys)
             tg_none(), #tg
             pss_none(), #pss
         )
+        #case_gen.bus.BusTypes = BusTypes.REF
         #Attach the dynamic generator to the system by
         # specifying the dynamic and static components
         add_component!(sys, case_gen, g)
-    #Find the generator at bus 103
-    elseif get_number(get_bus(g)) == 3
-        #Create the dynamic inverter
+    elseif get_number(get_bus(g)) == 102;
         case_inv = DynamicInverter(
-            get_name(g),
-            1.0, # ω_ref,
-            converter_high_power(), #converter
-            outer_control(), #outer control
-            inner_control(), #inner control voltage source
-            dc_source_lv(), #dc source
-            pll(), #pll
-            filt(), #filter
-        )
-        #Attach the dynamic inverter to the system
+                    get_name(g),
+                    1.0, # ω_ref,
+                    converter_high_power(), #converter
+                    outer_control(), #outer control
+                    inner_control(), #inner control voltage source
+                    dc_source_lv(), #dc source
+                    pll(), #pll
+                    filt(), #filter
+                )
         add_component!(sys, case_inv, g)
     end
+
 end
 
-remove_component!(ThermalStandard, sys, "generator-1-1")
-
-to_json(sys, joinpath(pwd(), "../json_data/9bus.json"), force = true)
+# Save as json 
+to_json(sys, joinpath(pwd(), "../json_data/inv_v_machine.json"), force = true)

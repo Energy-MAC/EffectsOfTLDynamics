@@ -7,19 +7,7 @@ const PSID = PowerSimulationsDynamics;
 
 sys = System(joinpath(pwd(), "../raw_data/WSCC_9bus.raw"))
 
-slack_bus = [b for b in get_components(Bus, sys) if get_bustype(b) == BusTypes.REF][1]
-
-inf_source = Source(
-           name = "InfBus", #name
-           available = true, #availability
-           active_power = 0.0,
-           reactive_power = 0.0,
-           bus = slack_bus, #bus
-           R_th = 0.0, #Rth
-           X_th = 5e-6, #Xth
-       )
-
-add_component!(sys, inf_source)
+slack_bus =[b for b in get_components(Bus, sys) if get_bustype(b) == BusTypes.REF][1]
 
 #Define machine
 # Create the machine
@@ -97,8 +85,22 @@ filt() = LCLFilter(lf = 0.08, rf = 0.003, cf = 0.074, lg = 0.2, rg = 0.01)
 #filt() = LCFilter(lf = 0.08, rf = 0.003, cf = 0.074)
 
 for g in get_components(Generator, sys)
+    if get_number(get_bus(g)) == 1
+        #Create the dynamic inverter
+        case_inv = DynamicInverter(
+            get_name(g),
+            1.0, # ω_ref,
+            converter_high_power(), #converter
+            outer_control(), #outer control
+            inner_control(), #inner control voltage source
+            dc_source_lv(), #dc source
+            pll(), #pll
+            filt(), #filter
+        )
+        #Attach the dynamic inverter to the system
+        add_component!(sys, case_inv, g)
     #Find the generator at bus 102
-    if get_number(get_bus(g)) == 2
+    elseif get_number(get_bus(g)) == 2
         #Create the dynamic generator
         case_gen = DynamicGenerator(
             get_name(g),
@@ -130,6 +132,4 @@ for g in get_components(Generator, sys)
     end
 end
 
-remove_component!(ThermalStandard, sys, "generator-1-1")
-
-to_json(sys, joinpath(pwd(), "../json_data/9bus.json"), force = true)
+to_json(sys, joinpath(pwd(), "../json_data/9bus_slackless.json"), force = true)
