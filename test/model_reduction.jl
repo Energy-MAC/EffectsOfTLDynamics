@@ -1,7 +1,9 @@
 cd(@__DIR__)
 using PowerSystems
 using PowerSimulationsDynamics
-using EffectsOfTLDynamics
+
+const PSY = PowerSystems;
+const PSID = PowerSimulationsDynamics;
 
 using InvertedIndices
 using ControlSystems
@@ -100,7 +102,7 @@ function get_subsystem_states!(x::Vector{String}, d::Dict);
 
 end
 
-function get_subsys_df(x::Vector{String}, pf_df);
+function get_subsys_df!(x::Vector{String}, pf_df);
     y = []
     for i in x;
         for row in 1:size(pf_df, 1);
@@ -113,7 +115,16 @@ function get_subsys_df(x::Vector{String}, pf_df);
     return pf_df[y,:]
 end 
 
-
+function get_subsys_df!(x::String, pf_df);
+    y = []
+    for row in 1:size(pf_df, 1);
+        state_name = pf_df[row,"Name"];
+        if occursin(x,state_name)
+            push!(y,row)
+        end
+    end
+    return pf_df[y,:]
+end 
 
 
 file_name = "../data/json_data/twobus_2inv.json"; # choose system 
@@ -121,21 +132,22 @@ sys = System(joinpath(pwd(), file_name));
 
 # Define list of strings that can be used to uniquely identify each subsystem (e.g., 102, 101)
 inv_ids = ["101", "102"]; 
-line_ids = [["BUS 1-BUS 2", "V_"]]; # strings to identify line - need V_ to pick up voltage states. 
+line_ids = ["BUS 1-BUS 2"]; # strings to identify line  
 
 # Specify what subsystems are connected by specifying pairs of subsystem names - can be automated in future 
 connections = [("101", "BUS 1-BUS 2"), ("102", "BUS 1-BUS 2")];
 
-# Define sim parameters 
-t_max = 2.0;
-sim_p = SimParams(
-    abstol = 1e13, # should this be -13? 
-    reltol = 1e10,
-    maxiters = Int(1e10),
-    dtmax = 1e-4,
-    solver = "Rodas4",
-    t_max = t_max,
-)
+## Commented out bc of issue with L shaped segments 
+# # Define sim parameters 
+# t_max = 2.0;
+# sim_p = SimParams(
+#     abstol = 1e13, # should this be -13? 
+#     reltol = 1e10,
+#     maxiters = Int(1e10),
+#     dtmax = 1e-4,
+#     solver = "Rodas4",
+#     t_max = t_max,
+# )
 
 # Define line parameters 
 Z_c = 380; # Ω
@@ -172,7 +184,7 @@ sim = PSID.Simulation(
            MassMatrixModel, #Type of model used
            og_sys_copy, #system
            pwd(), #folder to output results
-           (0.0, t_max), #time span
+           (0.0, 2.0), #time span
            crc, #Type of perturbation
            all_lines_dynamic = true
        )
@@ -188,12 +200,12 @@ d = get_state_index_map(ssig.index);
 
 # Get info on all the line subsystems 
 for line_subsys in line_ids;
-    line_states = get_subsystem_states!(line_subsys, d)
+    line_states = get_subsystem_states!([line_subsys, "V_"], d) # need to pick up voltage states using "V_"
     display(get_val!(d, line_states))
     line_A_i = line_states;
     lineA = construct_A_matrix(J, line_A_i);
     line_bw = maximum(abs.(imag(eigvals(lineA))))
-    display("Line bandwidth: "*string(line_bw))
+    display("Line bandwidth (rad/s): "*string(line_bw))
 end
 
 # Get info on all the inverter subsystems 
@@ -203,7 +215,7 @@ for inv_subsys in inv_ids;
     inv_A_i = inv_states;
     invA = construct_A_matrix(J, inv_A_i);
     inv_bw = maximum(abs.(imag(eigvals(invA))))
-    display("Inverter bandwidth: "*string(inv_bw))
+    display("Inverter bandwidth (rad/s): "*string(inv_bw))
 end
 
 display("Combined system bandwidth")
@@ -217,7 +229,7 @@ pf = summary_participation_factors(ssig); # get all pf
 
 subsys_ns = Dict(); # store vectors of overall participation by each subsys 
 for subsys in union(inv_ids, line_ids);
-    df = get_subsys_df([subsys], pf);
+    df = get_subsys_df!(subsys, pf);
     n = get_interaction_modes(pf, df)
     display(n)
     subsys_ns[subsys] = n;
@@ -236,6 +248,6 @@ for pair in connections;
 end
 
 interacting_modes = unique(interacting_modes);
-print("Bandwidth of interacting inverter modes: ")
+print("Bandwidth of interacting inverter modes (rad/s): ")
 interacting_bw = maximum(abs.(imag(interacting_modes)))
 
