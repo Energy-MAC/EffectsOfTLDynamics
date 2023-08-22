@@ -114,29 +114,29 @@ function build_new_impedance_model!(sys, p::ExpParams)
 end
 
 function build_seg_model!(sys_segs, p::ExpParams)
+    
     Z_c = p.Z_c # Ω
+
     r_km = p.r_km # Ω/km
     x_km = p.x_km # Ω/km
     z_km = r_km + im*x_km # Ω/km
     
-    g_km = p.g_km # S/km
-    b_km = p.b_km # S/km
+    g_km = convert(Float64, p.g_km[1]) # S/km
+    b_km = convert(Float64, p.b_km[1]) # S/km
     y_km = g_km + im*b_km
     
     z_km_pu = z_km/Z_c
     y_km_pu = y_km*Z_c
-    
+
     l = p.l #km
-    γ = sqrt(z_km*y_km)
-    z_ll = z_km_pu*l*(sinh(γ*l)/(γ*l))
-    y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
+    γ = sqrt(z_km[1]*y_km)
     N = p.N
     M = p.M
     l_prime = l/N
 
-    z_seg_pu = z_km_pu*l_prime#*(sinh(γ*l_prime)/(γ*l_prime))
-    y_seg_pu = y_km_pu*l_prime#*(tanh(γ*l_prime/2)/(γ*l_prime/2))
-
+    z_seg_pu = z_km_pu*l_prime
+    y_seg_pu = y_km_pu*l_prime
+    
     for ll in collect(get_components(Line, sys_segs))
         bus_from = ll.arc.from
         bus_to = ll.arc.to
@@ -164,9 +164,9 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     active_power_flow = ll.active_power_flow,
                     reactive_power_flow = ll.reactive_power_flow,
                     arc = Arc(from = start_bus, to = end_bus),
-                    r = real(z_seg_pu)/M,
-                    x = imag(z_seg_pu)/M,
-                    b = (from = imag(y_seg_pu)/2 , to = imag(y_seg_pu)/2),
+                    r = real(z_seg_pu[m]),
+                    x = imag(z_seg_pu[m]),
+                    b = (from = imag(y_seg_pu)/M , to = imag(y_seg_pu)/M),
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
                 )
@@ -183,9 +183,9 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     active_power_flow = ll.active_power_flow,
                     reactive_power_flow = ll.reactive_power_flow,
                     arc = Arc(from = start_bus, to = bus_to),
-                    r = real(z_seg_pu)/M,
-                    x = imag(z_seg_pu)/M,
-                    b = (from = imag(y_seg_pu)/2, to = imag(y_seg_pu)/2),
+                    r = real(z_seg_pu[m])/M,
+                    x = imag(z_seg_pu[m])/M,
+                    b = (from = imag(y_seg_pu)/M, to = imag(y_seg_pu)/M),
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
             )

@@ -11,6 +11,28 @@ using DataFrames
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
+### Choose test case
+# "SIIB.json"
+# "9bus.json"
+# "inv_v_machine.json"
+# "twobus_2inv.json"
+# "9bus_slackless.json"
+file_name = "../data/json_data/SIIB.json"
+
+### Load relevant line data
+impedance_csv = "../data/cable_data/impedance_data.csv"
+capacitance_csv = "../data/cable_data/C_per_km.csv"
+
+### Choose perturbation to be applied
+# "BIC"
+# "GenTrip"
+# "CRC"
+# "LoadChange"
+# "LoadTrip"
+# "InfBusChange"
+perturbation = "InfBusChange"
+
+### Define simulation parameters
 sim_p = SimParams(
     abstol = 1e13,
     reltol = 1e10,
@@ -20,24 +42,8 @@ sim_p = SimParams(
     t_max = 2.0,
 )
 
-# "SIIB.json"
-# "9bus.json"
-# "inv_v_machine.json"
-# "twobus_2inv.json"
-# "9bus_slackless.json"
-file_name = "../data/json_data/SIIB.json"
-
-# "BIC"
-# "GenTrip"
-# "CRC"
-# "LoadChange"
-# "LoadTrip"
-# "InfBusChange"
-perturbation = "InfBusChange"
-
-M = 2
-impedance_csv = "../data/cable_data/impedance_data.csv"
-capacitance_csv = "../data/cable_data/C_per_km.csv"
+### Extract line data from files
+M = 1
 r_km, x_km, g_km, b_km, Z_c = get_line_parameters(impedance_csv, capacitance_csv, M)
 
 # Kundur parameters for testing
@@ -46,12 +52,28 @@ r_km, x_km, g_km, b_km, Z_c = get_line_parameters(impedance_csv, capacitance_csv
 # x_km = 0.488 # Ω/km
 # g_km = 0 # S/km
 # b_km = 3.371e-6 # S/km
+
+### Define more data
 l = 100 #km
 N = nothing
 t_fault = 0.25
+
+### Get perturbation struct
 perturbation_params = get_default_perturbation(t_fault, perturbation)
 # perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)
-p = ExpParams(N, M, l, Z_c, r_km, x_km, g_km, b_km, sim_p, perturbation, perturbation_params)
+
+p = ExpParams(
+    N, 
+    M, 
+    l, 
+    Z_c, 
+    r_km, 
+    x_km, 
+    g_km, 
+    b_km, 
+    sim_p, 
+    perturbation, 
+    perturbation_params)
 
 line_model_1 = "Algebraic"
 results_alg, sys = run_experiment(file_name, line_model_1, p);
@@ -67,7 +89,7 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 
 line_model_3 = "Multi-Segment Dynamic"
 
-for n in [2, 3, 4, 5, 10]
+for n in [1]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
