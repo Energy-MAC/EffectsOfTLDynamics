@@ -4,6 +4,8 @@ using Sundials
 using PowerNetworkMatrices
 using SparseArrays
 using OrdinaryDiffEq
+using CSV
+using DataFrames
 
 include("ExperimentStructs.jl")
 using .ExperimentStructs
@@ -246,6 +248,19 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     return results, sim
 end
 
+function get_line_parameters(impedance_csv, capacitance_csv, M)
+    df_imp = CSV.read(impedance_csv, DataFrame);
+    c_km = CSV.read(capacitance_csv, DataFrame)."C"
+
+    r_km = zeros(M, 1)
+    l_km = zeros(M, 1)
+    for m in 1 : M
+        r_km[m,1] = df_imp[M, "R"*string(m)]
+        l_km[m,1] = df_imp[M, "L"*string(m)]
+    end
+    return r_km, l_km, c_km
+end
+
 export choose_disturbance
 export build_sim
 export execute_sim
@@ -253,3 +268,4 @@ export results_sim
 export build_new_impedance_model
 export build_seg_model
 export run_experiment
+export get_line_parameters
