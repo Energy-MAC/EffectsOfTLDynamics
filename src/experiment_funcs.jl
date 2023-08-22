@@ -87,18 +87,20 @@ end
 
 function build_new_impedance_model!(sys, p::ExpParams)
     Z_c = p.Z_c # Ω
-    r_km = p.r_km # Ω/km
-    x_km = p.x_km # Ω/km
+    r_km = convert(Float64, p.r_km[1]) # Ω/km
+    x_km = convert(Float64, p.x_km[1]) # Ω/km
     z_km = r_km + im*x_km # Ω/km
     
-    g_km = p.g_km # S/km
-    b_km = p.b_km # S/km
+    g_km = convert(Float64, p.g_km[1]) # S/km
+    b_km = convert(Float64, p.b_km[1]) # S/km
     y_km = g_km + im*b_km
     
     z_km_pu = z_km/Z_c
     y_km_pu = y_km*Z_c
     
     l = p.l #km
+    println(typeof(z_km))
+    println(typeof(y_km))
     γ = sqrt(z_km*y_km)
     z_ll = z_km_pu*l*(sinh(γ*l)/(γ*l))
     y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
@@ -252,13 +254,23 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
     df_imp = CSV.read(impedance_csv, DataFrame);
     c_km = CSV.read(capacitance_csv, DataFrame)."C"
 
-    r_km = zeros(M, 1)
-    l_km = zeros(M, 1)
+    r_km = vec(zeros(M, 1))
+    l_km = vec(zeros(M, 1))
+    
     for m in 1 : M
         r_km[m,1] = df_imp[M, "R"*string(m)]
         l_km[m,1] = df_imp[M, "L"*string(m)]
     end
-    return r_km, l_km, c_km
+    
+    x_km = 2*pi*60*l_km
+    z_km = r_km + im*x_km
+    g_km = [0.0]
+    b_km = 2*pi*60*c_km
+    y_km = g_km + im*b_km
+    
+    Z_c = sqrt(z_km[1]/y_km[1])
+    
+    return r_km, x_km, g_km, b_km, abs(Z_c)
 end
 
 export choose_disturbance

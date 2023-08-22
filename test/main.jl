@@ -38,14 +38,14 @@ perturbation = "InfBusChange"
 M = 2
 impedance_csv = "../data/cable_data/impedance_data.csv"
 capacitance_csv = "../data/cable_data/C_per_km.csv"
-r_km, l_km, c_km = get_line_parameters(impedance_csv, capacitance_csv, M)
-# Z_c, r_km, x_km, g_km, b_km = get_line_parameters(impedance_csv, capacitance_csv, M)
+r_km, x_km, g_km, b_km, Z_c = get_line_parameters(impedance_csv, capacitance_csv, M)
 
-Z_c = 380 # Ω
-r_km = 0.05 # Ω/km
-x_km = 0.488 # Ω/km
-g_km = 0 # S/km
-b_km = 3.371e-6 # S/km
+# Kundur parameters for testing
+# Z_c = 380 # Ω
+# r_km = 0.05 # Ω/km
+# x_km = 0.488 # Ω/km
+# g_km = 0 # S/km
+# b_km = 3.371e-6 # S/km
 l = 100 #km
 N = nothing
 t_fault = 0.25

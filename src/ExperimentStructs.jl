@@ -60,12 +60,12 @@ end
 @with_kw mutable struct ExpParams
     N::Union{Int, Nothing}
     M::Union{Int, Nothing}
-    l::Float64
+    l::Union{Int64, Float64}
     Z_c::Float64
-    r_km::Float64
-    x_km::Float64
-    g_km::Float64
-    b_km::Float64
+    r_km::Union{Vector{Float64}, Matrix{Float64}}
+    x_km::Union{Vector{Float64}, Matrix{Float64}}
+    g_km::Union{Vector{Float64}, Matrix{Float64}}
+    b_km::Union{Vector{Float64}, Matrix{Float64}}
     sim_params::SimParams
     perturbation::String
     perturbation_params::PerturbationParams
