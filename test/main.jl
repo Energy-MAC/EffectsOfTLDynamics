@@ -43,8 +43,9 @@ sim_p = SimParams(
 )
 
 ### Extract line data from files
-M = 1
-r_km, x_km, g_km, b_km, Z_c = get_line_parameters(impedance_csv, capacitance_csv, M)
+M = 5
+
+r_km, x_km, g_km, b_km, Z_c, r_km_pi, x_km_pi, Z_c_pi = get_line_parameters(impedance_csv, capacitance_csv, M)
 
 # Kundur parameters for testing
 # Z_c = 380 # Ω
@@ -71,6 +72,9 @@ p = ExpParams(
     x_km, 
     g_km, 
     b_km, 
+    r_km_pi,
+    x_km_pi,
+    Z_c_pi,
     sim_p, 
     perturbation, 
     perturbation_params)
@@ -79,7 +83,7 @@ line_model_1 = "Algebraic"
 results_alg, sys = run_experiment(file_name, line_model_1, p);
 
 line_model_2 = "Dynamic"
-results_dyn, dyn_sys = run_experiment(file_name, line_model_2, p);
+results_dyn, sys_dyn = run_experiment(file_name, line_model_2, p);
 
 vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
 vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
@@ -89,7 +93,7 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 
 line_model_3 = "Multi-Segment Dynamic"
 
-for n in [1]
+for n in [2]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
@@ -100,6 +104,43 @@ for n in [1]
 end
 
 plot!(xlims=(0.24, 0.5))
-plot!(ylims=(0.8,1))
+plot!(ylims=(0.98155,0.98162))
 plot!(legend = true)
 plot!(legend=:bottomright)
+
+l = first(get_components(Line, sys))
+
+l_dyn = first(get_components(Line, sys_dyn))
+
+n = 1
+p.N = n
+results_ms_dyn, sys_seg = nothing, nothing
+results_ms_dyn, sys_seg = run_experiment(file_name, line_model_3, p);
+
+y_total = 0;
+
+b_total = 0
+for l in get_components(Line, sys)
+    r = l.r;
+    x = l.x;
+    z = r + im*x;
+    b = l.b.from
+    b_total = b_total + b
+    y_total = y_total + 1/z;    
+end
+
+z_total = 1/y_total;
+r_total = real(z_total)
+x_total = imag(z_total)
+b_total
+
+l.r
+l_dyn.r
+l_seg.r
+
+l.x
+l_dyn.x
+l_seg.x
+
+l.b.from
+l.b

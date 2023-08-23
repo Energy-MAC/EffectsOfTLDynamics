@@ -86,9 +86,23 @@ function results_sim(sim)
 end
 
 function build_new_impedance_model!(sys, p::ExpParams)
+    
+    # Z_c = p.Z_c_pi # Ω
+    # r_km = p.r_km_pi # Ω/km
+    # x_km = p.x_km_pi # Ω/km
+    # z_km = r_km + im*x_km # Ω/km
+    
+    # g_km = convert(Float64, p.g_km[1]) # S/km
+    # b_km = convert(Float64, p.b_km[1]) # S/km
+    # y_km = g_km + im*b_km
+    
+    # z_km_pu = z_km/Z_c
+    # y_km_pu = y_km*Z_c
+
     Z_c = p.Z_c # Ω
-    r_km = convert(Float64, p.r_km[1]) # Ω/km
-    x_km = convert(Float64, p.x_km[1]) # Ω/km
+
+    r_km = p.r_km # Ω/km
+    x_km = p.x_km # Ω/km
     z_km = r_km + im*x_km # Ω/km
     
     g_km = convert(Float64, p.g_km[1]) # S/km
@@ -97,13 +111,26 @@ function build_new_impedance_model!(sys, p::ExpParams)
     
     z_km_pu = z_km/Z_c
     y_km_pu = y_km*Z_c
-    
+
     l = p.l #km
-    println(typeof(z_km))
-    println(typeof(y_km))
-    γ = sqrt(z_km*y_km)
-    z_ll = z_km_pu*l*(sinh(γ*l)/(γ*l))
+    M = p.M
+    y_total = 0;
+    
+    for i in 1:M
+        r = real(z_km_pu[i]);
+        x = imag(z_km_pu[i]);
+        z = r + im*x;
+        y_total = y_total + 1/z;    
+    end
+
+    z_km_total = 1/y_total
+
+    γ = sqrt(z_km_total*y_km)
+    z_ll = z_km_total*l*(sinh(γ*l)/(γ*l))
     y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
+    println(z_ll)
+    println(y_ll)
+    # error("Terminate")
 
         for ll in get_components(Line, sys)
             ll.r = real(z_ll)
@@ -129,7 +156,6 @@ function build_seg_model!(sys_segs, p::ExpParams)
     y_km_pu = y_km*Z_c
 
     l = p.l #km
-    γ = sqrt(z_km[1]*y_km)
     N = p.N
     M = p.M
     l_prime = l/N
@@ -166,7 +192,7 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     arc = Arc(from = start_bus, to = end_bus),
                     r = real(z_seg_pu[m]),
                     x = imag(z_seg_pu[m]),
-                    b = (from = imag(y_seg_pu)/M , to = imag(y_seg_pu)/M),
+                    b = (from = imag(y_seg_pu)/(2*M) , to = imag(y_seg_pu)/(2*M)),
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
                 )
@@ -183,9 +209,9 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     active_power_flow = ll.active_power_flow,
                     reactive_power_flow = ll.reactive_power_flow,
                     arc = Arc(from = start_bus, to = bus_to),
-                    r = real(z_seg_pu[m])/M,
-                    x = imag(z_seg_pu[m])/M,
-                    b = (from = imag(y_seg_pu)/M, to = imag(y_seg_pu)/M),
+                    r = real(z_seg_pu[m]),
+                    x = imag(z_seg_pu[m]),
+                    b = (from = imag(y_seg_pu)/(2*M), to = imag(y_seg_pu)/(2*M)),
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
             )
@@ -247,7 +273,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     
     # read results
     results = results_sim(sim)
-    return results, sim
+    return results, sys
 end
 
 function get_line_parameters(impedance_csv, capacitance_csv, M)
@@ -262,15 +288,31 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
         l_km[m,1] = df_imp[M, "L"*string(m)]
     end
     
-    x_km = 2*pi*60*l_km
+    f = 60
+    ω = 2*pi*f
+
+    x_km = ω*l_km
     z_km = r_km + im*x_km
     g_km = [0.0]
-    b_km = 2*pi*60*c_km
+    b_km = ω*c_km
     y_km = g_km + im*b_km
+
+    r_km_pi = df_imp[1, "R1"]
+    x_km_pi = ω*df_imp[1, "L1"]
+    z_km_pi = r_km_pi + im*x_km_pi
+    Z_c_pi = sqrt(z_km_pi/y_km[1])
     
-    Z_c = sqrt(z_km[1]/y_km[1])
+    Y_ = 0
+    for i in 1:M
+        Y_ = Y_ + 1/(im*ω*l_km[i] + r_km[i])
+    end
+
+    Z_ = 1/Y_
+    Z_c = sqrt(Z_/y_km[1])
     
-    return r_km, x_km, g_km, b_km, abs(Z_c)
+
+    
+    return r_km, x_km, g_km, b_km, abs(Z_c), r_km_pi, x_km_pi, abs(Z_c_pi)
 end
 
 export choose_disturbance
