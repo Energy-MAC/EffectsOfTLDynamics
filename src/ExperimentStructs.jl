@@ -62,13 +62,10 @@ end
     M::Union{Int64, Nothing}
     l::Union{Int64, Float64}
     Z_c::Float64
-    r_km::Union{Vector{Float64}, Matrix{Float64}, Float64}
-    x_km::Union{Vector{Float64}, Matrix{Float64}, Float64}
-    g_km::Union{Vector{Float64}, Matrix{Float64}, Float64}
-    b_km::Union{Vector{Float64}, Matrix{Float64}, Float64}
-    r_km_pi::Float64
-    x_km_pi::Float64
-    Z_c_pi::Float64
+    z_km::Union{Vector{ComplexF64}, ComplexF64}
+    y_km::Union{Vector{ComplexF64}, ComplexF64}
+    z_km_ω::ComplexF64
+    l_dict::Union{Dict, Nothing} = nothing
     sim_params::SimParams
     perturbation::String
     perturbation_params::PerturbationParams
@@ -80,6 +77,18 @@ default_crc_params = CRCParam(DynamicInverter, "generator-102-1", :V_ref, 0.95)
 default_lc_params = LCParam(ElectricLoad, "load-103-1", :P_ref, 1.08)
 default_lt_params = LTParam(ElectricLoad, "load-103-1")
 default_sbvc_params = SBVCParam(:V_ref, 1.048)
+
+default_2_bus_line_dict = Dict(
+    "BUS 1-BUS 2-i_1" => 100,
+)
+default_9_bus_line_dict = Dict(
+    "Bus 5-Bus 4-i_1" => 90,
+    "Bus 7-Bus 8-i_1" => 80,
+    "Bus 6-Bus 4-i_1" => 100,
+    "Bus 7-Bus 5-i_1" => 170,
+    "Bus 8-Bus 9-i_1" => 110,
+    "Bus 9-Bus 6-i_1" => 180,
+)
 
 function get_default_perturbation(t_fault::Float64, perturbation::String)
     if perturbation == "BIC"
@@ -106,6 +115,8 @@ export default_crc_params
 export default_lc_params
 export default_lt_params
 export default_sbvc_params
+export default_2_bus_line_dict
+export default_9_bus_line_dict
 
 export get_default_perturbation
 

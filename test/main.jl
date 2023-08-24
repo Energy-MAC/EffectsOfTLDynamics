@@ -17,7 +17,10 @@ const PSID = PowerSimulationsDynamics;
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/inv_v_machine.json"
+file_name = "../data/json_data/9bus.json"
+# default_2_bus_line_dict - For 2 bus system
+# default_9_bus_line_dict - For 9 bus system
+line_dict = default_9_bus_line_dict
 
 ### Load relevant line data
 impedance_csv = "../data/cable_data/impedance_data.csv"
@@ -30,7 +33,7 @@ capacitance_csv = "../data/cable_data/C_per_km.csv"
 # "LoadChange"
 # "LoadTrip"
 # "InfBusChange"
-perturbation = "CRC"
+perturbation = "InfBusChange"
 
 ### Define simulation parameters
 sim_p = SimParams(
@@ -45,7 +48,7 @@ sim_p = SimParams(
 ### Extract line data from files
 M = 1
 
-r_km, x_km, g_km, b_km, Z_c = get_line_parameters(impedance_csv, capacitance_csv, M)
+z_km, y_km, Z_c, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
 # r_km = [0.0]
 # Kundur parameters for testing
 # Z_c = 380 # Ω
@@ -68,13 +71,10 @@ p = ExpParams(
     M, 
     l, 
     Z_c, 
-    r_km, 
-    x_km, 
-    g_km, 
-    b_km, 
-    r_km_pi,
-    x_km_pi,
-    Z_c_pi,
+    z_km,
+    y_km,
+    z_km_ω, 
+    line_dict,
     sim_p, 
     perturbation, 
     perturbation_params)

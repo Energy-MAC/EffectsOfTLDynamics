@@ -86,53 +86,23 @@ function results_sim(sim)
 end
 
 function build_new_impedance_model!(sys, p::ExpParams)
-    
-    # Z_c = p.Z_c_pi # Ω
-    # r_km = p.r_km_pi # Ω/km
-    # x_km = p.x_km_pi # Ω/km
-    # z_km = r_km + im*x_km # Ω/km
-    
-    # g_km = convert(Float64, p.g_km[1]) # S/km
-    # b_km = convert(Float64, p.b_km[1]) # S/km
-    # y_km = g_km + im*b_km
-    
-    # z_km_pu = z_km/Z_c
-    # y_km_pu = y_km*Z_c
 
     Z_c = p.Z_c # Ω
-
-    r_km = p.r_km # Ω/km
-    x_km = p.x_km # Ω/km
-    z_km = r_km + im*x_km # Ω/km
+    z_km = p.z_km # Ω/km
+    y_km = p.y_km # S/km
+    z_km_ω = p.z_km_ω # Ω/km
     
-    g_km = convert(Float64, p.g_km[1]) # S/km
-    b_km = convert(Float64, p.b_km[1]) # S/km
-    y_km = g_km + im*b_km
-    
-    z_km_pu = z_km/Z_c
-    y_km_pu = y_km*Z_c
+    z_km_pu = z_km/abs(Z_c)
+    y_km_pu = y_km*abs(Z_c)
+    γ = sqrt(z_km_ω*y_km)
 
-    l = p.l #km
     M = p.M
-    y_total = 0;
-    
-    for i in 1:M
-        r = real(z_km_pu[i]);
-        x = imag(z_km_pu[i]);
-        z = r + im*x;
-        y_total = y_total + 1/z;    
-    end
-
-    z_km_total = 1/y_total
-
-    γ = sqrt(z_km_total*y_km)
-    z_ll = z_km_total*l*(sinh(γ*l)/(γ*l))
-    y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
-    println(z_ll)
-    println(y_ll)
-    # error("Terminate")
 
         for ll in get_components(Line, sys)
+            l = p.l_dict[ll.name] #km
+
+            z_ll = z_km_ω*l*(sinh(γ*l)/(γ*l))
+            y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
             ll.r = real(z_ll)
             ll.x = imag(z_ll)
             ll.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
@@ -143,27 +113,21 @@ end
 function build_seg_model!(sys_segs, p::ExpParams)
     
     Z_c = p.Z_c # Ω
-
-    r_km = p.r_km # Ω/km
-    x_km = p.x_km # Ω/km
-    z_km = r_km + im*x_km # Ω/km
+    z_km = p.z_km # Ω/km
+    y_km = p.y_km # S/km
+    z_km_ω = p.z_km_ω # Ω/km
     
-    g_km = convert(Float64, p.g_km[1]) # S/km
-    b_km = convert(Float64, p.b_km[1]) # S/km
-    y_km = g_km + im*b_km
-    
-    z_km_pu = z_km/Z_c
-    y_km_pu = y_km*Z_c
+    z_km_pu = z_km/abs(Z_c)
+    y_km_pu = y_km*abs(Z_c)
 
-    l = p.l #km
     N = p.N
     M = p.M
-    l_prime = l/N
-
-    z_seg_pu = z_km_pu*l_prime
-    y_seg_pu = y_km_pu*l_prime
     
     for ll in collect(get_components(Line, sys_segs))
+        l = p.l_dict[ll.name] #km
+        l_prime = l/N
+        z_seg_pu = z_km_pu*l_prime
+        y_seg_pu = y_km_pu*l_prime
         bus_from = ll.arc.from
         bus_to = ll.arc.to
         # Create a bunch of Bus
@@ -302,10 +266,10 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
         Y_ = Y_ + 1/(im*ω*l_km[i] + r_km[i])
     end
 
-    z_km = 1/Y_
-    Z_c = sqrt(z_km/y_km[1])
+    z_km_ω = 1/Y_
+    Z_c = sqrt(z_km_ω/y_km[1])
     
-    return r_km, x_km, g_km, b_km, abs(Z_c)
+    return z_km, y_km, Z_c, z_km_ω
 end
 
 export choose_disturbance
