@@ -184,19 +184,20 @@ function build_seg_model!(sys_segs, p::ExpParams)
             add_component!(sys_segs, bus_to_create)
             end_bus = bus_to_create
             for m in 1 : M
-                line_to_create = Line(
-                    name = ll.name * "_segment_" * string(b_ix) * "_branch_" * string(m),
-                    available = true,
-                    active_power_flow = ll.active_power_flow,
-                    reactive_power_flow = ll.reactive_power_flow,
-                    arc = Arc(from = start_bus, to = end_bus),
-                    r = real(z_seg_pu[m]),
-                    x = imag(z_seg_pu[m]),
-                    b = (from = imag(y_seg_pu)/(2*M) , to = imag(y_seg_pu)/(2*M)),
-                    rate = ll.rate,
-                    angle_limits = ll.angle_limits,
-                )
-                add_component!(sys_segs, line_to_create)
+                    line_to_create = Line(
+                        name = ll.name * "_segment_" * string(b_ix) * "_branch_" * string(m),
+                        available = true,
+                        active_power_flow = ll.active_power_flow,
+                        reactive_power_flow = ll.reactive_power_flow,
+                        arc = Arc(from = start_bus, to = end_bus),
+                        r = real(z_seg_pu[m]),
+                        x = imag(z_seg_pu[m]),
+                        b = (from = imag(y_seg_pu)/(2*M), to = imag(y_seg_pu)/(2*M)), # Asymmetrical for first segment 
+                        rate = ll.rate,
+                        angle_limits = ll.angle_limits,
+                    )
+                    add_component!(sys_segs, line_to_create)
+                
             end
             # println(get_name(line_to_create))
             # println("Bus From: $(line_to_create.arc.from.name), Bus To: $(line_to_create.arc.to.name)")
@@ -211,7 +212,93 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     arc = Arc(from = start_bus, to = bus_to),
                     r = real(z_seg_pu[m]),
                     x = imag(z_seg_pu[m]),
-                    b = (from = imag(y_seg_pu)/(2*M), to = imag(y_seg_pu)/(2*M)),
+                    b = (from = imag(y_seg_pu)/(2*M), to = imag(y_seg_pu)/(2*M)), # asymmetrical for last segment 
+                    rate = ll.rate,
+                    angle_limits = ll.angle_limits,
+            )
+            add_component!(sys_segs, line_to_create)
+        end
+        # println(get_name(line_to_create))
+        # println("Bus From: $(line_to_create.arc.from.name), Bus To: $(line_to_create.arc.to.name)")
+        remove_component!(sys_segs, ll)
+    end
+    
+    return sys_segs
+end
+
+function build_seg_model_Lshape!(sys_segs, p::ExpParams)
+    
+    Z_c = p.Z_c # Ω
+
+    r_km = p.r_km # Ω/km
+    x_km = p.x_km # Ω/km
+    z_km = r_km + im*x_km # Ω/km
+    
+    g_km = convert(Float64, p.g_km[1]) # S/km
+    b_km = convert(Float64, p.b_km[1]) # S/km
+    y_km = g_km + im*b_km
+    
+    z_km_pu = z_km/Z_c
+    y_km_pu = y_km*Z_c
+
+    l = p.l #km
+    N = p.N
+    M = p.M
+    l_prime = l/N
+
+    z_seg_pu = z_km_pu*l_prime
+    y_seg_pu = y_km_pu*l_prime
+    
+    for ll in collect(get_components(Line, sys_segs))
+        bus_from = ll.arc.from
+        bus_to = ll.arc.to
+        # Create a bunch of Bus
+        start_bus = bus_from
+        for b_ix in 1 : N - 1
+            println(b_ix)
+            bus_to_create = Bus(
+                number = 1000000000 + 100000*bus_from.number + 100*bus_to.number + b_ix,
+                name = bus_from.name * "-" * bus_to.name * "-internal-bus_" * string(b_ix),
+                bustype = BusTypes.PQ,
+                angle = bus_from.angle,
+                magnitude = bus_from.magnitude,
+                voltage_limits = bus_from.voltage_limits,
+                base_voltage = bus_from.base_voltage,
+                area = bus_from.area,
+                load_zone = bus_from.load_zone
+            )
+            add_component!(sys_segs, bus_to_create)
+            end_bus = bus_to_create
+            for m in 1 : M
+                    line_to_create = Line(
+                        name = ll.name * "_segment_" * string(b_ix) * "_branch_" * string(m),
+                        available = true,
+                        active_power_flow = ll.active_power_flow,
+                        reactive_power_flow = ll.reactive_power_flow,
+                        arc = Arc(from = start_bus, to = end_bus),
+                        r = real(z_seg_pu[m]),
+                        x = imag(z_seg_pu[m]),
+                        b = (from = 0, to = imag(y_seg_pu)/(M)),
+                        rate = ll.rate,
+                        angle_limits = ll.angle_limits,
+                    )
+                    add_component!(sys_segs, line_to_create)
+                
+            end
+            # println(get_name(line_to_create))
+            # println("Bus From: $(line_to_create.arc.from.name), Bus To: $(line_to_create.arc.to.name)")
+            start_bus = end_bus
+        end
+        for m in 1 : M
+            line_to_create = Line(
+                    name = ll.name * "_segment_" * string(N) * "_branch_" * string(m),
+                    available = true,
+                    active_power_flow = ll.active_power_flow,
+                    reactive_power_flow = ll.reactive_power_flow,
+                    arc = Arc(from = start_bus, to = bus_to),
+                    r = real(z_seg_pu[m]),
+                    x = imag(z_seg_pu[m]),
+                    b = (from = 0, to = imag(y_seg_pu)/(M)), # asymmetrical for last segment 
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
             )
@@ -273,7 +360,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     
     # read results
     results = results_sim(sim)
-    return results, sys
+    return results, sys, sim
 end
 
 function get_line_parameters(impedance_csv, capacitance_csv, M)
