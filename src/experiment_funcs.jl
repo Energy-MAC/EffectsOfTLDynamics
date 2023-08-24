@@ -192,7 +192,7 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     arc = Arc(from = start_bus, to = end_bus),
                     r = real(z_seg_pu[m]),
                     x = imag(z_seg_pu[m]),
-                    b = (from = imag(y_seg_pu)/(2*M) , to = imag(y_seg_pu)/(2*M)),
+                    b = (from = imag(y_seg_pu)/(2*M), to = imag(y_seg_pu)/(2*M)),
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
                 )
@@ -296,23 +296,16 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
     g_km = [0.0]
     b_km = ω*c_km
     y_km = g_km + im*b_km
-
-    r_km_pi = df_imp[1, "R1"]
-    x_km_pi = ω*df_imp[1, "L1"]
-    z_km_pi = r_km_pi + im*x_km_pi
-    Z_c_pi = sqrt(z_km_pi/y_km[1])
     
     Y_ = 0
     for i in 1:M
         Y_ = Y_ + 1/(im*ω*l_km[i] + r_km[i])
     end
 
-    Z_ = 1/Y_
-    Z_c = sqrt(Z_/y_km[1])
+    z_km = 1/Y_
+    Z_c = sqrt(z_km/y_km[1])
     
-
-    
-    return r_km, x_km, g_km, b_km, abs(Z_c), r_km_pi, x_km_pi, abs(Z_c_pi)
+    return r_km, x_km, g_km, b_km, abs(Z_c)
 end
 
 export choose_disturbance
