@@ -92,21 +92,25 @@ function build_new_impedance_model!(sys, p::ExpParams)
     y_km = p.y_km # S/km
     z_km_ω = p.z_km_ω # Ω/km
     
-    z_km_pu = z_km/Z_c_abs
+    # z_km_pu = z_km/Z_c_abs
+    z_km_ω_pu = z_km_ω/Z_c_abs
     y_km_pu = y_km*Z_c_abs
-    γ = sqrt(z_km_ω*y_km[1])
+    γ = sqrt(z_km_ω*y_km)
 
-    M = p.M
+    for ll in get_components(Line, sys)
+        l = p.l
+        #l = p.l_dict[ll.name] #km
+        println(l)
+        z_ll = z_km_ω_pu*l*(sinh(γ*l)/(γ*l))
+        y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
+        println(z_ll)
+        println(y_ll)
+        # error("dayumn")
+        ll.r = real(z_ll)
+        ll.x = imag(z_ll)
+        ll.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
+    end
 
-        for ll in get_components(Line, sys)
-            l = p.l_dict[ll.name] #km
-
-            z_ll = z_km_ω*l*(sinh(γ*l)/(γ*l))
-            y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
-            ll.r = real(z_ll)
-            ll.x = imag(z_ll)
-            ll.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
-        end
     return sys
 end
 
@@ -230,7 +234,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     end
     # build simulation
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
-    # show_states_initial_value(sim)
+    show_states_initial_value(sim)
     
     # execute simulation
     exec = execute_sim!(sim, p)
@@ -269,7 +273,7 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
     z_km_ω = 1/Y_
     Z_c = sqrt(z_km_ω/y_km[1])
     
-    return z_km, y_km, abs(Z_c), z_km_ω
+    return z_km, y_km[1], abs(Z_c), z_km_ω
 end
 
 export choose_disturbance
