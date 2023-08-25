@@ -278,7 +278,7 @@ function build_seg_model_Lshape!(sys_segs, p::ExpParams)
                         arc = Arc(from = start_bus, to = end_bus),
                         r = real(z_seg_pu[m]),
                         x = imag(z_seg_pu[m]),
-                        b = (from = 0, to = imag(y_seg_pu)/(M)),
+                        b = (from = imag(y_seg_pu)/(M), to = 0),
                         rate = ll.rate,
                         angle_limits = ll.angle_limits,
                     )
@@ -298,7 +298,7 @@ function build_seg_model_Lshape!(sys_segs, p::ExpParams)
                     arc = Arc(from = start_bus, to = bus_to),
                     r = real(z_seg_pu[m]),
                     x = imag(z_seg_pu[m]),
-                    b = (from = 0, to = imag(y_seg_pu)/(M)), # asymmetrical for last segment 
+                    b = (from = imag(y_seg_pu)/(M), to = 0), # asymmetrical for last segment 
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
             )

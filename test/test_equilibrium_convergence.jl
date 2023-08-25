@@ -37,8 +37,8 @@ perturbation = "CRC"
 
 ### Define simulation parameters
 sim_p = SimParams(
-    abstol = 1e13,
-    reltol = 1e10,
+    abstol = 1e-13,
+    reltol = 1e-10,
     maxiters = Int(1e10),
     dtmax = 1e-4,
     solver = "Rodas4",
@@ -53,9 +53,15 @@ M = 1
 #Kundur parameters for testing
 Z_c = 380 # Ω
 r_km = 0.05 # Ω/km
+#r_km = 0.0;
 x_km = 0.488 # Ω/km
 g_km = 0.0 # S/km
 b_km = 3.371e-6 # S/km
+
+# Calculate Z_c 
+# z_km = r_km + im*x_km;
+# y_km = im*b_km;
+# Z_c = abs(sqrt(z_km[1]/y_km[1]))
 
 r_km_pi = r_km;
 x_km_pi = x_km;
@@ -67,7 +73,7 @@ g_km = [g_km]
 b_km = [b_km]
 
 ### Define more data
-l = 500 #km
+l = 600 #km
 N = nothing
 t_fault = 0.25
 
@@ -92,78 +98,56 @@ p = ExpParams(
     perturbation_params)
 
 line_model_1 = "Algebraic"
-results_alg, sys, alg_sim = run_experiment(file_name, line_model_1, p);
+sys = System(joinpath(pwd(), file_name));
+tspan = (0.0, p.sim_params.t_max)
+sys = build_new_impedance_model!(sys, p)
 
-line_model_2 = "Dynamic"
-results_dyn, sys_dyn, dyn_sim = run_experiment(file_name, line_model_2, p);
+dist = choose_disturbance(sys, p.perturbation, p)
 
-vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
-vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
+model = MassMatrixModel
+sim = PSID.Simulation(
+    model, #Type of model used
+    sys, #system
+    pwd(), #folder to output results
+    tspan, #time span
+    dist, #Type of perturbation
+    all_lines_dynamic = false
+)
 
-plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
-plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
+#sim = build_sim(sys, tspan, perturbation, false, p)
+#show_states_initial_value(sim)
+
+V1_r = sim.x0_init[1]
+V1_i = sim.x0_init[3]
+V2_r = sim.x0_init[2]
+V2_i = sim.x0_init[4]
+# ir = sim.x0_init[5]
+# ii = sim.x0_init[6]
 
 line_model_3 = "Multi-Segment Dynamic"
 
-for n in [20]
-    print(n)
+v2rs = [];
+
+for n in 1:50
     p.N = n
-    results_ms_dyn, seg_sys = nothing, nothing
-    results_ms_dyn, seg_sys = run_experiment(file_name, line_model_3, p);
-
-    vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)"))
+    sys = System(joinpath(pwd(), file_name));
+    sys = build_seg_model_Lshape!(sys, p);
+    sim = build_sim(sys, tspan, dist, true, p);
+    V2_r = sim.x0_init[2];
+    ir = sim.x0_init[5];
+    push!(v2rs, V2_r);
 end
 
-plot!(xlims=(0.24, 0.275))
-plot!(ylims=(0.9814,0.909))
-plot!(legend = true)
-plot!(legend=:bottomright)
+plot(v2rs)
 
-l = first(get_components(Line, sys))
+# Check line parameters
+p.N = 2
+sys = System(joinpath(pwd(), file_name));
+sys = build_seg_model_Lshape!(sys, p);
+line = first(get_components(Line, sys))
 
-l_dyn = first(get_components(Line, sys_dyn))
-
-n = 1
-p.N = n
-results_ms_dyn, sys_seg = nothing, nothing
-results_ms_dyn, sys_seg = run_experiment(file_name, line_model_3, p);
-
-y_total = 0;
-
-b_total = 0
-for l in get_components(Line, sys)
-    r = l.r;
-    x = l.x;
-    z = r + im*x;
-    b = l.b.from
-    b_total = b_total + b
-    y_total = y_total + 1/z;    
-end
-
-z_total = 1/y_total;
-r_total = real(z_total)
-x_total = imag(z_total)
-b_total
-
-l.r
-l_dyn.r
-l_seg.r
-
-l.x
-l_dyn.x
-l_seg.x
-
-l.b.from
-l.b
-
-
-
-
-# Extract l and r from initial states
 
 # Need to get voltage states at t=0, and line current states
-ilr = get_state_series(results_dyn, "Il_R")
 
 ilr_dyn = get_state_series(results_dyn, ("BUS 1-BUS 2-i_1", :Il_R))[2][1] # 2 is values, 1 is first timestep
 ili_dyn = get_state_series(results_dyn, ("BUS 1-BUS 2-i_1", :Il_I))[2][1]
