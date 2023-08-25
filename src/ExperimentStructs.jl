@@ -61,11 +61,11 @@ end
     N::Union{Int64, Nothing}
     M::Union{Int64, Nothing}
     l::Union{Int64, Float64}
-    Z_c::Float64
+    Z_c_abs::Float64
     z_km::Union{Vector{ComplexF64}, ComplexF64}
     y_km::Union{Vector{ComplexF64}, ComplexF64}
     z_km_ω::ComplexF64
-    l_dict::Union{Dict, Nothing} = nothing
+    l_dict::Union{Dict{String, Int64}, Nothing} = nothing
     sim_params::SimParams
     perturbation::String
     perturbation_params::PerturbationParams
@@ -81,6 +81,7 @@ default_sbvc_params = SBVCParam(:V_ref, 1.048)
 default_2_bus_line_dict = Dict(
     "BUS 1-BUS 2-i_1" => 100,
 )
+
 default_9_bus_line_dict = Dict(
     "Bus 5-Bus 4-i_1" => 90,
     "Bus 7-Bus 8-i_1" => 80,

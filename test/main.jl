@@ -48,7 +48,7 @@ sim_p = SimParams(
 ### Extract line data from files
 M = 1
 
-z_km, y_km, Z_c, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
+z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
 # r_km = [0.0]
 # Kundur parameters for testing
 # Z_c = 380 # Ω
@@ -70,7 +70,7 @@ p = ExpParams(
     N, 
     M, 
     l, 
-    Z_c, 
+    Z_c_abs, 
     z_km,
     y_km,
     z_km_ω, 

@@ -87,14 +87,14 @@ end
 
 function build_new_impedance_model!(sys, p::ExpParams)
 
-    Z_c = p.Z_c # Ω
+    Z_c_abs = p.Z_c_abs # Ω
     z_km = p.z_km # Ω/km
     y_km = p.y_km # S/km
     z_km_ω = p.z_km_ω # Ω/km
     
-    z_km_pu = z_km/abs(Z_c)
-    y_km_pu = y_km*abs(Z_c)
-    γ = sqrt(z_km_ω*y_km)
+    z_km_pu = z_km/Z_c_abs
+    y_km_pu = y_km*Z_c_abs
+    γ = sqrt(z_km_ω*y_km[1])
 
     M = p.M
 
@@ -112,13 +112,13 @@ end
 
 function build_seg_model!(sys_segs, p::ExpParams)
     
-    Z_c = p.Z_c # Ω
+    Z_c_abs = p.Z_c_abs # Ω
     z_km = p.z_km # Ω/km
     y_km = p.y_km # S/km
     z_km_ω = p.z_km_ω # Ω/km
     
-    z_km_pu = z_km/abs(Z_c)
-    y_km_pu = y_km*abs(Z_c)
+    z_km_pu = z_km/Z_c_abs
+    y_km_pu = y_km*Z_c_abs
 
     N = p.N
     M = p.M
@@ -269,7 +269,7 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
     z_km_ω = 1/Y_
     Z_c = sqrt(z_km_ω/y_km[1])
     
-    return z_km, y_km, Z_c, z_km_ω
+    return z_km, y_km, abs(Z_c), z_km_ω
 end
 
 export choose_disturbance
