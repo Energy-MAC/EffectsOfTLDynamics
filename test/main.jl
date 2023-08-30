@@ -17,10 +17,10 @@ const PSID = PowerSimulationsDynamics;
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/9bus_slackless.json"
+file_name = "../data/json_data/inv_v_machine.json"
 # default_2_bus_line_dict - For 2 bus system
 # default_9_bus_line_dict - For 9 bus system
-line_dict = default_9_bus_line_dict
+line_dict = default_2_bus_line_dict
 
 ### Load relevant line data
 impedance_csv = "../data/cable_data/impedance_data.csv"
@@ -33,7 +33,8 @@ capacitance_csv = "../data/cable_data/C_per_km.csv"
 # "LoadChange"
 # "LoadTrip"
 # "InfBusChange"
-perturbation = "CRC"
+# "BranchTrip"
+perturbation = "BranchTrip"
 
 ### Define simulation parameters
 sim_p = SimParams(
@@ -46,7 +47,7 @@ sim_p = SimParams(
 )
 
 ### Extract line data from files
-M = 1
+M = 3
 
 z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
 # r_km = [0.0]
@@ -59,12 +60,13 @@ z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_cs
 
 ### Define more data
 l = 100 #, 500, 750, 100 #km
+line_dict["BUS 1-BUS 2-i_1"] = l
 N = nothing
 t_fault = 0.25
 
 ### Get perturbation struct
 perturbation_params = get_default_perturbation(t_fault, perturbation)
-perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)
+# perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)
 
 p = ExpParams(
     N, 
@@ -93,18 +95,18 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
 
 line_model_3 = "Multi-Segment Dynamic"
-
-for n in [1,2,3,4,5,10]
+seg_sys = nothing
+for n in [5]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
     results_ms_dyn, seg_sys = run_experiment(file_name, line_model_3, p)
 
     vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)_L"))
+    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)"))
 end
 
-plot!(xlims=(0.24, 0.5))
+plot!(xlims=(0.24, 0.3))
 plot!(ylims=(0.981,0.983))
 plot!(legend = false)
 plot!(legend=:bottomright)

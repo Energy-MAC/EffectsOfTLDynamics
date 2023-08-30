@@ -37,6 +37,8 @@ function choose_disturbance(sys, dist::String, p::ExpParams)
         # Source bus voltage change
         s_device = first(get_components(Source, sys))
         dist_struct = SourceBusVoltageChange(pp.t_fault, s_device, pp.source_bus_voltage_change_params.var_to_change, pp.source_bus_voltage_change_params.ref_value)
+    elseif dist == "BranchTrip"
+        dist_struct = BranchTrip(pp.t_fault, Line, pp.branch_trip_params.line_to_trip)
     else
         return error("Unknown disturbance")
     end
@@ -51,13 +53,14 @@ function build_sim(sys, tspan::Tuple{Float64, Float64}, perturbation, dyn_lines:
     else
         return error("Unknown solver")
     end
+    show_components(sys, Line)
     sim = PSID.Simulation(
            model, #Type of model used
            sys, #system
            pwd(), #folder to output results
            tspan, #time span
-           perturbation, #Type of perturbation
-           all_lines_dynamic = dyn_lines
+           perturbation #, #Type of perturbation
+           # all_lines_dynamic = dyn_lines
        )
     return sim
 end
@@ -85,7 +88,7 @@ function results_sim(sim)
     return results
 end
 
-function build_new_impedance_model!(sys, p::ExpParams)
+function build_new_impedance_model!(sys, p::ExpParams, dyn_lines::Bool, alg_line_name::String)
 
     Z_c_abs = p.Z_c_abs # Ω
     z_km = p.z_km # Ω/km
@@ -99,7 +102,7 @@ function build_new_impedance_model!(sys, p::ExpParams)
 
     for ll in get_components(Line, sys)
         l = p.l
-        #l = p.l_dict[ll.name] #km
+        # l = p.l_dict[ll.name] #km
         println(l)
         z_ll = z_km_ω_pu*l*(sinh(γ*l)/(γ*l))
         y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
@@ -109,13 +112,16 @@ function build_new_impedance_model!(sys, p::ExpParams)
         ll.r = real(z_ll)
         ll.x = imag(z_ll)
         ll.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
+        if (ll.name != alg_line_name) && dyn_lines
+            dyn_branch = DynamicBranch(get_component(Line, sys, ll.name))
+            add_component!(sys, dyn_branch)
+        end
     end
 
     return sys
 end
 
-function build_seg_model!(sys_segs, p::ExpParams)
-    
+function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name::String)
     Z_c_abs = p.Z_c_abs # Ω
     z_km = p.z_km # Ω/km
     y_km = p.y_km # S/km
@@ -123,11 +129,27 @@ function build_seg_model!(sys_segs, p::ExpParams)
     
     z_km_pu = z_km/Z_c_abs
     y_km_pu = y_km*Z_c_abs
+    z_km_ω_pu = z_km_ω/Z_c_abs
+    γ = sqrt(z_km_ω*y_km)
 
     N = p.N
     M = p.M
     
     for ll in collect(get_components(Line, sys_segs))
+        if ll.name == alg_line_name
+            l = p.l
+            # l = p.l_dict[ll.name] #km
+            println(l)
+            z_ll = z_km_ω_pu*l*(sinh(γ*l)/(γ*l))
+            y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
+            println(z_ll)
+            println(y_ll)
+            # error("dayumn")
+            ll.r = real(z_ll)
+            ll.x = imag(z_ll)
+            ll.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
+            continue
+        end
         l = p.l_dict[ll.name] #km
         l_prime = l/N
         z_seg_pu = z_km_pu*l_prime
@@ -165,6 +187,10 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     angle_limits = ll.angle_limits,
                 )
                 add_component!(sys_segs, line_to_create)
+                if dyn_lines
+                    dyn_branch = DynamicBranch(get_component(Line, sys_segs, line_to_create.name))
+                    add_component!(sys_segs, dyn_branch)
+                end
             end
             # println(get_name(line_to_create))
             # println("Bus From: $(line_to_create.arc.from.name), Bus To: $(line_to_create.arc.to.name)")
@@ -184,6 +210,10 @@ function build_seg_model!(sys_segs, p::ExpParams)
                     angle_limits = ll.angle_limits,
             )
             add_component!(sys_segs, line_to_create)
+            if dyn_lines
+                dyn_branch = DynamicBranch(get_component(Line, sys_segs, line_to_create.name))
+                add_component!(sys_segs, dyn_branch)
+            end
         end
         # println(get_name(line_to_create))
         # println("Bus From: $(line_to_create.arc.from.name), Bus To: $(line_to_create.arc.to.name)")
@@ -225,14 +255,36 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     else
         return error("Unknown line model")
     end
+
+    alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
+    if length(get_components(Bus, sys)) == 2
+        ll = first(get_components(Line, sys))
+        
+        ll_alg = Line(
+                    name = ll.name * "_static",
+                    available = true,
+                    active_power_flow = ll.active_power_flow,
+                    reactive_power_flow = ll.reactive_power_flow,
+                    arc = ll.arc,
+                    r = ll.r,
+                    x = ll.x,
+                    b = (from = ll.b.from, to = ll.b.to),
+                    rate = ll.rate,
+                    angle_limits = ll.angle_limits,
+            )
+        
+        alg_line_name = ll_alg.name
+        add_component!(sys, ll_alg)
+    end
     
     # build segments model
     if (multi_segment == true)
-        sys = build_seg_model!(sys, p)
+        sys = build_seg_model!(sys, p, dyn_lines, alg_line_name)
     else
-        sys = build_new_impedance_model!(sys, p)
+        sys = build_new_impedance_model!(sys, p, dyn_lines, alg_line_name)
     end
     # build simulation
+
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
     show_states_initial_value(sim)
     

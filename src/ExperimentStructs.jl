@@ -47,6 +47,10 @@ end
     ref_value::Float64
 end
 
+@with_kw mutable struct BTParam
+    line_to_trip::String
+end
+
 @with_kw mutable struct PerturbationParams
     t_fault::Float64
     branch_impedance_change_params::Union{BICParam, Nothing} = nothing
@@ -55,6 +59,7 @@ end
     load_change_params::Union{LCParam, Nothing} = nothing
     load_trip_params::Union{LTParam, Nothing} = nothing
     source_bus_voltage_change_params::Union{SBVCParam, Nothing} = nothing
+    branch_trip_params::Union{BTParam, Nothing} = nothing
 end
 
 @with_kw mutable struct ExpParams
@@ -77,6 +82,7 @@ default_crc_params = CRCParam(DynamicInverter, "generator-102-1", :V_ref, 0.95)
 default_lc_params = LCParam(ElectricLoad, "load-103-1", :P_ref, 1.08)
 default_lt_params = LTParam(ElectricLoad, "load-103-1")
 default_sbvc_params = SBVCParam(:V_ref, 1.048)
+default_branch_trip_params = BTParam("BUS 1-BUS 2-i_1_static")
 
 default_2_bus_line_dict = Dict(
     "BUS 1-BUS 2-i_1" => 100,
@@ -93,18 +99,20 @@ default_9_bus_line_dict = Dict(
 
 function get_default_perturbation(t_fault::Float64, perturbation::String)
     if perturbation == "BIC"
-        perturbation_struct = PerturbationParams(t_fault, default_bic_params, nothing, nothing, nothing, nothing, nothing)
+        perturbation_struct = PerturbationParams(t_fault, default_bic_params, nothing, nothing, nothing, nothing, nothing, nothing)
     elseif perturbation == "GenTrip"
-        perturbation_struct = PerturbationParams(t_fault, nothing, default_gen_trip_params, nothing, nothing, nothing, nothing)
+        perturbation_struct = PerturbationParams(t_fault, nothing, default_gen_trip_params, nothing, nothing, nothing, nothing, nothing)
     elseif perturbation == "CRC"
-        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, default_crc_params, nothing, nothing, nothing)
+        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, default_crc_params, nothing, nothing, nothing, nothing)
     elseif perturbation == "LoadChange"
-        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, default_lc_params, nothing, nothing)
+        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, default_lc_params, nothing, nothing, nothing)
     elseif perturbation == "LoadTrip"
-        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, nothing, default_lt_params, nothing)
+        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, nothing, default_lt_params, nothing, nothing)
     elseif perturbation == "InfBusChange"
-        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, nothing, nothing, default_sbvc_params)
-    else
+        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, nothing, nothing, default_sbvc_params, nothing)
+    elseif perturbation == "BranchTrip"
+        perturbation_struct = PerturbationParams(t_fault, nothing, nothing, nothing, nothing, nothing, nothing, default_branch_trip_params)
+    else 
         return error("Unknown perturbation")
     end
     return perturbation_struct
@@ -116,6 +124,7 @@ export default_crc_params
 export default_lc_params
 export default_lt_params
 export default_sbvc_params
+export default_branch_trip_params
 export default_2_bus_line_dict
 export default_9_bus_line_dict
 
@@ -130,5 +139,6 @@ export CRCParam
 export LCParam
 export LTParam
 export SBVCParam
+export BTParam
 
 end # module ExperimentStructs
