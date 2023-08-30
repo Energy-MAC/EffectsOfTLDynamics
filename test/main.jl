@@ -35,7 +35,8 @@ capacitance_csv = "../data/cable_data/C_per_km.csv"
 # "LoadChange"
 # "LoadTrip"
 # "InfBusChange"
-perturbation = "CRC"
+# "BranchTrip"
+perturbation = "BranchTrip"
 
 ### Define simulation parameters
 sim_p = SimParams(
@@ -48,9 +49,9 @@ sim_p = SimParams(
 )
 
 ### Extract line data from files
-M = 1
+M = 3
 
-z_km, y_km, Z_c, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
+z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
 # r_km = [0.0]
 # Kundur parameters for testing
 Z_c = 380 # Ω
@@ -63,7 +64,8 @@ y_km = im*b_km
 z_km_ω = z_km[1]
 
 ### Define more data
-l = 300 #, 500, 750, 100 #km
+l = 100 #, 500, 750, 100 #km
+line_dict["BUS 1-BUS 2-i_1"] = l
 N = nothing
 t_fault = 0.25
 
@@ -75,7 +77,7 @@ p = ExpParams(
     N, 
     M, 
     l, 
-    Z_c, 
+    Z_c_abs, 
     z_km,
     y_km,
     z_km_ω, 
@@ -98,18 +100,18 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
 
 line_model_3 = "Multi-Segment Dynamic"
-
-for n in [1,2,3,4,5,10]
+seg_sys = nothing
+for n in [5]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
     results_ms_dyn, seg_sys = run_experiment(file_name, line_model_3, p)
 
     vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)_L"))
+    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)"))
 end
 
-plot!(xlims=(0.24, 0.5))
+plot!(xlims=(0.24, 0.3))
 plot!(ylims=(0.981,0.983))
 plot!(legend = false)
 plot!(legend=:bottomright)
