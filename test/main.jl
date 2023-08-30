@@ -11,16 +11,18 @@ using DataFrames
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
+include("../src/ExperimentStructs.jl")
+
 ### Choose test case
 # "SIIB.json"
 # "9bus.json"
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/9bus.json"
+file_name = "../data/json_data/inv_v_machine.json"
 # default_2_bus_line_dict - For 2 bus system
 # default_9_bus_line_dict - For 9 bus system
-line_dict = default_9_bus_line_dict
+line_dict = default_2_bus_line_dict
 
 ### Load relevant line data
 impedance_csv = "../data/cable_data/impedance_data.csv"
@@ -33,7 +35,7 @@ capacitance_csv = "../data/cable_data/C_per_km.csv"
 # "LoadChange"
 # "LoadTrip"
 # "InfBusChange"
-perturbation = "InfBusChange"
+perturbation = "CRC"
 
 ### Define simulation parameters
 sim_p = SimParams(
@@ -51,20 +53,23 @@ M = 1
 z_km, y_km, Z_c, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
 # r_km = [0.0]
 # Kundur parameters for testing
-# Z_c = 380 # Ω
-# r_km = 0.05 # Ω/km
-# x_km = 0.488 # Ω/km
-# g_km = 0.0 # S/km
-# b_km = 3.371e-6 # S/km
+Z_c = 380 # Ω
+r_km = 0.05 # Ω/km
+x_km = 0.488 # Ω/km
+g_km = 0.0 # S/km
+b_km = 3.371e-6 # S/km
+z_km = r_km + im*x_km
+y_km = im*b_km
+z_km_ω = z_km[1]
 
 ### Define more data
-l = 500 #, 500, 750, 100 #km
+l = 300 #, 500, 750, 100 #km
 N = nothing
 t_fault = 0.25
 
 ### Get perturbation struct
 perturbation_params = get_default_perturbation(t_fault, perturbation)
-# perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)
+#perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)
 
 p = ExpParams(
     N, 

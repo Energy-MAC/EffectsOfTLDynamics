@@ -1,49 +1,244 @@
-┌ Warning: 2023-08-24T18:58:30.329 [2610562:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /home/gabrielecr/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Info: 2023-08-24T18:58:30.329 [2610562:1]: Pre-Initializing Simulation States
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:265
-┌ Info: 2023-08-24T18:58:30.329 [2610562:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
-└ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
-┌ Info: 2023-08-24T18:58:30.329 [2610562:1]: PowerFlow solve converged, the results have been stored in the system
-└ @ PowerFlows /home/gabrielecr/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
-┌ Info: 2023-08-24T18:58:30.329 [2610562:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
-└ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
-┌ Info: 2023-08-24T18:58:30.330 [2610562:1]: Residual from initial guess: max = 6.021849685566849e-10 at 16, total = 1.4934726132554448e-9
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:101
-┌ Info: 2023-08-24T18:58:30.330 [2610562:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:68
-┌ Info: 2023-08-24T18:58:30.330 [2610562:1]: Attaching Perturbations
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:296
-┌ Info: 2023-08-24T18:58:30.330 [2610562:1]: Simulations status = BUILT
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:426
-┌ Info: 2023-08-24T18:58:30.330 [2610562:1]: 
+┌ Warning: 2023-08-29T19:39:10.863 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.864 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.864 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.864 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.864 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.864 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.864 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.864 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.865 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.865 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.865 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.865 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.865 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.865 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.866 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.866 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.866 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.866 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.866 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.866 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.866 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.866 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.866 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.867 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.867 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.867 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.867 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.867 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.867 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.867 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.867 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.867 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.868 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.869 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.870 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.871 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.871 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.871 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.871 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.871 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.871 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.871 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.871 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.872 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.872 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.872 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.872 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.872 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.872 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.872 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.872 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.872 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.873 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.873 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.873 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.873 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.873 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.873 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.874 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.874 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.874 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.874 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.874 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.874 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.874 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.875 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.875 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.875 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.875 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.875 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.875 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Warning: 2023-08-29T19:39:10.875 [22199:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
+└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
+┌ Info: 2023-08-29T19:39:10.877 [22199:1]: Pre-Initializing Simulation States
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:265
+┌ Info: 2023-08-29T19:39:10.877 [22199:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
+└ @ PowerSystems /Users/ruthkravis/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
+┌ Info: 2023-08-29T19:39:10.881 [22199:1]: PowerFlow solve converged, the results have been stored in the system
+└ @ PowerFlows /Users/ruthkravis/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
+┌ Info: 2023-08-29T19:39:10.881 [22199:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
+└ @ PowerSystems /Users/ruthkravis/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
+┌ Info: 2023-08-29T19:39:10.886 [22199:1]: Residual from initial guess: max = 3.951847599159564e-9 at 147, total = 3.1598078660920467e-7
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:101
+┌ Info: 2023-08-29T19:39:11.082 [22199:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:68
+┌ Info: 2023-08-29T19:39:11.082 [22199:1]: Attaching Perturbations
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:296
+┌ Info: 2023-08-29T19:39:11.082 [22199:1]: Simulations status = BUILT
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:426
+┌ Info: 2023-08-29T19:39:11.082 [22199:1]: 
 │  ───────────────────────────────────────────────────────────────────────────────
 │                                                      Time          Allocations  
 │                                                ───────────────   ───────────────
-│                 Total measured:                    1.23ms             502KiB    
+│                 Total measured:                     219ms            45.6MiB    
 │ 
 │  Section                               ncalls     time    %tot     alloc    %tot
 │  ───────────────────────────────────────────────────────────────────────────────
-│  Build Simulation                           1   1.23ms  100.0%    501KiB  100.0%
-│    Line Transform to Dynamic                1    167μs   13.6%   22.1KiB    4.4%
-│    Build Simulation Inputs                  1    288μs   23.4%   67.2KiB   13.4%
-│      Wrap Branches                          1   35.4μs    2.9%   2.41KiB    0.5%
-│      Wrap Dynamic Injectors                 1    142μs   11.6%   42.2KiB    8.4%
-│      Calculate MM, DAE_vector, Tota...      1   10.4μs    0.8%   1.95KiB    0.4%
-│      Wrap Static Injectors                  1   14.6μs    1.2%   2.22KiB    0.4%
-│    Pre-initialization                       1    417μs   33.8%    211KiB   42.0%
-│      Power Flow solution                    1    233μs   18.9%   89.3KiB   17.8%
-│      Initialize Static Injectors            1    381ns    0.0%     0.00B    0.0%
-│      Initialize Dynamic Injectors           1    143μs   11.6%    109KiB   21.8%
-│      Initialize Dynamic Branches            1   6.62μs    0.5%      384B    0.1%
-│    Calculate Jacobian                       1   59.3μs    4.8%   62.6KiB   12.5%
-│    Make Model Function                      1   3.72μs    0.3%      912B    0.2%
-│    Initial Condition NLsolve refine...      1    107μs    8.6%   83.6KiB   16.7%
-│    Build Perturbations                      1   25.0μs    2.0%   9.38KiB    1.9%
-│    Make DiffEq Problem                      1    136μs   11.0%   30.1KiB    6.0%
+│  Build Simulation                           1    219ms  100.0%   45.6MiB  100.0%
+│    Line Transform to Dynamic                1   12.3ms    5.6%   1.70MiB    3.7%
+│    Build Simulation Inputs                  1   1.48ms    0.7%   1.14MiB    2.5%
+│      Wrap Branches                          1    423μs    0.2%    162KiB    0.3%
+│      Wrap Dynamic Injectors                 1    214μs    0.1%   49.4KiB    0.1%
+│      Calculate MM, DAE_vector, Tota...      1    169μs    0.1%    365KiB    0.8%
+│      Wrap Static Injectors                  1   17.3μs    0.0%   2.20KiB    0.0%
+│    Pre-initialization                       1   4.46ms    2.0%   2.33MiB    5.1%
+│      Power Flow solution                    1   4.05ms    1.8%   2.18MiB    4.8%
+│      Initialize Static Injectors            1   1.62μs    0.0%     0.00B    0.0%
+│      Initialize Dynamic Injectors           1    262μs    0.1%    109KiB    0.2%
+│      Initialize Dynamic Branches            1    109μs    0.0%   37.5KiB    0.1%
+│    Calculate Jacobian                       1   4.01ms    1.8%   9.21MiB   20.2%
+│    Make Model Function                      1   10.7μs    0.0%   4.25KiB    0.0%
+│    Initial Condition NLsolve refine...      1    197ms   89.7%   31.2MiB   68.3%
+│    Build Perturbations                      1   32.7μs    0.0%   4.60KiB    0.0%
+│    Make DiffEq Problem                      1    162μs    0.1%   35.2KiB    0.1%
 │  ───────────────────────────────────────────────────────────────────────────────
 │ 
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:451
-┌ Error: 2023-08-24T19:14:54.554 [2610562:1]: Execution failed
-│   exception = (InterruptException(), Union{Ptr{Nothing}, Base.InterpreterIP}[Ptr{Nothing} @0x00007fbf09533dad, Ptr{Nothing} @0x00007fbf09f2fc2f, Ptr{Nothing} @0x00007fbf07580bee, Ptr{Nothing} @0x00007fbf07580f70, Ptr{Nothing} @0x00007fbcd47ff2d4, Ptr{Nothing} @0x00007fbcd47ff3c0, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbcd47fe8e6, Ptr{Nothing} @0x00007fbcd47fe9a6, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbcd3f16f8c, Ptr{Nothing} @0x00007fbcd3f17818, Ptr{Nothing} @0x00007fbcd3f17b83, Ptr{Nothing} @0x00007fbcd3f17be4, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbcd3f163ba, Ptr{Nothing} @0x00007fbcd3f167be, Ptr{Nothing} @0x00007fbcd3f16814, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf1dd1ff58, Ptr{Nothing} @0x00007fbcc0d69019, Ptr{Nothing} @0x00007fbcc0d6c67b, Ptr{Nothing} @0x00007fbcc0d7f6a4, Ptr{Nothing} @0x00007fbcc0d819db, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbcc0d5694f, Ptr{Nothing} @0x00007fbcc0d56bcd, Ptr{Nothing} @0x00007fbcc0d56df9, Ptr{Nothing} @0x00007fbcc0d56e36, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbcd47ad044, Ptr{Nothing} @0x00007fbcd47ae18d, Ptr{Nothing} @0x00007fbcd47ae418, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf091a30f8, Ptr{Nothing} @0x00007fbcd4b25b63, Ptr{Nothing} @0x00007fbcd4b266cf, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf1dd2cda4, Ptr{Nothing} @0x00007fbf1dd2c7c7, Ptr{Nothing} @0x00007fbf1dd2d415, Ptr{Nothing} @0x00007fbf1dd2e2f1, Base.InterpreterIP in top-level CodeInfo for Main at statement 0, Ptr{Nothing} @0x00007fbf1dd4923b, Ptr{Nothing} @0x00007fbf1dd49a89, Ptr{Nothing} @0x00007fbf1dd49a89, Ptr{Nothing} @0x00007fbf1dd4ae0a, Ptr{Nothing} @0x00007fbf0755a44f, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf1dd1ff58, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf1dd21e60, Ptr{Nothing} @0x00007fbf0922697c, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf1dd21e60, Ptr{Nothing} @0x00007fbf09227892, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf1dd21e60, Ptr{Nothing} @0x00007fbf075368ad, Ptr{Nothing} @0x00007fbf07536922, Ptr{Nothing} @0x00007fbf075371d2, Ptr{Nothing} @0x00007fbf07539128, Ptr{Nothing} @0x00007fbf075d266d, Ptr{Nothing} @0x00007fbf075d2a8e, Ptr{Nothing} @0x00007fbf075d404b, Ptr{Nothing} @0x00007fbf075d406f, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf091a30f8, Ptr{Nothing} @0x00007fbf075d3e3c, Ptr{Nothing} @0x00007fbf075d3f2f, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf1dd1ff58, Ptr{Nothing} @0x00007fbf07534af2, Ptr{Nothing} @0x00007fbf07534b12, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf1dd21e60, Ptr{Nothing} @0x00007fbf0751b228, Ptr{Nothing} @0x00007fbf0751b4ff, Ptr{Nothing} @0x00007fbf1dd10f5d, Ptr{Nothing} @0x00007fbf1dd325cf])
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:545
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:451
