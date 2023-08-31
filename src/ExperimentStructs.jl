@@ -86,6 +86,7 @@ default_branch_trip_params = BTParam("BUS 1-BUS 2-i_1_static")
 
 default_2_bus_line_dict = Dict(
     "BUS 1-BUS 2-i_1" => 100,
+    "BUS 1-BUS 2-i_1_static" => 100,
 )
 
 default_9_bus_line_dict = Dict(

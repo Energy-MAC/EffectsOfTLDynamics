@@ -47,7 +47,7 @@ sim_p = SimParams(
 )
 
 ### Extract line data from files
-M = 3
+M = 1
 
 z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
 # r_km = [0.0]
@@ -61,6 +61,8 @@ z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_cs
 ### Define more data
 l = 100 #, 500, 750, 100 #km
 line_dict["BUS 1-BUS 2-i_1"] = l
+line_dict["BUS 1-BUS 2-i_1_static"] = l
+
 N = nothing
 t_fault = 0.25
 
@@ -81,6 +83,9 @@ p = ExpParams(
     perturbation, 
     perturbation_params)
 
+# Verify impedance values of raw file vs CSV data
+verifying(file_name, M, impedance_csv, capacitance_csv, p)
+
 line_model_1 = "Algebraic"
 results_alg, sys = run_experiment(file_name, line_model_1, p);
 
@@ -95,8 +100,8 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
 
 line_model_3 = "Multi-Segment Dynamic"
-seg_sys = nothing
-for n in [5]
+results_ms_dyn, seg_sys = nothing, nothing
+for n in [1]
     print(n)
     p.N = n
     results_ms_dyn, seg_sys = nothing, nothing
@@ -106,44 +111,21 @@ for n in [5]
     display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)"))
 end
 
-plot!(xlims=(0.24, 0.3))
-plot!(ylims=(0.981,0.983))
-plot!(legend = false)
-plot!(legend=:bottomright)
+plot!(xlims=(0.25, 0.3))
+# plot!(ylims=(0.981,0.983))
+# plot!(legend = false)
+# plot!(legend=:bottomright)
 
-# l = first(get_components(Line, sys))
+l = get_component(Line, sys, "BUS 1-BUS 2-i_1")
+p_branch = get_activepower_branch_flow(results_alg, "BUS 1-BUS 2-i_1", :from)
+p_branch_dyn = get_activepower_branch_flow(results_dyn, "BUS 1-BUS 2-i_1", :from)
+p_branch_seg = get_activepower_branch_flow(results_ms_dyn, "BUS 1-BUS 2-i_1_segment_1", :from)
 
-# l_dyn = first(get_components(Line, sys_dyn))
+plot(p_branch)
+plot!(p_branch_dyn)
+plot!(ylim = (-1, -0.5))
 
-# n = 1
-# p.N = n
-# results_ms_dyn, sys_seg = nothing, nothing
-# results_ms_dyn, sys_seg = run_experiment(file_name, line_model_3, p);
-
-# y_total = 0;
-
-# b_total = 0
-# for l in get_components(Line, sys)
-#     r = l.r;
-#     x = l.x;
-#     z = r + im*x;
-#     b = l.b.from
-#     b_total = b_total + b
-#     y_total = y_total + 1/z;    
-# end
-
-# z_total = 1/y_total;
-# r_total = real(z_total)
-# x_total = imag(z_total)
-# b_total
-
-# l.r
-# l_dyn.r
-# l_seg.r
-
-# l.x
-# l_dyn.x
-# l_seg.x
-
-# l.b.from
-# l.b
+q_branch = get_reactivepower_branch_flow(results_alg, "BUS 1-BUS 2-i_1", :from)
+q_branch_dyn = get_reactivepower_branch_flow(results_dyn, "BUS 1-BUS 2-i_1", :from)
+plot(q_branch)
+plot!(q_branch_dyn)
