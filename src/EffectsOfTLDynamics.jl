@@ -9,6 +9,7 @@ export CRCParam
 export LCParam
 export LTParam
 export SBVCParam
+export BTParam
 
 export choose_disturbance
 export build_sim

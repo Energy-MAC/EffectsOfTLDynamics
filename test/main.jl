@@ -17,10 +17,10 @@ const PSID = PowerSimulationsDynamics;
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/inv_v_machine.json"
+file_name = "../data/json_data/9bus_slackless.json"
 # default_2_bus_line_dict - For 2 bus system
 # default_9_bus_line_dict - For 9 bus system
-line_dict = default_2_bus_line_dict
+line_dict = default_9_bus_line_dict
 
 ### Load relevant line data
 impedance_csv = "../data/cable_data/impedance_data.csv"
@@ -60,15 +60,17 @@ z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_cs
 
 ### Define more data
 l = 100 #, 500, 750, 100 #km
-line_dict["BUS 1-BUS 2-i_1"] = l
-line_dict["BUS 1-BUS 2-i_1_static"] = l
+# line_dict["BUS 1-BUS 2-i_1"] = l
+# line_dict["BUS 1-BUS 2-i_1_static"] = l
 
 N = nothing
 t_fault = 0.25
 
 ### Get perturbation struct
 perturbation_params = get_default_perturbation(t_fault, perturbation)
-# perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)
+perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
+# perturbation_params.branch_trip_params = BTParam("Bus 9-Bus 6-i_1")
+
 
 p = ExpParams(
     N, 
@@ -87,6 +89,7 @@ p = ExpParams(
 verifying(file_name, M, impedance_csv, capacitance_csv, p)
 
 line_model_1 = "Algebraic"
+sim = run_experiment(file_name, line_model_1, p);
 results_alg, sys = run_experiment(file_name, line_model_1, p);
 
 line_model_2 = "Dynamic"

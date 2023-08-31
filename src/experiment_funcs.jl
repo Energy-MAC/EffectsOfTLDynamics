@@ -259,7 +259,6 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
     if length(get_components(Bus, sys)) == 2
         ll = first(get_components(Line, sys))
-        
         ll_alg = Line(
                     name = ll.name * "_static",
                     available = true,
@@ -276,9 +275,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         set_active_power!(device, 0.8)
         alg_line_name = ll_alg.name
         add_component!(sys, ll_alg)
-
-
-    end
+        end
     
     # build segments model
     if (multi_segment == true)
@@ -290,7 +287,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
 
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
     show_states_initial_value(sim)
-    
+    return sim
     # execute simulation
     exec = execute_sim!(sim, p)
     
