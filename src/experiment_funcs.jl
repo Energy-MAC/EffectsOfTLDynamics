@@ -281,19 +281,19 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     if (multi_segment == true)
         sys = build_seg_model!(sys, p, dyn_lines, alg_line_name)
     else
-        sys = build_new_impedance_model!(sys, p, dyn_lines, alg_line_name)
+        # sys = build_new_impedance_model!(sys, p, dyn_lines, alg_line_name)
     end
     # build simulation
 
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
     show_states_initial_value(sim)
-    return sim
+    # return sim
     # execute simulation
     exec = execute_sim!(sim, p)
     
     # read results
     results = results_sim(sim)
-    return results, sys
+    return results, sim
 end
 
 function get_line_parameters(impedance_csv, capacitance_csv, M)
@@ -332,28 +332,33 @@ end
 function verifying(file_name, M, impedance_csv, capacitance_csv, p)
     sys = System(joinpath(pwd(), file_name))
     
-    for l in get_components(Line, sys)
-        println("z_pu_ll = $(l.r) + j $(l.x)")
-        println("b_pu_ll = $(l.b.from + l.b.to)")
-    end
+    for ll in get_components(Line, sys)
+        println("\n"*ll.name)
+        println("z_pu_ll = $(ll.r) + j $(ll.x)")
+        println("b_pu_ll = $(ll.b.from + ll.b.to)")
 
-    for m in 1:M
-        z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, m)
-        z_km_pu = z_km/Z_c_abs
-        y_km_pu = y_km*Z_c_abs
-        z_km_ω_pu = z_km_ω/Z_c_abs
+        for m in 1:M
+            z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, m)
+            z_km_pu = z_km/Z_c_abs
+            y_km_pu = y_km*Z_c_abs
+            z_km_ω_pu = z_km_ω/Z_c_abs
+            
+            l = p.l_dict[ll.name]
+            println("Parallel branch impedances, with N = 1 and M = $(m)")
+            z_pu_ll = z_km_pu*l
+            #println("z_pu_ll = $(z_pu_ll)")
+    
+            b_pu_ll = imag(y_km_pu*l)
+            println("b_pu_ll = $(b_pu_ll)")
+            
+            # z_pu_w_ll = z_km_ω_pu * l
+            # println("z_pu_w_ll = $(z_pu_w_ll)")
 
-        z_pu_ll = z_km_pu*p.l
-        #println("z_pu_ll = $(z_pu_ll)")
-
-        b_pu_ll = imag(y_km_pu*p.l)
-        #println("b_pu_ll = $(b_pu_ll)")
-        
-        z_pu_w_ll = z_km_ω_pu * p.l
-        println("z_pu_w_ll = $(z_pu_w_ll)")
-
-        abs_z_pu_w_ll = abs(z_pu_w_ll)
-        println("z_pu_w_ll = $(abs_z_pu_w_ll)")
+            println("z_km_pu_ll = $(z_km_pu*l)")
+    
+            # abs_z_pu_w_ll = abs(z_pu_w_ll)
+            # println("z_pu_w_ll = $(abs_z_pu_w_ll)")
+        end
     end
 end
 

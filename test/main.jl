@@ -68,7 +68,7 @@ t_fault = 0.25
 
 ### Get perturbation struct
 perturbation_params = get_default_perturbation(t_fault, perturbation)
-perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
+# perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
 # perturbation_params.branch_trip_params = BTParam("Bus 9-Bus 6-i_1")
 
 
@@ -86,14 +86,17 @@ p = ExpParams(
     perturbation_params)
 
 # Verify impedance values of raw file vs CSV data
-verifying(file_name, M, impedance_csv, capacitance_csv, p)
+verifying(file_name, 5, impedance_csv, capacitance_csv, p)
 
 line_model_1 = "Algebraic"
-sim = run_experiment(file_name, line_model_1, p);
-results_alg, sys = run_experiment(file_name, line_model_1, p);
+results_alg, sim = run_experiment(file_name, line_model_1, p);
+sys = sim.sys
+s = small_signal_analysis(sim)
 
 line_model_2 = "Dynamic"
-results_dyn, sys_dyn = run_experiment(file_name, line_model_2, p);
+results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
+sys_dyn = sim_dyn.sys
+s_dyn = small_signal_analysis(sim_dyn)
 
 vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
 vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
@@ -103,12 +106,14 @@ plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
 
 line_model_3 = "Multi-Segment Dynamic"
-results_ms_dyn, seg_sys = nothing, nothing
-for n in [1]
+results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing
+for n in [5]
     print(n)
     p.N = n
-    results_ms_dyn, seg_sys = nothing, nothing
-    results_ms_dyn, seg_sys = run_experiment(file_name, line_model_3, p)
+    results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing
+    results_ms_dyn, seg_sim = run_experiment(file_name, line_model_3, p)
+    seg_sys = seg_sim.sys
+    s_seg = small_signal_analysis(seg_sim)
 
     vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
     display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)"))
