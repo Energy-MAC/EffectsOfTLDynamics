@@ -17,10 +17,10 @@ const PSID = PowerSimulationsDynamics;
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/9bus_slackless.json"
+file_name = "../data/json_data/inv_v_machine.json"
 # default_2_bus_line_dict - For 2 bus system
 # default_9_bus_line_dict - For 9 bus system
-line_dict = default_9_bus_line_dict
+line_dict = default_2_bus_line_dict
 
 ### Load relevant line data
 impedance_csv = "../data/cable_data/impedance_data.csv"
@@ -83,10 +83,13 @@ p = ExpParams(
     line_dict,
     sim_p, 
     perturbation, 
-    perturbation_params)
+    perturbation_params,
+    nothing,
+    nothing
+)
 
 # Verify impedance values of raw file vs CSV data
-verifying(file_name, 5, impedance_csv, capacitance_csv, p)
+verifying(file_name, M, impedance_csv, capacitance_csv, p)
 
 line_model_1 = "Algebraic"
 results_alg, sim = run_experiment(file_name, line_model_1, p);
@@ -108,15 +111,32 @@ plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
 line_model_3 = "Multi-Segment Dynamic"
 results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing
 for n in [5]
-    print(n)
-    p.N = n
-    results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing
-    results_ms_dyn, seg_sim = run_experiment(file_name, line_model_3, p)
-    seg_sys = seg_sim.sys
-    s_seg = small_signal_analysis(seg_sim)
+    for l in [100, 300, 500]
+        vr_ms_dyns = [nothing, nothing, nothing]
+        count = 1
+        for (p_load, q_load) in [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
+            p.N = n
+            p.l = l
+            p.p_load = p_load
+            p.q_load = q_load
+            results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing
+            results_ms_dyn, seg_sim = run_experiment(file_name, line_model_3, p)
+            seg_sys = seg_sim.sys
+            s_seg = small_signal_analysis(seg_sim)
 
-    vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-    display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)"))
+            vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
+            vr_ms_dyns[count] = vr_ms_dyn
+            count += 1
+        end
+        # Plot the results for all 3 load values
+        plot(vr_ms_dyns[1], xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)")
+        plot!(vr_ms_dyns[2], xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)")
+        plot!(vr_ms_dyns[3], xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)")
+        plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
+        # Display plot
+        display(plot!())
+    end
+    print(n)
 end
 
 plot!(xlims=(0.25, 0.3))

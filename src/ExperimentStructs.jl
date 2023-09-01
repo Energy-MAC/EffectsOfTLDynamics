@@ -74,6 +74,8 @@ end
     sim_params::SimParams
     perturbation::String
     perturbation_params::PerturbationParams
+    p_load::Union{Float64, Nothing} = nothing
+    q_load::Union{Float64, Nothing} = nothing
 end
 
 default_bic_params = BICParam("line-102-103", 1.0)

@@ -271,17 +271,36 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
             )
-        device = first(get_components(Generator, sys))
-        set_active_power!(device, 0.8)
+        # device = first(get_components(Generator, sys))
+        # set_active_power!(device, 0.8)
         alg_line_name = ll_alg.name
         add_component!(sys, ll_alg)
-        end
+        load = StandardLoad(
+            name = "load1",
+            available = true,
+            bus = get_component(Bus, sys, "BUS 2"),
+            base_power = 100.0,
+            constant_active_power = 0.0,
+            constant_reactive_power = 0.0,
+            impedance_active_power = p.p_load,
+            impedance_reactive_power = p.q_load,
+            current_active_power = 0.0,
+            current_reactive_power = 0.0,
+            max_constant_active_power = 0.0,
+            max_constant_reactive_power = 0.0,
+            max_impedance_active_power = p.p_load,
+            max_impedance_reactive_power = p.q_load,
+            max_current_active_power = 0.0,
+            max_current_reactive_power = 0.0,
+        )
+        add_component!(sys, load)
+    end
     
     # build segments model
     if (multi_segment == true)
         sys = build_seg_model!(sys, p, dyn_lines, alg_line_name)
     else
-        # sys = build_new_impedance_model!(sys, p, dyn_lines, alg_line_name)
+        sys = build_new_impedance_model!(sys, p, dyn_lines, alg_line_name)
     end
     # build simulation
 
