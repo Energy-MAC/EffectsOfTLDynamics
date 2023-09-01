@@ -112,7 +112,8 @@ line_model_3 = "Multi-Segment Dynamic"
 results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing
 for n in [5]
     for l in [100, 300, 500]
-        vr_ms_dyns = [nothing, nothing, nothing]
+        # initialize storage for simulation results
+        vr_ms_dyns = Vector{Vector{Float64}}(undef, 3)
         count = 1
         for (p_load, q_load) in [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
             p.N = n
