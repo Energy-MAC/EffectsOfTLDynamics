@@ -164,109 +164,121 @@ g_km = 0.0; # S/km
 b_km = 3.371e-6; # S/km
 z_km = r_km + im*x_km;
 y_km = g_km + im*b_km;
+M = 1;
 
-N = 4; # Number of segments. 
-M = 1; # Number of parallel branches 
+Nrange = 1:15;
 
-perturbation_type = "CRC"
-t_fault = 0.25
-perturbation_params = get_default_perturbation(t_fault, perturbation_type)
+results = zeros(length(Nrange),4);
+idx = 1;
+for N in Nrange;
 
-p = ExpParams(
-    N, 
-    M, 
-    l, 
-    Z_c, 
-    z_km,
-    y_km,
-    z_km, 
-    line_dict,
-    sim_p,
-    perturbation_type, 
-    perturbation_params)
+    perturbation_type = "CRC"
+    t_fault = 0.25
+    perturbation_params = get_default_perturbation(t_fault, perturbation_type)
 
-sys = System(joinpath(pwd(), file_name));
-sys_ms = build_seg_model!(sys, p, true, "")
+    p = ExpParams(
+        N, 
+        M, 
+        l, 
+        Z_c, 
+        z_km,
+        y_km,
+        z_km, 
+        line_dict,
+        sim_p,
+        perturbation_type, 
+        perturbation_params)
 
-dist = choose_disturbance(sys, perturbation_type, p)
+    sys = System(joinpath(pwd(), file_name));
+    sys_ms = build_seg_model!(sys, p, true, "")
 
-# Make a pi line model 
-sim = PSID.Simulation(
-           MassMatrixModel, #Type of model used
-           sys_ms, #system
-           pwd(), #folder to output results
-           (0.0, 2.0), #time span
-           dist, #Type of perturbation
-           all_lines_dynamic = true
-       )
+    dist = choose_disturbance(sys, perturbation_type, p)
 
-ssig = small_signal_analysis(sim);
+    # Make a pi line model 
+    sim = PSID.Simulation(
+            MassMatrixModel, #Type of model used
+            sys_ms, #system
+            pwd(), #folder to output results
+            (0.0, 2.0), #time span
+            dist, #Type of perturbation
+            all_lines_dynamic = true
+        )
 
-J = ssig.reduced_jacobian;
+    ssig = small_signal_analysis(sim);
 
-state_index = collect(1:size(J)[1]); # Get list of all state indices 
+    J = ssig.reduced_jacobian;
 
-# iterate through 'devices' in model to get corresponding states for those devices. 
-d = get_state_index_map(ssig.index);
+    state_index = collect(1:size(J)[1]); # Get list of all state indices 
 
-# line_states = get_subsystem_states!([line_ids[1], "V_"], d); # need to pick up voltage states using "V_"
-# display(get_val!(d, line_states));
-# line_A_i = line_states;
-# lineA = construct_A_matrix(J, line_A_i);
-# # Apply mask to remove entries that should be zero - this might be tricky for arbitrary N ?
+    # iterate through 'devices' in model to get corresponding states for those devices. 
+    d = get_state_index_map(ssig.index);
 
+    # Get info on all the line subsystems 
+    for line_subsys in line_ids;
+        line_states = get_subsystem_states!([line_subsys, "V_"], d); # need to pick up voltage states using "V_"
+        #display(get_val!(d, line_states));
+        line_A_i = line_states;
+        lineA = construct_A_matrix(J, line_A_i);
+        line_bw = maximum(abs.(imag(eigvals(lineA))));
+        display("Line bandwidth (rad/s): "*string(line_bw))
+        results[idx,1] = line_bw;
+    end
 
-# line_bw = maximum(abs.(imag(eigvals(lineA))))
+    # Get info on all the inverter subsystems 
+    for inv_subsys in inv_ids;
+        inv_states = get_subsystem_states!([inv_subsys], d);
+        #display(get_val!(d, inv_states));
+        inv_A_i = inv_states;
+        invA = construct_A_matrix(J, inv_A_i);
+        inv_bw = maximum(abs.(imag(eigvals(invA))));
+        display("Device "*inv_subsys*" bandwidth (rad/s): "*string(inv_bw))
+        results[idx, 2] = inv_bw
+    end
+    
 
-# Get info on all the line subsystems 
-for line_subsys in line_ids;
-    line_states = get_subsystem_states!([line_subsys, "V_"], d); # need to pick up voltage states using "V_"
-    #display(get_val!(d, line_states));
-    line_A_i = line_states;
-    lineA = construct_A_matrix(J, line_A_i);
-    line_bw = maximum(abs.(imag(eigvals(lineA))));
-    display("Line bandwidth (rad/s): "*string(line_bw))
+    sys_bw = maximum(abs.(imag(ssig.eigenvalues)));
+    display("Combined system bandwidth: "*string(sys_bw))
+    results[idx,3] = sys_bw;
+
+    # Darco proces of finding interaction modes. 
+
+    pf = summary_participation_factors(ssig); # get all pf 
+    # Need to find the indices of the pf_df that correspond to different subsystems.
+    # These are different to indices in state space.  
+
+    subsys_ns = Dict(); # store vectors of overall participation by each subsys 
+    for subsys in union(inv_ids, line_ids);
+        df = get_subsys_df!(subsys, pf);
+        n = get_interaction_modes(pf, df);
+        subsys_ns[subsys] = n;
+    end
+
+    # Define threshold 
+    thr = 0.01; # threshold for participation
+
+    interacting_modes = [];
+    for pair in connections;
+        s1 = subsys_ns[pair[1]];
+        s2 = subsys_ns[pair[2]];
+        coupled = (s1.>thr) .&  (s1.>thr);
+        coupled_eigs = ssig.eigenvalues[vec(coupled)]; # what is a smarter way to do this?
+        append!(interacting_modes, coupled_eigs)
+    end
+
+    interacting_modes = unique(interacting_modes);
+    interacting_bw = maximum(abs.(imag(interacting_modes)));
+    print("Bandwidth of interacting inverter modes (rad/s): "*string(interacting_bw))
+    results[idx,4] = interacting_bw;
+    idx += 1;
 end
 
-# Get info on all the inverter subsystems 
-for inv_subsys in inv_ids;
-    inv_states = get_subsystem_states!([inv_subsys], d);
-    #display(get_val!(d, inv_states));
-    inv_A_i = inv_states;
-    invA = construct_A_matrix(J, inv_A_i);
-    inv_bw = maximum(abs.(imag(eigvals(invA))));
-    display("Device "*inv_subsys*" bandwidth (rad/s): "*string(inv_bw))
-end
+results
 
-sys_bw = maximum(abs.(imag(ssig.eigenvalues)));
-display("Combined system bandwidth: "*string(sys_bw))
+plot()
+plot!(Nrange, results[:,1], label="line bw")
+plot!(Nrange, results[:,2], label="inv bw")
+plot!(Nrange, results[:,4], label="interacting bw")
 
-# Darco proces of finding interaction modes. 
-
-pf = summary_participation_factors(ssig); # get all pf 
-# Need to find the indices of the pf_df that correspond to different subsystems.
-# These are different to indices in state space.  
-
-subsys_ns = Dict(); # store vectors of overall participation by each subsys 
-for subsys in union(inv_ids, line_ids);
-    df = get_subsys_df!(subsys, pf);
-    n = get_interaction_modes(pf, df);
-    subsys_ns[subsys] = n;
-end
-
-# Define threshold 
-thr = 0.05; # threshold for participation
-
-interacting_modes = [];
-for pair in connections;
-    s1 = subsys_ns[pair[1]];
-    s2 = subsys_ns[pair[2]];
-    coupled = (s1.>thr) .&  (s1.>thr);
-    coupled_eigs = ssig.eigenvalues[vec(coupled)]; # what is a smarter way to do this?
-    append!(interacting_modes, coupled_eigs)
-end
-
-interacting_modes = unique(interacting_modes);
-interacting_bw = maximum(abs.(imag(interacting_modes)));
-print("Bandwidth of interacting inverter modes (rad/s): "*string(interacting_bw))
-
+xlabel!("N")
+ylabel!("Bandwidth (rad/s)")
+title!("Length="*string(l)*"km")

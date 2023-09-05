@@ -12,6 +12,7 @@ const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
 include("../src/ExperimentStructs.jl")
+include("../src/experiment_funcs.jl")
 
 ### Choose test case
 # "SIIB.json"

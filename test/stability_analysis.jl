@@ -18,9 +18,8 @@ line_dict = default_2_bus_line_dict
 l = 100; # Line length (km)
 line_dict["BUS 1-BUS 2-i_1"] = l;
 
-impedance_csv = "../data/cable_data/impedance_data.csv"
-capacitance_csv = "../data/cable_data/C_per_km.csv"
-
+# impedance_csv = "../data/cable_data/impedance_data.csv"
+# capacitance_csv = "../data/cable_data/C_per_km.csv"
 
 # Define line parameters 
 Z_c = 380.0; # Ω
@@ -38,22 +37,7 @@ perturbation_type = "CRC"
 t_fault = 0.25
 perturbation_params = get_default_perturbation(t_fault, perturbation_type)
 
-
 #z_km, y_km, Z_c, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
-
-p = ExpParams(N, M, l, abs(Z_c), z_km,y_km, z_km, line_dict,sim_p, perturbation_type,perturbation_params)
-sys = System(joinpath(pwd(), file_name));
-dist = choose_disturbance(sys, perturbation_type, p)
-sys_ms = build_seg_model!(sys, p)
-
-sim = PSID.Simulation(
-        MassMatrixModel, #Type of model used
-        sys_ms, #system
-        pwd(), #folder to output results
-        (0.0, 2.0), #time span
-        dist, #Type of perturbation
-        all_lines_dynamic = true
-    )
 
 #frange = [0.1, 0.5, 2, 5, 10, 100]
 frange = [1]

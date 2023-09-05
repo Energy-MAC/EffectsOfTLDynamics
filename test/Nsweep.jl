@@ -13,9 +13,9 @@ const PSID = PowerSimulationsDynamics;
 include("../src/ExperimentStructs.jl")
 include("../src/experiment_funcs.jl")
 
-file_name = "../data/json_data/inv_v_machine.json"; # choose system 
+file_name = "../data/json_data/twobus_2inv.json"; # choose system 
 line_dict = default_2_bus_line_dict
-l = 500; # Line length (km)
+l = 300; # Line length (km)
 line_dict["BUS 1-BUS 2-i_1"] = l;
 
 
@@ -25,9 +25,8 @@ r_km = 0.05; # Ω/km
 x_km = 0.488; # Ω/km
 g_km = 0; # S/km
 b_km = 3.371e-6; # S/km
-z_km = (r_km + im*x_km)*3;
+z_km = (r_km + im*x_km);
 y_km = im*b_km;
-
 
 M = 1; # Number of parallel branches 
 
@@ -35,7 +34,11 @@ perturbation_type = "CRC"
 t_fault = 0.25
 perturbation_params = get_default_perturbation(t_fault, perturbation_type)
 
-Nrange = [1,50,100];
+lseg_opt = 60;
+# find closest N 
+Nup = ceil(l/lseg_opt);
+
+Nrange = [1,2,50];
 
 stb = [];
 max_λ = []
@@ -57,7 +60,7 @@ for N in Nrange;
     perturbation_params)
 
     sys = System(joinpath(pwd(), file_name));
-    sys_ms = build_seg_model!(sys, p)
+    sys_ms = build_seg_model!(sys, p, true, "")
     dist = choose_disturbance(sys_ms, perturbation_type, p)
 
     sim = PSID.Simulation(
@@ -69,19 +72,22 @@ for N in Nrange;
            all_lines_dynamic = true
        )
 
-    ss = small_signal_analysis(sim)
-    push!(stb, ss)
-    push!(max_λ, maximum(real(ss.eigenvalues)))
-    n_eigs = length(ss.eigenvalues)
-    push!(second_λ, ss.eigenvalues[n_eigs-2])
-    
-    # # Plot eigenvalues 
-    display(plot!(real(ss.eigenvalues), imag(ss.eigenvalues), seriestype=:scatter, label="N="*string(N)))
+    if sim.status != PSID.BUILD_FAILED
+        ss = small_signal_analysis(sim)
+        push!(stb, ss)
+        push!(max_λ, maximum(real(ss.eigenvalues)))
+        n_eigs = length(ss.eigenvalues)
+        push!(second_λ, ss.eigenvalues[n_eigs-2])
+        
+        # # Plot eigenvalues 
+        display(plot!(real(ss.eigenvalues), imag(ss.eigenvalues), seriestype=:scatter, label="N="*string(N)))
+    end
 
 end
 
 max_λ
 second_λ
+stb
 
 
 xlabel!("Real")

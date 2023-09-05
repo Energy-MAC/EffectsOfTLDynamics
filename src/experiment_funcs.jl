@@ -334,8 +334,9 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     else
         return error("Unknown line model")
     end
-
+    
     alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
+    
     if length(get_components(Bus, sys)) == 2
         ll = first(get_components(Line, sys))
         
