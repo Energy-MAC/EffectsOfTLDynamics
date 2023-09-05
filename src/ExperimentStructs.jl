@@ -70,6 +70,8 @@ end
     z_km::Union{Vector{ComplexF64}, ComplexF64}
     y_km::Union{Vector{ComplexF64}, ComplexF64}
     z_km_ω::ComplexF64
+    z_km_ω_5_to_1::ComplexF64
+    Z_c_5_to_1_abs::Float64
     l_dict::Union{Dict{String, Int64}, Nothing} = nothing
     sim_params::SimParams
     perturbation::String
