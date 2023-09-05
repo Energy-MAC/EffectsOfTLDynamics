@@ -101,8 +101,8 @@ function build_new_impedance_model!(sys, p::ExpParams, dyn_lines::Bool, alg_line
     γ = sqrt(z_km_ω*y_km)
 
     for ll in get_components(Line, sys)
-        l = p.l
-        # l = p.l_dict[ll.name] #km
+        # l = p.l
+        l = p.l_dict[ll.name] #km
         println(l)
         z_ll = z_km_ω_pu*l*(sinh(γ*l)/(γ*l))
         y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
@@ -137,8 +137,8 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
     
     for ll in collect(get_components(Line, sys_segs))
         if ll.name == alg_line_name
-            l = p.l
-            # l = p.l_dict[ll.name] #km
+            # l = p.l
+            l = p.l_dict[ll.name] #km
             println(l)
             z_ll = z_km_ω_pu*l*(sinh(γ*l)/(γ*l))
             y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
@@ -339,7 +339,6 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     
     if length(get_components(Bus, sys)) == 2
         ll = first(get_components(Line, sys))
-        
         ll_alg = Line(
                     name = ll.name * "_static",
                     available = true,
@@ -352,9 +351,29 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
                     rate = ll.rate,
                     angle_limits = ll.angle_limits,
             )
-        
+        # device = first(get_components(Generator, sys))
+        # set_active_power!(device, 0.8)
         alg_line_name = ll_alg.name
         add_component!(sys, ll_alg)
+        load = StandardLoad(
+            name = "load1",
+            available = true,
+            bus = get_component(Bus, sys, "BUS 2"),
+            base_power = 100.0,
+            constant_active_power = 0.0,
+            constant_reactive_power = 0.0,
+            impedance_active_power = p.p_load,
+            impedance_reactive_power = p.q_load,
+            current_active_power = 0.0,
+            current_reactive_power = 0.0,
+            max_constant_active_power = 0.0,
+            max_constant_reactive_power = 0.0,
+            max_impedance_active_power = p.p_load,
+            max_impedance_reactive_power = p.q_load,
+            max_current_active_power = 0.0,
+            max_current_reactive_power = 0.0,
+        )
+        add_component!(sys, load)
     end
     
     # build segments model
@@ -367,7 +386,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
 
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
     show_states_initial_value(sim)
-    
+    # return sim
     # execute simulation
     exec = execute_sim!(sim, p)
     
@@ -408,6 +427,40 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
     return z_km, y_km[1], abs(Z_c), z_km_ω
 end
 
+# Verifying
+function verifying(file_name, M, impedance_csv, capacitance_csv, p)
+    sys = System(joinpath(pwd(), file_name))
+    
+    for ll in get_components(Line, sys)
+        println("\n"*ll.name)
+        println("z_pu_ll = $(ll.r) + j $(ll.x)")
+        println("b_pu_ll = $(ll.b.from + ll.b.to)")
+
+        for m in 1:M
+            z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, m)
+            z_km_pu = z_km/Z_c_abs
+            y_km_pu = y_km*Z_c_abs
+            z_km_ω_pu = z_km_ω/Z_c_abs
+            
+            l = p.l_dict[ll.name]
+            println("Parallel branch impedances, with N = 1 and M = $(m)")
+            z_pu_ll = z_km_pu*l
+            #println("z_pu_ll = $(z_pu_ll)")
+    
+            b_pu_ll = imag(y_km_pu*l)
+            println("b_pu_ll = $(b_pu_ll)")
+            
+            # z_pu_w_ll = z_km_ω_pu * l
+            # println("z_pu_w_ll = $(z_pu_w_ll)")
+
+            println("z_km_pu_ll = $(z_km_pu*l)")
+    
+            # abs_z_pu_w_ll = abs(z_pu_w_ll)
+            # println("z_pu_w_ll = $(abs_z_pu_w_ll)")
+        end
+    end
+end
+
 export choose_disturbance
 export build_sim
 export execute_sim
@@ -416,3 +469,4 @@ export build_new_impedance_model
 export build_seg_model
 export run_experiment
 export get_line_parameters
+export verifying

@@ -9,6 +9,7 @@ export CRCParam
 export LCParam
 export LTParam
 export SBVCParam
+export BTParam
 
 export choose_disturbance
 export build_sim
@@ -17,6 +18,8 @@ export results_sim
 export build_new_impedance_model
 export build_seg_model
 export run_experiment
+export get_line_parameters
+export verifying
 
 export default_bic_params
 export default_gen_trip_params

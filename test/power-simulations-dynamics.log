@@ -1,74 +1,42 @@
-┌ Warning: 2023-09-01T13:42:56.981 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.981 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.981 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.981 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.981 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.982 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.982 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.982 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.982 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.982 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.982 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.982 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.982 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.983 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Warning: 2023-09-01T13:42:56.983 [31985:1]: struct DynamicBranch does not exist in validation configuration file, validation skipped
-└ @ InfrastructureSystems /Users/ruthkravis/.julia/packages/InfrastructureSystems/c88O2/src/validation.jl:51
-┌ Info: 2023-09-01T13:42:56.983 [31985:1]: Pre-Initializing Simulation States
-└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:265
-┌ Info: 2023-09-01T13:42:56.983 [31985:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
-└ @ PowerSystems /Users/ruthkravis/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
-┌ Info: 2023-09-01T13:42:56.984 [31985:1]: PowerFlow solve converged, the results have been stored in the system
-└ @ PowerFlows /Users/ruthkravis/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
-┌ Info: 2023-09-01T13:42:56.984 [31985:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
-└ @ PowerSystems /Users/ruthkravis/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
-┌ Info: 2023-09-01T13:42:56.985 [31985:1]: Residual from initial guess: max = 8.681565535906266e-10 at 24, total = 1.3708362157821363e-8
-└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:101
-┌ Info: 2023-09-01T13:42:56.985 [31985:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
-└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:68
-┌ Info: 2023-09-01T13:42:56.985 [31985:1]: Attaching Perturbations
-└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:296
-┌ Info: 2023-09-01T13:42:56.985 [31985:1]: Simulations status = BUILT
-└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:426
-┌ Info: 2023-09-01T13:42:56.985 [31985:1]: 
+┌ Info: 2023-08-31T01:21:19.484 [2993026:1]: Pre-Initializing Simulation States
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:265
+┌ Info: 2023-08-31T01:21:19.484 [2993026:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
+└ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
+┌ Info: 2023-08-31T01:21:19.485 [2993026:1]: PowerFlow solve converged, the results have been stored in the system
+└ @ PowerFlows /home/gabrielecr/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
+┌ Info: 2023-08-31T01:21:19.485 [2993026:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
+└ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9jm8v/src/base.jl:407
+┌ Info: 2023-08-31T01:21:19.507 [2993026:1]: Residual from initial guess: max = 2.3722501740763846e-9 at 62, total = 2.6766112811819615e-9
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:101
+┌ Info: 2023-08-31T01:21:19.508 [2993026:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/nlsolve_wrapper.jl:68
+┌ Info: 2023-08-31T01:21:19.508 [2993026:1]: Attaching Perturbations
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:296
+┌ Info: 2023-08-31T01:21:19.508 [2993026:1]: Simulations status = BUILT
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:426
+┌ Info: 2023-08-31T01:21:19.508 [2993026:1]: 
 │  ───────────────────────────────────────────────────────────────────────────────
 │                                                      Time          Allocations  
 │                                                ───────────────   ───────────────
-│                 Total measured:                    4.62ms            2.10MiB    
+│                 Total measured:                    24.3ms            1.65MiB    
 │ 
 │  Section                               ncalls     time    %tot     alloc    %tot
 │  ───────────────────────────────────────────────────────────────────────────────
-│  Build Simulation                           1   4.62ms  100.0%   2.09MiB  100.0%
-│    Line Transform to Dynamic                1   2.13ms   46.1%    262KiB   12.2%
-│    Build Simulation Inputs                  1    598μs   12.9%    162KiB    7.5%
-│      Wrap Branches                          1    146μs    3.2%   25.5KiB    1.2%
-│      Wrap Dynamic Injectors                 1    197μs    4.3%   58.0KiB    2.7%
-│      Calculate MM, DAE_vector, Tota...      1   28.5μs    0.6%   14.4KiB    0.7%
-│      Wrap Static Injectors                  1   15.8μs    0.3%   2.14KiB    0.1%
-│    Pre-initialization                       1   1.04ms   22.4%    592KiB   27.6%
-│      Power Flow solution                    1    735μs   15.9%    389KiB   18.1%
-│      Initialize Static Injectors            1    917ns    0.0%     0.00B    0.0%
-│      Initialize Dynamic Injectors           1    255μs    5.5%    190KiB    8.9%
-│      Initialize Dynamic Branches            1   19.8μs    0.4%   5.62KiB    0.3%
-│    Calculate Jacobian                       1    288μs    6.2%    527KiB   24.6%
-│    Make Model Function                      1   5.00μs    0.1%   1.55KiB    0.1%
-│    Initial Condition NLsolve refine...      1    363μs    7.9%    551KiB   25.7%
-│    Build Perturbations                      1   29.8μs    0.6%   4.65KiB    0.2%
-│    Make DiffEq Problem                      1    147μs    3.2%   35.2KiB    1.6%
+│  Build Simulation                           1   24.3ms  100.0%   1.64MiB  100.0%
+│    Build Simulation Inputs                  1    384μs    1.6%    116KiB    6.9%
+│      Wrap Branches                          1   1.95μs    0.0%      240B    0.0%
+│      Wrap Dynamic Injectors                 1    221μs    0.9%   68.0KiB    4.0%
+│      Calculate MM, DAE_vector, Tota...      1   15.2μs    0.1%   6.44KiB    0.4%
+│      Wrap Static Injectors                  1   31.5μs    0.1%   9.64KiB    0.6%
+│    Pre-initialization                       1   22.3ms   91.5%    723KiB   42.9%
+│      Power Flow solution                    1    513μs    2.1%    375KiB   22.3%
+│      Initialize Static Injectors            1    340ns    0.0%     0.00B    0.0%
+│      Initialize Dynamic Injectors           1   21.7ms   89.1%    337KiB   20.0%
+│    Calculate Jacobian                       1   81.0μs    0.3%    164KiB    9.7%
+│    Make Model Function                      1   3.32μs    0.0%   1.36KiB    0.1%
+│    Initial Condition NLsolve refine...      1   1.40ms    5.8%    627KiB   37.2%
+│    Build Perturbations                      1   39.4μs    0.2%   9.27KiB    0.6%
+│    Make DiffEq Problem                      1    135μs    0.6%   30.1KiB    1.8%
 │  ───────────────────────────────────────────────────────────────────────────────
 │ 
-└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:451
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:451

@@ -74,6 +74,8 @@ end
     sim_params::SimParams
     perturbation::String
     perturbation_params::PerturbationParams
+    p_load::Union{Float64, Nothing} = nothing
+    q_load::Union{Float64, Nothing} = nothing
 end
 
 default_bic_params = BICParam("line-102-103", 1.0)
@@ -86,6 +88,7 @@ default_branch_trip_params = BTParam("BUS 1-BUS 2-i_1_static")
 
 default_2_bus_line_dict = Dict(
     "BUS 1-BUS 2-i_1" => 100,
+    "BUS 1-BUS 2-i_1_static" => 100,
 )
 
 default_9_bus_line_dict = Dict(
