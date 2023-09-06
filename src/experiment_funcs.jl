@@ -172,7 +172,7 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
         end
         l = p.l_dict[ll.name] #km
 
-        N = Int(l/l_seg)
+        N = Int(ceil(l/l_seg))
         # l_seg = l/N
         z_seg_pu = z_km_pu*l_seg
         y_seg_pu = y_km_pu*l_seg

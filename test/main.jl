@@ -17,7 +17,7 @@ const PSID = PowerSimulationsDynamics;
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/SIIB.json"
+file_name = "../data/json_data/inv_v_machine.json"
 # default_2_bus_line_dict - For 2 bus system
 # default_9_bus_line_dict - For 9 bus system
 line_dict = default_2_bus_line_dict
@@ -43,7 +43,7 @@ sim_p = SimParams(
     maxiters = Int(1e10),
     dtmax = 1e-4,
     solver = "Rodas4",
-    t_max = 20.0,
+    t_max = 2.0,
 )
 
 ### Extract line data from files
@@ -71,9 +71,9 @@ perturbation_params = get_default_perturbation(t_fault, perturbation)
 # perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
 # perturbation_params.branch_trip_params = BTParam("Bus 9-Bus 6-i_1")
 
-p_load = 1.0
-q_load = 0.25
-l_seg = 10 #km
+p_load = nothing
+q_load = nothing
+l_seg = 50 #km
 
 p = ExpParams(
     N, 
@@ -98,11 +98,15 @@ p = ExpParams(
 # verifying(file_name, M, impedance_csv, capacitance_csv, p)
 
 line_model_1 = "Algebraic"
+line_model_2 = "Dynamic"
+line_model_3 = "Multi-Segment Dynamic"
+
+"""
 results_alg, sim = run_experiment(file_name, line_model_1, p);
 sys = sim.sys
 s = small_signal_analysis(sim)
 
-line_model_2 = "Dynamic"
+
 results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
 sys_dyn = sim_dyn.sys
 s_dyn = small_signal_analysis(sim_dyn)
@@ -117,7 +121,6 @@ plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "V1")
 plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "V1_dyn")
 plot!(title = "Line length = "*string(p.l_dict["BUS 1-BUS 2-i_1"])*" km, perturbation = "*perturbation)
 
-line_model_3 = "Multi-Segment Dynamic"
 results_ms_dyn, sim_ms_dyn = run_experiment(file_name, line_model_3, p);
 sys_ms_dyn = sim_ms_dyn.sys
 s_ms_dyn = small_signal_analysis(sim_ms_dyn)            
@@ -156,7 +159,9 @@ results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothin
 results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
 results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
 
-line_lengths = [100]
+"""
+
+line_lengths = [100, 250, 500]
 loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
 plots = []
@@ -218,9 +223,9 @@ for l in line_lengths
     end
 end
 
-combined_plot = plot(plots..., layout=(1,3))
-plot!(combined_plot, legend = true)
-savefig("../figures/l = 400.png")
+combined_plot = plot(plots..., layout=(3,3))
+plot!(combined_plot, legend = true, layout = (1,3))
+savefig("../figures/2s_zoom.png")
 
 # for n in [5]
 #     display(plot())
