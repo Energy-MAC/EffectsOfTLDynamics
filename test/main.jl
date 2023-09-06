@@ -59,9 +59,9 @@ z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_paramete
 # b_km = 3.371e-6 # S/km
 
 ### Define more data
-l = 100 #, 500, 750, 100 #km
-# line_dict["BUS 1-BUS 2-i_1"] = l
-# line_dict["BUS 1-BUS 2-i_1_static"] = l
+l = 200 #, 500, 750, 100 #km
+line_dict["BUS 1-BUS 2-i_1"] = l
+line_dict["BUS 1-BUS 2-i_1_static"] = l
 
 N = nothing
 t_fault = 0.25
@@ -73,11 +73,13 @@ perturbation_params = get_default_perturbation(t_fault, perturbation)
 
 p_load = 1.0
 q_load = 0.25
+l_seg = 10 #km
 
 p = ExpParams(
     N, 
     M, 
-    l, 
+    l,
+    l_seg, 
     Z_c_abs, 
     z_km,
     y_km,
@@ -118,23 +120,71 @@ plot!(title = "Line length = "*string(p.l_dict["BUS 1-BUS 2-i_1"])*" km, perturb
 line_model_3 = "Multi-Segment Dynamic"
 results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing;
 
-for M in [1, 5]
-    z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
-    p.M = M
-    p.z_km = z_km
-    # p.z_km_ω_5_to_1 = z_km_ω_5_to_1
-    # p.Z_c_5_to_1_abs = Z_c_5_to_1_abs
+results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
+results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
+results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
+results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
 
-    for n in [5]
-        p.N = n
-        results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing;
+line_lengths = [100, 250, 400]
+loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
+
+plots = []
+plt = []
+
+for l in line_lengths
+    p.l_dict["BUS 1-BUS 2-i_1"] = l
+    p.l_dict["BUS 1-BUS 2-i_1_static"] = l
+    for (p_load, q_load) in loading_scenarios
+        p.p_load = p_load
+        p.q_load = q_load
+    
+        M = 1
+        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
+        p.M = M
+        p.z_km = z_km
+    
+        results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
+        results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
+        results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
+        results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
+
+        results_alg, sim = run_experiment(file_name, line_model_1, p);
+        sys = sim.sys
+        s = small_signal_analysis(sim)
+        vr_alg = get_voltage_magnitude_series(results_alg, 102);
+        plt = plot(vr_alg, label = "V1_alg")
+
+        results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
+        sys_dyn = sim_dyn.sys
+        s_dyn = small_signal_analysis(sim_dyn)
+        vr_dyn = get_voltage_magnitude_series(results_dyn, 102);
+        plot!(plt, vr_dyn, label = "V1_dyn")
+
         results_ms_dyn, seg_sim = run_experiment(file_name, line_model_3, p)
         seg_sys = seg_sim.sys
-        s_seg = small_signal_analysis(seg_sim)
+        s_seg = small_signal_analysis(seg_sim)            
         vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
-        display(plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)"))
+        plot!(plt, vr_ms_dyn, label = "V1_ms_dyn")
+
+        M = 5
+        p.M = M
+        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
+        p.M = M
+        p.z_km = z_km
+
+        results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p)
+        sys_ms_mb = sim_ms_mb.sys
+        s_ms_mb = small_signal_analysis(sim_ms_mb)            
+        vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
+        plot!(plt, vr_ms_mb_dyn, label = "V1_ms_mb_dyn")
+        
+        plot!(plt, legend = true, title = "l = $l, p = $p_load, q = $q_load")        
+        push!(plots, plt)
     end
 end
+
+combined_plot = plot(plots..., layout=(3,3))
+plot!(combined_plot, legend = false)
 
 for n in [5]
     display(plot())
@@ -167,7 +217,7 @@ for n in [5]
     print(n)
 end
 
-plot!(xlims=(0.249, 0.3))
+plot!(xlims=(0.249, 0.255))
 # plot!(ylims=(0.981,0.983))
 # plot!(legend = false)
 # plot!(legend=:bottomright)

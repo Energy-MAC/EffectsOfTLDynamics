@@ -144,8 +144,9 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
     z_km_ω_pu = z_km_ω/Z_c_abs
     γ = sqrt(z_km_ω*y_km)
 
-    N = p.N
+    # N = p.N
     M = p.M
+    l_seg = p.l_seg
 
     if M == 1
         z_km_pu = z_km_ω_5_to_1/Z_c_5_to_1_abs
@@ -168,9 +169,11 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
             continue
         end
         l = p.l_dict[ll.name] #km
-        l_prime = l/N
-        z_seg_pu = z_km_pu*l_prime
-        y_seg_pu = y_km_pu*l_prime
+
+        N = Int(l/l_seg)
+        # l_seg = l/N
+        z_seg_pu = z_km_pu*l_seg
+        y_seg_pu = y_km_pu*l_seg
         bus_from = ll.arc.from
         bus_to = ll.arc.to
         # Create a bunch of Bus

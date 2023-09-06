@@ -66,6 +66,7 @@ end
     N::Union{Int64, Nothing}
     M::Union{Int64, Nothing}
     l::Union{Int64, Float64}
+    l_seg::Union{Int64, Float64}
     Z_c_abs::Float64
     z_km::Union{Vector{ComplexF64}, ComplexF64}
     y_km::Union{Vector{ComplexF64}, ComplexF64}
