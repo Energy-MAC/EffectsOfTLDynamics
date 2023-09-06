@@ -206,6 +206,10 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
                     angle_limits = ll.angle_limits,
             )
             add_component!(sys_segs, line_to_create)
+            if dyn_lines
+                dyn_branch = DynamicBranch(get_component(Line, sys_segs, line_to_create.name))
+                add_component!(sys_segs, dyn_branch)
+            end
         end
         # println(get_name(line_to_create))
         # println("Bus From: $(line_to_create.arc.from.name), Bus To: $(line_to_create.arc.to.name)")
@@ -335,7 +339,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         return error("Unknown line model")
     end
     
-    alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
+    #alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
     
     if length(get_components(Bus, sys)) == 2
         ll = first(get_components(Line, sys))
@@ -377,6 +381,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     end
     
     # build segments model
+    alg_line_name = "";
     if (multi_segment == true)
         sys = build_seg_model!(sys, p, dyn_lines, alg_line_name)
     else
