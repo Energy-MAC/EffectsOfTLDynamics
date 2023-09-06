@@ -47,10 +47,10 @@ sim_p = SimParams(
 )
 
 ### Extract line data from files
-M = 5
+M = 1
 
 z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
-# r_km = [0.0]
+
 # Kundur parameters for testing
 # Z_c = 380 # Ω
 # r_km = 0.05 # Ω/km
@@ -59,7 +59,7 @@ z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_paramete
 # b_km = 3.371e-6 # S/km
 
 ### Define more data
-l = 200 #, 500, 750, 100 #km
+l = 100 #, 500, 750, 100 #km
 line_dict["BUS 1-BUS 2-i_1"] = l
 line_dict["BUS 1-BUS 2-i_1_static"] = l
 
@@ -95,7 +95,7 @@ p = ExpParams(
 )
 
 # Verify impedance values of raw file vs CSV data
-verifying(file_name, M, impedance_csv, capacitance_csv, p)
+# verifying(file_name, M, impedance_csv, capacitance_csv, p)
 
 line_model_1 = "Algebraic"
 results_alg, sim = run_experiment(file_name, line_model_1, p);
@@ -107,18 +107,32 @@ results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
 sys_dyn = sim_dyn.sys
 s_dyn = small_signal_analysis(sim_dyn)
 
-
 vr_alg = get_voltage_magnitude_series(results_alg, 102);
 vr_dyn = get_voltage_magnitude_series(results_dyn, 102);
-# vr_alg = get_state_series(results_alg, ("generator-102-1", :vr_filter));
-# vr_dyn = get_state_series(results_dyn, ("generator-102-1", :vr_filter));
 
 plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
 plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
 plot!(title = "Line length = "*string(p.l_dict["BUS 1-BUS 2-i_1"])*" km, perturbation = "*perturbation)
 
 line_model_3 = "Multi-Segment Dynamic"
-results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing;
+results_ms_dyn, sim_ms_dyn = run_experiment(file_name, line_model_3, p);
+sys_ms_dyn = sim_ms_dyn.sys
+s_ms_dyn = small_signal_analysis(sim_ms_dyn)            
+vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
+plot!(vr_ms_dyn, label = "V1_ms_dyn")
+
+M = 5
+p.M = M
+z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
+p.z_km = z_km
+
+results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p);
+sys_ms_mb = sim_ms_mb.sys
+s_ms_mb = small_signal_analysis(sim_ms_mb)            
+vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
+
+plot!(vr_ms_mb_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)")
+plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
 
 results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
 results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
@@ -160,16 +174,15 @@ for l in line_lengths
         vr_dyn = get_voltage_magnitude_series(results_dyn, 102);
         plot!(plt, vr_dyn, label = "V1_dyn")
 
-        results_ms_dyn, seg_sim = run_experiment(file_name, line_model_3, p)
-        seg_sys = seg_sim.sys
-        s_seg = small_signal_analysis(seg_sim)            
+        results_ms_dyn, sim_ms_dyn = run_experiment(file_name, line_model_3, p);
+        sys_ms_dyn = sim_ms_dyn.sys
+        s_ms_dyn = small_signal_analysis(sim_ms_dyn)            
         vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
         plot!(plt, vr_ms_dyn, label = "V1_ms_dyn")
 
         M = 5
         p.M = M
         z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
-        p.M = M
         p.z_km = z_km
 
         results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p)
@@ -186,36 +199,36 @@ end
 combined_plot = plot(plots..., layout=(3,3))
 plot!(combined_plot, legend = false)
 
-for n in [5]
-    display(plot())
-    for l in [100]
-        # initialize storage for simulation results
-        vr_ms_dyns = Vector{Vector{Float64}}(undef, 3)
-        count = 1
-        for (p_load, q_load) in [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
-            p.N = n
-            p.l_dict["BUS 1-BUS 2-i_1"] = l
-            p.l_dict["BUS 1-BUS 2-i_1_static"] = l
-            p.l = l
-            p.p_load = p_load
-            p.q_load = q_load
-            results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing
-            results_ms_dyn, seg_sim = run_experiment(file_name, line_model_3, p)
-            seg_sys = seg_sim.sys
-            s_seg = small_signal_analysis(seg_sim)
+# for n in [5]
+#     display(plot())
+#     for l in [100]
+#         # initialize storage for simulation results
+#         vr_ms_dyns = Vector{Vector{Float64}}(undef, 3)
+#         count = 1
+#         for (p_load, q_load) in [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
+#             p.N = n
+#             p.l_dict["BUS 1-BUS 2-i_1"] = l
+#             p.l_dict["BUS 1-BUS 2-i_1_static"] = l
+#             p.l = l
+#             p.p_load = p_load
+#             p.q_load = q_load
+#             results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing
+#             results_ms_dyn, seg_sim = run_experiment(file_name, line_model_3, p)
+#             seg_sys = seg_sim.sys
+#             s_seg = small_signal_analysis(seg_sim)
             
-            vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
-            # vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
+#             vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
+#             # vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
 
-            plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)")
-            plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
+#             plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)")
+#             plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
             
-            # Display plot
-            display(plot!())
-        end
-    end
-    print(n)
-end
+#             # Display plot
+#             display(plot!())
+#         end
+#     end
+#     print(n)
+# end
 
 plot!(xlims=(0.249, 0.255))
 # plot!(ylims=(0.981,0.983))
