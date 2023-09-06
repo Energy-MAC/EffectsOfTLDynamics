@@ -94,11 +94,20 @@ function build_new_impedance_model!(sys, p::ExpParams, dyn_lines::Bool, alg_line
     z_km = p.z_km # Ω/km
     y_km = p.y_km # S/km
     z_km_ω = p.z_km_ω # Ω/km
+    z_km_ω_5_to_1 = p.z_km_ω_5_to_1
+    Z_c_5_to_1_abs = p.Z_c_5_to_1_abs
     
     # z_km_pu = z_km/Z_c_abs
     z_km_ω_pu = z_km_ω/Z_c_abs
     y_km_pu = y_km*Z_c_abs
     γ = sqrt(z_km_ω*y_km)
+    
+    M = p.M
+    if M == 1
+        z_km_ω_pu = z_km_ω_5_to_1/Z_c_5_to_1_abs
+        y_km_pu = y_km*Z_c_5_to_1_abs
+        γ = sqrt(z_km_ω_5_to_1*y_km)
+    end
 
     for ll in get_components(Line, sys)
         # l = p.l
@@ -126,14 +135,23 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
     z_km = p.z_km # Ω/km
     y_km = p.y_km # S/km
     z_km_ω = p.z_km_ω # Ω/km
+
+    z_km_ω_5_to_1 = p.z_km_ω_5_to_1
+    Z_c_5_to_1_abs = p.Z_c_5_to_1_abs
     
     z_km_pu = z_km/Z_c_abs
     y_km_pu = y_km*Z_c_abs
     z_km_ω_pu = z_km_ω/Z_c_abs
     γ = sqrt(z_km_ω*y_km)
 
-    N = p.N
+    # N = p.N
     M = p.M
+    l_seg = p.l_seg
+
+    if M == 1
+        z_km_pu = z_km_ω_5_to_1/Z_c_5_to_1_abs
+        y_km_pu = y_km*Z_c_5_to_1_abs
+    end
     
     for ll in collect(get_components(Line, sys_segs))
         if ll.name == alg_line_name
@@ -151,9 +169,11 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
             continue
         end
         l = p.l_dict[ll.name] #km
-        l_prime = l/N
-        z_seg_pu = z_km_pu*l_prime
-        y_seg_pu = y_km_pu*l_prime
+
+        N = Int(l/l_seg)
+        # l_seg = l/N
+        z_seg_pu = z_km_pu*l_seg
+        y_seg_pu = y_km_pu*l_seg
         bus_from = ll.arc.from
         bus_to = ll.arc.to
         # Create a bunch of Bus
@@ -428,8 +448,27 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
 
     z_km_ω = 1/Y_
     Z_c = sqrt(z_km_ω/y_km[1])
+
+    r_km_5_to_1 = vec(zeros(5, 1))
+    l_km_5_to_1 = vec(zeros(5, 1))
     
-    return z_km, y_km[1], abs(Z_c), z_km_ω
+    for m in 1 : 5
+        r_km_5_to_1[m,1] = df_imp[5, "R"*string(m)]
+        l_km_5_to_1[m,1] = df_imp[5, "L"*string(m)]
+    end
+    
+    # x_km_5_to_1 = ω*l_km_5_to_1
+    # z_km_5_to_1 = r_km_5_to_1 + im*x_km_5_to_1
+
+    Y_5_to_1 = 0 
+    for i in 1:5
+        Y_5_to_1 = Y_5_to_1 + 1/(im*ω*l_km_5_to_1[i] + r_km_5_to_1[i])
+    end
+
+    z_km_ω_5_to_1 = 1/Y_5_to_1
+    Z_c_5_to_1 = sqrt(z_km_ω_5_to_1/y_km[1])
+    
+    return z_km, y_km[1], abs(Z_c), z_km_ω, z_km_ω_5_to_1, abs(Z_c_5_to_1)
 end
 
 # Verifying
