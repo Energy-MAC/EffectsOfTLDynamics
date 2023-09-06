@@ -17,7 +17,7 @@ const PSID = PowerSimulationsDynamics;
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/inv_v_machine.json"
+file_name = "../data/json_data/SIIB.json"
 # default_2_bus_line_dict - For 2 bus system
 # default_9_bus_line_dict - For 9 bus system
 line_dict = default_2_bus_line_dict
@@ -59,7 +59,7 @@ z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_paramete
 # b_km = 3.371e-6 # S/km
 
 ### Define more data
-l = 100 #, 500, 750, 100 #km
+l = 100 #km
 line_dict["BUS 1-BUS 2-i_1"] = l
 line_dict["BUS 1-BUS 2-i_1_static"] = l
 
@@ -109,9 +109,12 @@ s_dyn = small_signal_analysis(sim_dyn)
 
 vr_alg = get_voltage_magnitude_series(results_alg, 102);
 vr_dyn = get_voltage_magnitude_series(results_dyn, 102);
+#ω_alg = get_state_series(results_alg, ("generator-101-1", :ω))
+#ω_dyn = get_state_series(results_dyn, ("generator-101-1", :ω))
 
-plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "vr")
-plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_dyn")
+
+plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "V1")
+plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "V1_dyn")
 plot!(title = "Line length = "*string(p.l_dict["BUS 1-BUS 2-i_1"])*" km, perturbation = "*perturbation)
 
 line_model_3 = "Multi-Segment Dynamic"
@@ -120,26 +123,40 @@ sys_ms_dyn = sim_ms_dyn.sys
 s_ms_dyn = small_signal_analysis(sim_ms_dyn)            
 vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
 plot!(vr_ms_dyn, label = "V1_ms_dyn")
+#ω_ms_dyn = get_state_series(results_ms_dyn, ("generator-101-1", :ω))
 
 M = 5
 p.M = M
 z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
-p.z_km = z_km
+p.z_km = z_km;
+p.y_km = y_km;
+p.Z_c_abs = Z_c_abs;
+p.z_km_ω = z_km_ω;
+p.z_km_ω_5_to_1 = z_km_ω_5_to_1;
+p.Z_c_5_to_1_abs = Z_c_5_to_1_abs;
 
 results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p);
 sys_ms_mb = sim_ms_mb.sys
 s_ms_mb = small_signal_analysis(sim_ms_mb)            
 vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
+#ω_ms_mb_dyn = get_state_series(results_ms_mb_dyn, ("generator-101-1", :ω))
 
-plot!(vr_ms_mb_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)")
+plot!(vr_ms_mb_dyn, label = "V1_ms_mb_dyn")
 plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
+
+#savefig("../figures/diff M.png")
+
+plot(ω_alg)
+plot!(ω_dyn)
+plot!(ω_ms_dyn)
+plot!(ω_ms_mb_dyn)
 
 results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
 results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
 results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
 results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
 
-line_lengths = [100, 250, 400]
+line_lengths = [100]
 loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
 plots = []
@@ -160,7 +177,7 @@ for l in line_lengths
         results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
         results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
         results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
-        results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
+        results_ms_mb_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
 
         results_alg, sim = run_experiment(file_name, line_model_1, p);
         sys = sim.sys
@@ -183,7 +200,12 @@ for l in line_lengths
         M = 5
         p.M = M
         z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
-        p.z_km = z_km
+        p.z_km = z_km;
+        p.y_km = y_km;
+        p.Z_c_abs = Z_c_abs;
+        p.z_km_ω = z_km_ω;
+        p.z_km_ω_5_to_1 = z_km_ω_5_to_1;
+        p.Z_c_5_to_1_abs = Z_c_5_to_1_abs;
 
         results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p)
         sys_ms_mb = sim_ms_mb.sys
@@ -196,8 +218,9 @@ for l in line_lengths
     end
 end
 
-combined_plot = plot(plots..., layout=(3,3))
-plot!(combined_plot, legend = false)
+combined_plot = plot(plots..., layout=(1,3))
+plot!(combined_plot, legend = true)
+savefig("../figures/l = 400.png")
 
 # for n in [5]
 #     display(plot())
@@ -238,11 +261,13 @@ plot!(xlims=(0.249, 0.255))
 l = get_component(Line, sys, "BUS 1-BUS 2-i_1")
 p_branch = get_activepower_branch_flow(results_alg, "BUS 1-BUS 2-i_1", :from)
 p_branch_dyn = get_activepower_branch_flow(results_dyn, "BUS 1-BUS 2-i_1", :from)
-p_branch_seg = get_activepower_branch_flow(results_ms_dyn, "BUS 1-BUS 2-i_1_segment_1", :from)
+p_branch_ms = get_activepower_branch_flow(results_ms_dyn, "BUS 1-BUS 2-i_1_segment_1_branch_1", :from)
+p_branch_ms_mb = [get_activepower_branch_flow(results_ms_mb_dyn, "BUS 1-BUS 2-i_1_segment_1_branch_"*string(i), :from) for i in 1:5]
 
 plot(p_branch)
 plot!(p_branch_dyn)
-plot!(ylim = (-1, -0.5))
+plot!(p_branch_ms)
+plot!(ylim = (0, 1))
 
 q_branch = get_reactivepower_branch_flow(results_alg, "BUS 1-BUS 2-i_1", :from)
 q_branch_dyn = get_reactivepower_branch_flow(results_dyn, "BUS 1-BUS 2-i_1", :from)
