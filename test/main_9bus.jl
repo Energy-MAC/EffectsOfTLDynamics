@@ -3,6 +3,7 @@ using PowerSystems
 using PowerSimulationsDynamics
 using Plots
 using Revise
+using EffectsOfTLDynamics
 
 using CSV
 using DataFrames
@@ -10,17 +11,14 @@ using DataFrames
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-include("../src/ExperimentStructs.jl")
-include("../src/experiment_funcs.jl")
-
 ### Choose test case
-file_name = "data/json_data/9bus_slackless.json"
+file_name = "../data/json_data/9bus_slackless.json"
 
 line_dict = default_9_bus_line_dict
 
 ### Load relevant line data
-impedance_csv = "data/cable_data/impedance_data.csv"
-capacitance_csv = "data/cable_data/C_per_km.csv"
+impedance_csv = "../data/cable_data/impedance_data.csv"
+capacitance_csv = "../data/cable_data/C_per_km.csv"
 
 ### Choose perturbation to be applied
 # "BIC"
@@ -43,19 +41,20 @@ sim_p = SimParams(
 )
 
 ### Extract line data from files
-M = 1
+M = 5
 
-z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, M)
+z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
 
-# 
-
+# zkm omega and zkm omega 5 to 1 are the same?
 
 # try scale this data down a bit
+f = 0.1;
+z_km = z_km*f;
+y_km = y_km*f;
+z_km_ω = z_km_ω*f;
+z_km_ω_5_to_1 = z_km_ω_5_to_1*f;
 
-z_km = z_km*0.5;
-y_km = y_km*0.5;
-z_km_ω = z_km_ω*0.5;
-Z_c_abs = abs(sqrt(z_km_ω/y_km[1]))
+
 
 # r_km = [0.0]
 # Kundur parameters for testing
@@ -80,24 +79,28 @@ t_fault = 0.25
 perturbation_params = get_default_perturbation(t_fault, perturbation_name)
 perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-3-1", :V_ref, 0.95)
 
+l_seg = 20;
+
 p = ExpParams(
     N, 
     M, 
-    l, 
+    l,
+    l_seg, 
     Z_c_abs, 
     z_km,
     y_km,
-    z_km_ω, 
+    z_km_ω,
+    z_km_ω_5_to_1,
+    Z_c_5_to_1_abs,
     line_dict,
     sim_p, 
     perturbation_name, 
     perturbation_params,
-    nothing,
-    nothing
+    0.0,
+    0.0
 )
-
 # Verify impedance values of raw file vs CSV data
-verifying(file_name, M, impedance_csv, capacitance_csv, p)
+#verifying(file_name, M, impedance_csv, capacitance_csv, p)
 
 line_model_1 = "Algebraic"
 results_alg, sys, sim = run_experiment(file_name, line_model_1, p);
