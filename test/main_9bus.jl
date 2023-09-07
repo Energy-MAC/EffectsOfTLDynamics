@@ -69,9 +69,11 @@ N = nothing
 t_fault = 0.25
 
 ### Get perturbation struct
+# Longest line
 perturbation_params = get_default_perturbation(t_fault, perturbation)
-# perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
-perturbation_params.branch_trip_params = BTParam("Bus 9-Bus 6-i_1")
+# perturbation_params.branch_trip_params = BTParam("Bus 9-Bus 6-i_1")
+# Heaviest loaded line
+perturbation_params.branch_trip_params = BTParam("Bus 7-Bus 5-i_1")
 
 p_load = 0.5
 q_load = 0.5
@@ -106,6 +108,10 @@ line_model_3 = "Multi-Segment Dynamic"
 results_alg, sim = run_experiment(file_name, line_model_1, p);
 sys = sim.sys
 s = small_signal_analysis(sim)
+
+# Find heaviest loaded line
+# sol = solve_powerflow(ACPowerFlow(), sys)
+# sol["flow_results"]
 
 results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
 sys_dyn = sim_dyn.sys
