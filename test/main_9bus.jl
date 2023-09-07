@@ -42,7 +42,7 @@ sim_p = SimParams(
     reltol = 1e-10,
     maxiters = Int(1e10),
     dtmax = 1e-4,
-    solver = "FBDF",
+    solver = "Rodas4",
     t_max = 20.0,
 )
 
@@ -136,7 +136,7 @@ vr_dyn = get_voltage_magnitude_series(results_dyn, 6);
 
 plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "V1")
 plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "V1_dyn")
-plot!(title = "Line length = "*string(p.l_dict["BUS 1-BUS 2-i_1"])*" km, perturbation = "*perturbation)
+# plot!(title = "Line length = "*string(p.l_dict["BUS 1-BUS 2-i_1"])*" km, perturbation = "*perturbation)
     
 vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 6);
 plot!(vr_ms_dyn, label = "V1_ms_dyn")
@@ -226,7 +226,7 @@ end
 
 combined_plot = plot(plots..., layout=(3,3))
 plot!(combined_plot, legend = true, layout = (1,3))
-savefig("../figures/2s_zoom.png")
+# savefig("../figures/2s_zoom.png")
 
 plot!(xlims=(0.249, 0.255))
 # plot!(ylims=(0.981,0.983))
