@@ -17,7 +17,7 @@ const PSID = PowerSimulationsDynamics;
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/9bus.json"
+file_name = "../data/json_data/9bus_slackless.json"
 # default_2_bus_line_dict - For 2 bus system
 # default_9_bus_line_dict - For 9 bus system
 line_dict = default_9_bus_line_dict
