@@ -46,7 +46,7 @@ function choose_disturbance(sys, dist::String, p::ExpParams)
 end
 
 function build_sim(sys, tspan::Tuple{Float64, Float64}, perturbation, dyn_lines::Bool, p::ExpParams)
-    if p.sim_params.solver == "Rodas4"
+    if p.sim_params.solver == "Rodas4" || p.sim_params.solver == "FBDF"
         model = MassMatrixModel
     elseif p.sim_params.solver == "IDA"
         model = ResidualModel
@@ -70,6 +70,8 @@ function execute_sim!(sim, p::ExpParams)
         solver = Rodas4()
     elseif p.sim_params.solver == "IDA"
         solver = IDA()
+    elseif p.sim_params.solver == "FBDF"
+        solver = FBDF()
     else
         return error("Unknown solver")
     end
@@ -317,6 +319,10 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         )
         add_component!(sys, load)
     end
+
+    for l in get_components(PSY.StandardLoad, sys)
+        transform_load_to_constant_impedance(l) 
+    end
     
     # build segments model
     if (multi_segment == true)
@@ -337,7 +343,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     return results, sim
 end
 
-function get_line_parameters(impedance_csv, capacitance_csv, M)
+function get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
     df_imp = CSV.read(impedance_csv, DataFrame);
     c_km = CSV.read(capacitance_csv, DataFrame)."C"
 
@@ -353,14 +359,14 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
     ω = 2*pi*f
 
     x_km = ω*l_km
-    z_km = r_km + im*x_km
+    z_km = (r_km + im*x_km)*factor_z
     g_km = [0.0]
     b_km = ω*c_km
-    y_km = g_km + im*b_km
+    y_km = (g_km + im*b_km)*factor_y
     
     Y_ = 0
     for i in 1:M
-        Y_ = Y_ + 1/(im*ω*l_km[i] + r_km[i])
+        Y_ = Y_ + 1/(z_km[i])
     end
 
     z_km_ω = 1/Y_
@@ -374,12 +380,12 @@ function get_line_parameters(impedance_csv, capacitance_csv, M)
         l_km_5_to_1[m,1] = df_imp[5, "L"*string(m)]
     end
     
-    # x_km_5_to_1 = ω*l_km_5_to_1
-    # z_km_5_to_1 = r_km_5_to_1 + im*x_km_5_to_1
+    x_km_5_to_1 = ω*l_km_5_to_1
+    z_km_5_to_1 = (r_km_5_to_1 + im*x_km_5_to_1)*factor_z
 
     Y_5_to_1 = 0 
     for i in 1:5
-        Y_5_to_1 = Y_5_to_1 + 1/(im*ω*l_km_5_to_1[i] + r_km_5_to_1[i])
+        Y_5_to_1 = Y_5_to_1 + 1/(z_km_5_to_1[i])
     end
 
     z_km_ω_5_to_1 = 1/Y_5_to_1

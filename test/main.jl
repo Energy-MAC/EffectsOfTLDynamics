@@ -49,7 +49,10 @@ sim_p = SimParams(
 ### Extract line data from files
 M = 1
 
-z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
+# Do not change these factors for the 2 bus case
+factor_z = 1.0
+factor_y = 1.0
+z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
 
 # Kundur parameters for testing
 # Z_c = 380 # Ω
@@ -71,8 +74,8 @@ perturbation_params = get_default_perturbation(t_fault, perturbation)
 # perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
 # perturbation_params.branch_trip_params = BTParam("Bus 9-Bus 6-i_1")
 
-p_load = nothing
-q_load = nothing
+p_load = 1.0
+q_load = 0.25
 l_seg = 50 #km
 
 p = ExpParams(
@@ -101,12 +104,12 @@ line_model_1 = "Algebraic"
 line_model_2 = "Dynamic"
 line_model_3 = "Multi-Segment Dynamic"
 
-"""
+
 results_alg, sim = run_experiment(file_name, line_model_1, p);
 sys = sim.sys
 s = small_signal_analysis(sim)
 
-
+"""
 results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
 sys_dyn = sim_dyn.sys
 s_dyn = small_signal_analysis(sim_dyn)
