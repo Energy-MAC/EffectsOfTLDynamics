@@ -78,6 +78,9 @@ p_load = 1.0
 q_load = 0.25
 l_seg = 50 #km
 
+load_scale = 1.0
+line_scale = 1.0
+
 p = ExpParams(
     N, 
     M, 
@@ -94,7 +97,9 @@ p = ExpParams(
     perturbation, 
     perturbation_params,
     p_load,
-    q_load
+    q_load,
+    line_scale,
+    load_scale
 )
 
 # Verify impedance values of raw file vs CSV data
@@ -178,7 +183,7 @@ for l in line_lengths
         p.q_load = q_load
     
         M = 1
-        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
+        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.M = M
         p.z_km = z_km
     
@@ -207,7 +212,7 @@ for l in line_lengths
 
         M = 5
         p.M = M
-        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
+        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.z_km = z_km;
         p.y_km = y_km;
         p.Z_c_abs = Z_c_abs;
@@ -227,39 +232,8 @@ for l in line_lengths
 end
 
 combined_plot = plot(plots..., layout=(3,3))
-plot!(combined_plot, legend = true, layout = (1,3))
-savefig("../figures/2s_zoom.png")
-
-# for n in [5]
-#     display(plot())
-#     for l in [100]
-#         # initialize storage for simulation results
-#         vr_ms_dyns = Vector{Vector{Float64}}(undef, 3)
-#         count = 1
-#         for (p_load, q_load) in [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
-#             p.N = n
-#             p.l_dict["BUS 1-BUS 2-i_1"] = l
-#             p.l_dict["BUS 1-BUS 2-i_1_static"] = l
-#             p.l = l
-#             p.p_load = p_load
-#             p.q_load = q_load
-#             results_ms_dyn, seg_sim, seg_sys, s_seg = nothing, nothing, nothing, nothing
-#             results_ms_dyn, seg_sim = run_experiment(file_name, line_model_3, p)
-#             seg_sys = seg_sim.sys
-#             s_seg = small_signal_analysis(seg_sim)
-            
-#             vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
-#             # vr_ms_dyn = get_state_series(results_ms_dyn, ("generator-102-1", :vr_filter));
-
-#             plot!(vr_ms_dyn, xlabel = "time", ylabel = "vr p.u.", label = "vr_segs_$(p.N)_branch_$(p.M)")
-#             plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
-            
-#             # Display plot
-#             display(plot!())
-#         end
-#     end
-#     print(n)
-# end
+plot!(combined_plot, legend = false, layout = (1,3), xlims = (0.249, 0.260), ylims = (0.8, 1.05), title = "")
+#savefig("../figures/2s_zoom.png")
 
 plot!(xlims=(0.249, 0.255))
 # plot!(ylims=(0.981,0.983))

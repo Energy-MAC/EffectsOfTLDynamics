@@ -79,6 +79,8 @@ end
     perturbation_params::PerturbationParams
     p_load::Union{Float64, Nothing} = nothing
     q_load::Union{Float64, Nothing} = nothing
+    line_scale::Float64
+    load_scale::Float64
 end
 
 default_bic_params = BICParam("line-102-103", 1.0)
