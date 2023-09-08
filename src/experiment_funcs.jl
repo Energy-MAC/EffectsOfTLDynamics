@@ -402,7 +402,7 @@ function get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor
 end
 
 # Verifying
-function verifying(file_name, M, impedance_csv, capacitance_csv, p)
+function verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, factor_y)
     sys = System(joinpath(pwd(), file_name))
     
     for ll in get_components(Line, sys)
@@ -411,7 +411,7 @@ function verifying(file_name, M, impedance_csv, capacitance_csv, p)
         println("b_pu_ll = $(ll.b.from + ll.b.to)")
 
         for m in 1:M
-            z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, m)
+            z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, m, factor_z, factor_y)
             z_km_pu = z_km/Z_c_abs
             y_km_pu = y_km*Z_c_abs
             z_km_ω_pu = z_km_ω/Z_c_abs

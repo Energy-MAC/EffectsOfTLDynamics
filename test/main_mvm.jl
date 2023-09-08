@@ -103,7 +103,8 @@ p = ExpParams(
 )
 
 # Verify impedance values of raw file vs CSV data
-# verifying(file_name, M, impedance_csv, capacitance_csv, p)
+M = 5
+verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, factor_y)
 
 line_model_1 = "Algebraic"
 line_model_2 = "Dynamic"
