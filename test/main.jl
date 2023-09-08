@@ -232,8 +232,11 @@ for l in line_lengths
 end
 
 combined_plot = plot(plots..., layout=(3,3))
-plot!(combined_plot, legend = false, layout = (1,3), xlims = (0.249, 0.260), ylims = (0.8, 1.05), title = "")
-#savefig("../figures/2s_zoom.png")
+plot!(combined_plot, legend = false, title = "")
+plot!(combined_plot, xlims = (0.0, 2.0))
+plot!(combined_plot, xlims = (0.249, 0.260))
+plot!(combined_plot, ylims = (0.8,1.2))
+savefig("../figures/Friday/ivm_2s_zoom.png")
 
 plot!(xlims=(0.249, 0.255))
 # plot!(ylims=(0.981,0.983))

@@ -103,7 +103,7 @@ p = ExpParams(
 )
 
 # Verify impedance values of raw file vs CSV data
-M = 5
+M = 1
 verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, factor_y)
 
 line_model_1 = "Algebraic"
@@ -233,11 +233,12 @@ for l in line_lengths
 end
 
 combined_plot = plot(plots..., layout=(3,3))
-plot!(combined_plot, legend = false, layout = (3,3), title = "")
+plot!(combined_plot, legend = false, title = "")
+plot!(combined_plot, xlims = (0.0, 2.0))
 plot!(combined_plot, xlims = (0.249, 0.260))
+plot!(combined_plot, ylims = (0.8,1.2))
+savefig("../figures/Friday/mvm_2s_zoom.png")
 
-plot!(combined_plot, ylims = (0.6, 1.05))
-#savefig("../figures/2s_zoom.png")
 
 plot!(xlims=(0.249, 0.255))
 # plot!(ylims=(0.981,0.983))

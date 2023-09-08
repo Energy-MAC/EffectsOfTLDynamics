@@ -43,7 +43,7 @@ sim_p = SimParams(
     maxiters = Int(1e10),
     dtmax = 1e-4,
     solver = "Rodas4",
-    t_max = 20.0,
+    t_max = 2.0,
 )
 
 ### Extract line data from files
@@ -114,6 +114,7 @@ results_alg, sim = run_experiment(file_name, line_model_1, p);
 sys = sim.sys
 s = small_signal_analysis(sim)
 
+"""
 # Find heaviest loaded line
 # using PowerFlows
 # sol = solve_powerflow(ACPowerFlow(), sys)
@@ -181,14 +182,14 @@ plots = []
 plt = []
 
 for l in line_lengths
-    p.l_dict["BUS 1-BUS 2-i_1"] = l
-    p.l_dict["BUS 1-BUS 2-i_1_static"] = l
+    p.l_dict["Bus 9-Bus 6-i_1"] = l
+    p.l_dict["Bus 9-Bus 6-i_1_static"] = l
     for (p_load, q_load) in loading_scenarios
         p.p_load = p_load
         p.q_load = q_load
     
         M = 1
-        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
+        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.M = M
         p.z_km = z_km
     
@@ -200,24 +201,24 @@ for l in line_lengths
         results_alg, sim = run_experiment(file_name, line_model_1, p);
         sys = sim.sys
         s = small_signal_analysis(sim)
-        vr_alg = get_voltage_magnitude_series(results_alg, 102);
+        vr_alg = get_voltage_magnitude_series(results_alg, 7);
         plt = plot(vr_alg, label = "V1_alg")
 
         results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
         sys_dyn = sim_dyn.sys
         s_dyn = small_signal_analysis(sim_dyn)
-        vr_dyn = get_voltage_magnitude_series(results_dyn, 102);
+        vr_dyn = get_voltage_magnitude_series(results_dyn, 7);
         plot!(plt, vr_dyn, label = "V1_dyn")
 
         results_ms_dyn, sim_ms_dyn = run_experiment(file_name, line_model_3, p);
         sys_ms_dyn = sim_ms_dyn.sys
         s_ms_dyn = small_signal_analysis(sim_ms_dyn)            
-        vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
+        vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 7);
         plot!(plt, vr_ms_dyn, label = "V1_ms_dyn")
 
         M = 5
         p.M = M
-        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
+        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.z_km = z_km;
         p.y_km = y_km;
         p.Z_c_abs = Z_c_abs;
@@ -228,7 +229,7 @@ for l in line_lengths
         results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p)
         sys_ms_mb = sim_ms_mb.sys
         s_ms_mb = small_signal_analysis(sim_ms_mb)            
-        vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
+        vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 7);
         plot!(plt, vr_ms_mb_dyn, label = "V1_ms_mb_dyn")
         
         plot!(plt, legend = true, title = "l = $l, p = $p_load, q = $q_load")        
@@ -237,10 +238,8 @@ for l in line_lengths
 end
 
 combined_plot = plot(plots..., layout=(3,3))
-plot!(combined_plot, legend = true, layout = (1,3))
-# savefig("../figures/2s_zoom.png")
-
-plot!(xlims=(0.249, 0.255))
-# plot!(ylims=(0.981,0.983))
-# plot!(legend = false)
-# plot!(legend=:bottomright)
+plot!(combined_plot, legend = false, title = "")
+plot!(combined_plot, xlims = (0.0, 2.0))
+plot!(combined_plot, xlims = (0.249, 0.260))
+plot!(combined_plot, ylims = (0.7,1.6))
+savefig("../figures/Friday/9b_2s_zoom.png")
