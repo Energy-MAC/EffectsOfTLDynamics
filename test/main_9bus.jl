@@ -79,7 +79,7 @@ p_load = 0.5
 q_load = 0.5
 l_seg = 50 #km
 
-load_scale = 1.0
+load_scale = 1.15
 line_scale = 1.0
 
 p = ExpParams(
@@ -190,12 +190,12 @@ for line_scale in line_scales
 #     p.l_dict["Bus 9-Bus 6-i_1"] = l
 #     p.l_dict["Bus 9-Bus 6-i_1_static"] = l
     
-    # for load_scale in load_scales
-    # p.load_scale = load_scale
+    for load_scale in load_scales
+    p.load_scale = load_scale
 
-    for (p_load, q_load) in loading_scenarios
-       p.p_load = p_load
-       p.q_load = q_load
+    # for (p_load, q_load) in loading_scenarios
+    #    p.p_load = p_load
+    #    p.q_load = q_load
     
         M = 1
         z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)

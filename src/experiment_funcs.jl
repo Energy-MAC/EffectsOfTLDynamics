@@ -116,12 +116,11 @@ function build_new_impedance_model!(sys, p::ExpParams, dyn_lines::Bool, alg_line
     for ll in get_components(Line, sys)
         # l = p.l
         l = p.l_dict[ll.name]*line_scale #km
-        println(l)
+        # println(l)
         z_ll = z_km_ω_pu*l*(sinh(γ*l)/(γ*l))
         y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
-        println(z_ll)
-        println(y_ll)
-        # error("dayumn")
+        # println(z_ll)
+        # println(y_ll)
         ll.r = real(z_ll)
         ll.x = imag(z_ll)
         ll.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
@@ -165,11 +164,11 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
         if ll.name == alg_line_name
             # l = p.l
             l = p.l_dict[ll.name]*line_scale #km
-            println(l)
+            # println(l)
             z_ll = z_km_ω_pu*l*(sinh(γ*l)/(γ*l))
             y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
-            println(z_ll)
-            println(y_ll)
+            # println(z_ll)
+            # println(y_ll)
             # error("dayumn")
             ll.r = real(z_ll)
             ll.x = imag(z_ll)
@@ -341,7 +340,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
 
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
     show_states_initial_value(sim)
-    # return sim
+
     # execute simulation
     exec = execute_sim!(sim, p)
     
@@ -416,7 +415,7 @@ function verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, fa
             y_km_pu = y_km*Z_c_abs
             z_km_ω_pu = z_km_ω/Z_c_abs
             
-            l = p.l_dict[ll.name]
+            l = p.l_dict[ll.name]*p.line_scale
             println("Parallel branch impedances, with N = 1 and M = $(m)")
             z_pu_ll = z_km_pu*l
             #println("z_pu_ll = $(z_pu_ll)")
