@@ -283,7 +283,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         return error("Unknown line model")
     end
 
-    alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
+    #alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
     if length(get_components(Bus, sys)) == 2
         ll = first(get_components(Line, sys))
         ll_alg = Line(
@@ -338,14 +338,14 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     end
     # build simulation
 
-    sim = build_sim(sys, tspan, perturbation, dyn_lines, p)
+    sim = build_sim(sys, tspan, perturbation, dyn_lines, p);
     show_states_initial_value(sim)
 
     # execute simulation
-    exec = execute_sim!(sim, p)
+    exec = execute_sim!(sim, p);
     
     # read results
-    results = results_sim(sim)
+    results = results_sim(sim);
     return results, sim
 end
 
@@ -432,6 +432,51 @@ function verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, fa
             # println("z_pu_w_ll = $(abs_z_pu_w_ll)")
         end
     end
+end
+
+
+function add_load_2bus(sys, p::ExpParams)
+# for adding pq loads to 2bus system 
+    load = StandardLoad(
+        name = "load1",
+        available = true,
+        bus = get_component(Bus, sys, "BUS 2"),
+        base_power = 100.0,
+        constant_active_power = 0.0,
+        constant_reactive_power = 0.0,
+        impedance_active_power = p.p_load,
+        impedance_reactive_power = p.q_load,
+        current_active_power = 0.0,
+        current_reactive_power = 0.0,
+        max_constant_active_power = 0.0,
+        max_constant_reactive_power = 0.0,
+        max_impedance_active_power = p.p_load,
+        max_impedance_reactive_power = p.q_load,
+        max_current_active_power = 0.0,
+        max_current_reactive_power = 0.0,
+    )
+    add_component!(sys, load)
+end
+
+
+function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams)
+    # build system
+    sys = System(joinpath(pwd(), file_name));
+
+    # Simulation time span
+    tspan = (0.0, p.sim_params.t_max)
+    perturbation = choose_disturbance(sys, p.perturbation, p)
+    
+    # build segments model
+    if (multi_segment == true)
+        sys = build_seg_model!(sys, p, dyn_lines, "")
+    else
+        sys = build_new_impedance_model!(sys, p, dyn_lines, "")
+    end
+    add_load_2bus(sys, p)
+
+    sim = build_sim(sys, tspan, perturbation, dyn_lines, p);
+    return sim 
 end
 
 export choose_disturbance

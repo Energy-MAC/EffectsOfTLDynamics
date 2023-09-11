@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ┌ Info: 2023-09-11T21:14:56.602 [1833913:1]: Pre-Initializing Simulation States
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:265
 ┌ Info: 2023-09-11T21:14:56.602 [1833913:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
@@ -37,6 +38,45 @@
 │    Initial Condition NLsolve refine...      1    163μs    8.0%    198KiB   14.4%
 │    Build Perturbations                      1   29.5μs    1.5%   9.27KiB    0.7%
 │    Make DiffEq Problem                      1    121μs    6.0%   32.1KiB    2.3%
+=======
+┌ Info: 2023-09-11T13:52:25.946 [87036:1]: Pre-Initializing Simulation States
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:265
+┌ Info: 2023-09-11T13:52:25.946 [87036:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
+└ @ PowerSystems /Users/ruthkravis/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
+┌ Error: 2023-09-11T13:52:26.102 [87036:1]: The powerflow solver returned convergence = false
+└ @ PowerFlows /Users/ruthkravis/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:50
+┌ Info: 2023-09-11T13:52:26.102 [87036:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
+└ @ PowerSystems /Users/ruthkravis/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
+┌ Error: 2023-09-11T13:52:26.102 [87036:1]: PowerFlow failed to solve
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation_initialization.jl:16
+┌ Info: 2023-09-11T13:52:26.105 [87036:1]: Residual from initial guess: max = 0.4761904761904756 at 1, total = 248.26534638550618
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:101
+┌ Error: 2023-09-11T13:52:26.118 [87036:1]: MassMatrixModel failed to build
+│   exception = (ErrorException("The initial residual in the state located at 1 has a value of 0.4761904761904756.\n                Generator = V_1, state = R.\n               Residual error is too large to continue"), Union{Ptr{Nothing}, Base.InterpreterIP}[Ptr{Nothing} @0x000000012884005f, Ptr{Nothing} @0x000000018a1860a5, Ptr{Nothing} @0x000000018a18895b, Ptr{Nothing} @0x000000018a1a7970, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x0000000189ff6a81, Ptr{Nothing} @0x0000000189ffdbc7, Ptr{Nothing} @0x0000000189ffe1cf, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x0000000128524dcc, Ptr{Nothing} @0x0000000189f1271f, Ptr{Nothing} @0x0000000189f1324a, Ptr{Nothing} @0x0000000189f132fb, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x0000000189c723a6, Ptr{Nothing} @0x000000018a6fa1cb, Ptr{Nothing} @0x000000010b961197, Ptr{Nothing} @0x000000010b96100d, Ptr{Nothing} @0x000000010b962255, Ptr{Nothing} @0x000000010ebc62fb, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x000000010b9376f9, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x000000010b9374d8, Ptr{Nothing} @0x0000000128b85553, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x000000010b9374d8, Ptr{Nothing} @0x0000000128b2306a, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x000000010b9374d8, Ptr{Nothing} @0x000000010eb62fb0, Ptr{Nothing} @0x000000017e81c43d, Ptr{Nothing} @0x000000017e81eb50, Ptr{Nothing} @0x000000017e8205ff, Ptr{Nothing} @0x000000017e820c31, Ptr{Nothing} @0x000000017e822331, Ptr{Nothing} @0x000000017e82235f, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x0000000128524dcc, Ptr{Nothing} @0x000000017e822036, Ptr{Nothing} @0x000000017e82211f, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x000000010b9376f9, Ptr{Nothing} @0x000000010eb5f7bd, Ptr{Nothing} @0x000000010eb5f7d2, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x000000010b9374d8, Ptr{Nothing} @0x000000010eb42274, Ptr{Nothing} @0x000000010eb424cf, Ptr{Nothing} @0x000000010b92af4d, Ptr{Nothing} @0x000000010b948d71])
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:434
+┌ Info: 2023-09-11T13:52:26.138 [87036:1]: 
+│  ───────────────────────────────────────────────────────────────────────────────
+│                                                      Time          Allocations  
+│                                                ───────────────   ───────────────
+│                 Total measured:                     193ms             106MiB    
+│ 
+│  Section                               ncalls     time    %tot     alloc    %tot
+│  ───────────────────────────────────────────────────────────────────────────────
+│  Build Simulation                           1    193ms  100.0%    106MiB  100.0%
+│    Build Simulation Inputs                  1   1.46ms    0.8%    367KiB    0.3%
+│      Wrap Branches                          1    645μs    0.3%    162KiB    0.2%
+│      Wrap Dynamic Injectors                 1    228μs    0.1%   50.9KiB    0.0%
+│      Calculate MM, DAE_vector, Tota...      1   37.4μs    0.0%   25.1KiB    0.0%
+│      Wrap Static Injectors                  1   36.2μs    0.0%   5.66KiB    0.0%
+│    Pre-initialization                       1    156ms   80.9%   96.9MiB   91.8%
+│      Power Flow solution                    1    155ms   80.6%   96.7MiB   91.6%
+│      Initialize Static Injectors            1   1.50μs    0.0%     0.00B    0.0%
+│      Initialize Dynamic Injectors           1    298μs    0.2%    142KiB    0.1%
+│      Initialize Dynamic Branches            1    104μs    0.1%   37.5KiB    0.0%
+│    Calculate Jacobian                       1   2.92ms    1.5%   5.14MiB    4.9%
+│    Make Model Function                      1   9.42μs    0.0%   2.91KiB    0.0%
+│    Initial Condition NLsolve refine...      1    741μs    0.4%    155KiB    0.1%
+>>>>>>> 470e9ff861c0ad21b35aa0cb99f7a05d1f2e176f
 │  ───────────────────────────────────────────────────────────────────────────────
 │ 
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/nbPYv/src/base/simulation.jl:451
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:453

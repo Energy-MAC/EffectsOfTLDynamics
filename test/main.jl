@@ -23,8 +23,8 @@ file_name = "../data/json_data/inv_v_machine.json"
 line_dict = default_2_bus_line_dict
 
 ### Load relevant line data
-impedance_csv = "../data/cable_data/impedance_data.csv"
-capacitance_csv = "../data/cable_data/C_per_km.csv"
+impedance_csv = "../data/cable_data/dommel_data.csv"
+capacitance_csv = "../data/cable_data/dommel_data_C.csv"
 
 ### Choose perturbation to be applied
 # "BIC"
