@@ -59,9 +59,11 @@ q_load = 0.0;
 Nrange = [1,2,5,10,20];
 
 # p=0.5, q=0.5
-lRange = 400:5:500;
-lRange = 150:10:250;
-
+lRange = 475:5:580; 
+#lRange = 150:10:250;
+lRange = 220:10:300;
+lRange = 100:50:500;
+lRange = 200:25:700;
 # p=q=0
 #lRange = 400:10:800;
 
@@ -69,6 +71,7 @@ lRange = 150:10:250;
 # Kundur 
 #lRange = 880:5:940; # P=1
 #lRange = 1000:10:1100; # P=1
+#lRange = 950:5:1000;
 
 
 results = zeros(length(lRange),length(Nrange));
@@ -81,6 +84,9 @@ for l = lRange;
     
     n_idx = 1;
     l_seg = l;
+    
+    load_scale = 1.0
+    line_scale = 1.0
     
     p = ExpParams(
         nothing, 
@@ -98,7 +104,9 @@ for l = lRange;
         perturbation_type, 
         perturbation_params,
         p_load,
-        q_load
+        q_load,
+        line_scale,
+        load_scale
     )
 
     sim_alg = build_2bus_sim_from_file(file_name, false, false, p)
@@ -134,7 +142,7 @@ for l = lRange;
 
     for N in Nrange;
         l_seg = l/N
-
+        
         p = ExpParams(
             nothing, 
             M, 
@@ -151,7 +159,9 @@ for l = lRange;
             perturbation_type, 
             perturbation_params,
             p_load,
-            q_load
+            q_load,
+            line_scale,
+            load_scale
         )
 
         sim_ms = build_2bus_sim_from_file(file_name, true, true, p)
@@ -172,21 +182,7 @@ for l = lRange;
     l_idx += 1
 end
 
-# title_str = "Stability heatmap, loading: p="*string(p_load)*", q="*string(q_load);
-# minc = -.1;
-# maxc = .1;
-# h1 = heatmap(lRange, Nrange, results', clim=(minc, maxc),colorbar_title="Largest real λ", ylabel="N", title=title_str)
-
-# # Dynamic pi results
-# h2 = heatmap(lRange, [1], dyn_results', clim=(minc, maxc), colorbar_title="Largest real λ", ylabel="Dyn")
-
-# #algebraic/static pi results
-# h3 = heatmap(lRange, [1], alg_results', clim=(minc, maxc), colorbar_title="Largest real λ", ylabel="Alg", xlabel="Line length (km)");
-
-# plot(h1,h2, h3, layout=@layout[a;b;c], size=(800,600))
-
-
-plot(lRange, alg_results, label="Alg",linestyle=:dash)
+plot(lRange, alg_results, label="Alg",linestyle=:dash, legend = :outertopright, size=(800,600),xlabel="Line length (km)", ylabel="Largest real λ, != 0")
 plot!(lRange, dyn_results, label="Dyn",linestyle=:dash)
 for k in 1:length(Nrange);
     display(plot!(lRange,results[:,k],label="N="*string(Nrange[k])*",M="*string(M)))
@@ -200,12 +196,8 @@ plt_ub = maximum([get_max(alg_results), get_max(dyn_results), get_max(results)])
 
 plot!(lRange, zeros(length(lRange)), fillrange = ones(length(lRange))*plt_ub, fillalpha = 0.1, linealpha=0, c = 1, label="Unstable")
    
-xlabel!("Line length (km)")
-ylabel!("Largest real λ, != 0")
 #title!("Kundur params, loading: p="*string(p_load)*", q="*string(q_load))
 
 title!("Fitted params, loading: p="*string(p_load)*", q="*string(q_load))
 
-#savefig("../figures/fitted_2bus_M5_p3.png")
-
-#savefig("../figures/kundur_2bus_M1_p2.png")
+#savefig("../figures/Ruth/Stability/fitted_2bus_L1_M5.png")
