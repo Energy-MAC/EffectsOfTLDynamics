@@ -206,6 +206,6 @@ ylabel!("Largest real λ, != 0")
 
 title!("Fitted params, loading: p="*string(p_load)*", q="*string(q_load))
 
-savefig("../figures/fitted_2bus_M5_p3.png")
+#savefig("../figures/fitted_2bus_M5_p3.png")
 
 #savefig("../figures/kundur_2bus_M1_p2.png")
