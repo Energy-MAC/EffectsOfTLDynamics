@@ -17,7 +17,7 @@ const PSID = PowerSimulationsDynamics;
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/inv_v_machine.json"
+file_name = "../data/json_data/mach_v_mach.json"
 # default_2_bus_line_dict - For 2 bus system
 # default_9_bus_line_dict - For 9 bus system
 line_dict = default_2_bus_line_dict
@@ -103,7 +103,8 @@ p = ExpParams(
 )
 
 # Verify impedance values of raw file vs CSV data
-# verifying(file_name, M, impedance_csv, capacitance_csv, p)
+M = 1
+verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, factor_y)
 
 line_model_1 = "Algebraic"
 line_model_2 = "Dynamic"
@@ -236,7 +237,8 @@ plot!(combined_plot, legend = false, title = "")
 plot!(combined_plot, xlims = (0.0, 2.0))
 plot!(combined_plot, xlims = (0.249, 0.260))
 plot!(combined_plot, ylims = (0.8,1.2))
-savefig("../figures/Friday/ivm_2s_zoom.png")
+savefig("../figures/Friday/mvm_2s_zoom.png")
+
 
 plot!(xlims=(0.249, 0.255))
 # plot!(ylims=(0.981,0.983))

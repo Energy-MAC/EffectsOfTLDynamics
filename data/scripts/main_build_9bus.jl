@@ -33,10 +33,24 @@ machine_oneDoneQ() = OneDOneQMachine(
     0.6, #Tq0_p
 )
 
+AF_machine() = AndersonFouadMachine(
+    0.0041, # R::Float64
+    1.25, # Xd::Float64
+    1.22, # Xq::Float64
+    0.232, # Xd_p::Float64
+    0.715, # Xq_p::Float64
+    0.12, # Xd_pp::Float64
+    0.12, # Xq_pp::Float64
+    4.75, # Td0_p::Float64
+    1.5, # Tq0_p::Float64
+    0.06, # Td0_pp::Float64
+    0.21# Tq0_pp::Float64
+)
+
 # Shaft
 shaft_no_damping() = SingleMass(
-    3.01, #H (M = 6.02 -> H = M/2)
-    0.0, #D
+    5.06, # H (M = 6.02 -> H = M/2)
+    2.0, #0  #D
 )
 
 # AVR: Type I: Resembles a DC1 AVR
@@ -103,7 +117,7 @@ for g in get_components(Generator, sys)
         case_gen = DynamicGenerator(
             get_name(g),
             1.0, # ω_ref,
-            machine_oneDoneQ(), #machine
+            AF_machine(), #machine
             shaft_no_damping(), #shaft
             avr_type1(), #avr
             tg_none(), #tg

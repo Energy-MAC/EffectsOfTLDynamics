@@ -111,9 +111,11 @@ function build_new_impedance_model!(sys, p::ExpParams, dyn_lines::Bool, alg_line
         γ = sqrt(z_km_ω_5_to_1*y_km)
     end
 
+    line_scale = p.line_scale
+
     for ll in get_components(Line, sys)
         # l = p.l
-        l = p.l_dict[ll.name] #km
+        l = p.l_dict[ll.name]*line_scale #km
         println(l)
         z_ll = z_km_ω_pu*l*(sinh(γ*l)/(γ*l))
         y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
@@ -150,6 +152,8 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
     M = p.M
     l_seg = p.l_seg
 
+    line_scale = p.line_scale
+
     if M == 1
         z_km_pu = z_km_ω_5_to_1/Z_c_5_to_1_abs
         y_km_pu = y_km*Z_c_5_to_1_abs
@@ -160,7 +164,7 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
     for ll in collect(get_components(Line, sys_segs))
         if ll.name == alg_line_name
             # l = p.l
-            l = p.l_dict[ll.name] #km
+            l = p.l_dict[ll.name]*line_scale #km
             println(l)
             z_ll = z_km_ω_pu*l*(sinh(γ*l)/(γ*l))
             y_ll = y_km_pu*l*(tanh(γ*l/2)/(γ*l/2))
@@ -172,7 +176,7 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
             ll.b = (from = imag(y_ll)/2, to = imag(y_ll)/2)
             continue
         end
-        l = p.l_dict[ll.name] #km
+        l = p.l_dict[ll.name]*line_scale #km
 
         N = Int(ceil(l/l_seg))
         # l_seg = l/N
@@ -319,9 +323,12 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         )
         add_component!(sys, load)
     end
-
+    
+    load_scale = p.load_scale
     for l in get_components(PSY.StandardLoad, sys)
-        transform_load_to_constant_impedance(l) 
+        transform_load_to_constant_impedance(l)
+        l.impedance_active_power = l.impedance_active_power * load_scale 
+        l.impedance_reactive_power = l.impedance_reactive_power * load_scale 
     end
     
     # build segments model
@@ -395,7 +402,7 @@ function get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor
 end
 
 # Verifying
-function verifying(file_name, M, impedance_csv, capacitance_csv, p)
+function verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, factor_y)
     sys = System(joinpath(pwd(), file_name))
     
     for ll in get_components(Line, sys)
@@ -404,7 +411,7 @@ function verifying(file_name, M, impedance_csv, capacitance_csv, p)
         println("b_pu_ll = $(ll.b.from + ll.b.to)")
 
         for m in 1:M
-            z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, m)
+            z_km, y_km, Z_c_abs, z_km_ω = get_line_parameters(impedance_csv, capacitance_csv, m, factor_z, factor_y)
             z_km_pu = z_km/Z_c_abs
             y_km_pu = y_km*Z_c_abs
             z_km_ω_pu = z_km_ω/Z_c_abs
