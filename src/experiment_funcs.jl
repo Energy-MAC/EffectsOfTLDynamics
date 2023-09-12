@@ -283,7 +283,6 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         return error("Unknown line model")
     end
 
-    #alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
     if length(get_components(Bus, sys)) == 2
         ll = first(get_components(Line, sys))
         ll_alg = Line(
@@ -309,27 +308,30 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
             base_power = 100.0,
             constant_active_power = 0.0,
             constant_reactive_power = 0.0,
-            impedance_active_power = p.p_load,
-            impedance_reactive_power = p.q_load,
+            impedance_active_power = p.p_load * p.load_scale,
+            impedance_reactive_power = p.q_load * p.load_scale,
             current_active_power = 0.0,
             current_reactive_power = 0.0,
             max_constant_active_power = 0.0,
             max_constant_reactive_power = 0.0,
-            max_impedance_active_power = p.p_load,
-            max_impedance_reactive_power = p.q_load,
+            max_impedance_active_power = p.p_load * p.load_scale,
+            max_impedance_reactive_power = p.q_load * p.load_scale,
             max_current_active_power = 0.0,
             max_current_reactive_power = 0.0,
         )
         add_component!(sys, load)
     end
     
-    load_scale = p.load_scale
+    if length(get_components(Bus, sys)) == 9
+        alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
+    end
+
+    # load_scale = p.load_scale
     for l in get_components(PSY.StandardLoad, sys)
         transform_load_to_constant_impedance(l)
-        l.impedance_active_power = l.impedance_active_power * load_scale 
-        l.impedance_reactive_power = l.impedance_reactive_power * load_scale 
+        l.impedance_active_power = l.impedance_active_power * p.load_scale 
+        l.impedance_reactive_power = l.impedance_reactive_power * p.load_scale 
     end
-    
     # build segments model
     if (multi_segment == true)
         sys = build_seg_model!(sys, p, dyn_lines, alg_line_name)
@@ -380,17 +382,17 @@ function get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor
 
     r_km_5_to_1 = vec(zeros(5, 1))
     l_km_5_to_1 = vec(zeros(5, 1))
-    
-    for m in 1 : 5
-        r_km_5_to_1[m,1] = df_imp[5, "R"*string(m)]
-        l_km_5_to_1[m,1] = df_imp[5, "L"*string(m)]
+    T = 3
+    for m in 1 : T
+        r_km_5_to_1[m,1] = df_imp[T, "R"*string(m)]
+        l_km_5_to_1[m,1] = df_imp[T, "L"*string(m)]
     end
     
     x_km_5_to_1 = ω*l_km_5_to_1
     z_km_5_to_1 = (r_km_5_to_1 + im*x_km_5_to_1)*factor_z
 
     Y_5_to_1 = 0 
-    for i in 1:5
+    for i in 1:T
         Y_5_to_1 = Y_5_to_1 + 1/(z_km_5_to_1[i])
     end
 
