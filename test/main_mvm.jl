@@ -23,8 +23,8 @@ file_name = "../data/json_data/mach_v_mach.json"
 line_dict = default_2_bus_line_dict
 
 ### Load relevant line data
-impedance_csv = "../data/cable_data/impedance_data.csv"
-capacitance_csv = "../data/cable_data/C_per_km.csv"
+impedance_csv = "../data/cable_data/dommel_data.csv"
+capacitance_csv = "../data/cable_data/dommel_data_C.csv"
 
 ### Choose perturbation to be applied
 # "BIC"
@@ -103,13 +103,11 @@ p = ExpParams(
 )
 
 # Verify impedance values of raw file vs CSV data
-M = 1
-verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, factor_y)
+# verifying(file_name, M, impedance_csv, capacitance_csv, p)
 
 line_model_1 = "Algebraic"
 line_model_2 = "Dynamic"
 line_model_3 = "Multi-Segment Dynamic"
-
 
 results_alg, sim = run_experiment(file_name, line_model_1, p);
 sys = sim.sys
@@ -170,18 +168,27 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 
 """
 
-line_lengths = [100, 250, 500]
-loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
+# line_lengths = [100, 250, 500]
+# loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
+
+line_scales = [1.0, 1.25, 1.5, 2.0]
+load_scales = [1.0, 1.25, 1.5, 1.75]
 
 plots = []
 plt = []
 
-for l in line_lengths
-    p.l_dict["BUS 1-BUS 2-i_1"] = l
-    p.l_dict["BUS 1-BUS 2-i_1_static"] = l
-    for (p_load, q_load) in loading_scenarios
-        p.p_load = p_load
-        p.q_load = q_load
+for line_scale in line_scales
+    p.line_scale = line_scale
+# for l in line_lengths
+#     p.l_dict["Bus 9-Bus 6-i_1"] = l
+#     p.l_dict["Bus 9-Bus 6-i_1_static"] = l
+    
+    for load_scale in load_scales
+    p.load_scale = load_scale
+
+    # for (p_load, q_load) in loading_scenarios
+    #    p.p_load = p_load
+    #    p.q_load = q_load
     
         M = 1
         z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
@@ -211,7 +218,7 @@ for l in line_lengths
         vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
         plot!(plt, vr_ms_dyn, label = "V1_ms_dyn")
 
-        M = 5
+        M = 3
         p.M = M
         z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.z_km = z_km;
@@ -227,18 +234,18 @@ for l in line_lengths
         vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
         plot!(plt, vr_ms_mb_dyn, label = "V1_ms_mb_dyn")
         
-        plot!(plt, legend = true, title = "l = $l, p = $p_load, q = $q_load")        
+        plot!(plt, legend = true)        
         push!(plots, plt)
     end
 end
 
-combined_plot = plot(plots..., layout=(3,3))
+combined_plot = plot(plots..., layout=(4,4))
 plot!(combined_plot, legend = false, title = "")
+plot!(combined_plot, ylims = (0.85,1.1))
 plot!(combined_plot, xlims = (0.0, 2.0))
+savefig("../figures/Week 2/Monday/mvm_2s.png")
 plot!(combined_plot, xlims = (0.249, 0.260))
-plot!(combined_plot, ylims = (0.8,1.2))
-savefig("../figures/Friday/mvm_2s_zoom.png")
-
+savefig("../figures/Week 2/Monday/mvm_2s_zoom.png")
 
 plot!(xlims=(0.249, 0.255))
 # plot!(ylims=(0.981,0.983))

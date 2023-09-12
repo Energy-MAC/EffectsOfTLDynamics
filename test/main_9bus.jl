@@ -23,8 +23,8 @@ file_name = "../data/json_data/9bus_slackless.json"
 line_dict = default_9_bus_line_dict
 
 ### Load relevant line data
-impedance_csv = "../data/cable_data/impedance_data.csv"
-capacitance_csv = "../data/cable_data/C_per_km.csv"
+impedance_csv = "../data/cable_data/dommel_data.csv"
+capacitance_csv = "../data/cable_data/dommel_data_C.csv"
 
 ### Choose perturbation to be applied
 # "BIC"
@@ -79,7 +79,7 @@ p_load = 0.5
 q_load = 0.5
 l_seg = 50 #km
 
-load_scale = 1.15
+load_scale = 1.0
 line_scale = 1.0
 
 p = ExpParams(
@@ -175,8 +175,8 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 
 """
 
-line_lengths = [100, 250, 500]
-loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
+# line_lengths = [100, 250, 500]
+# loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
 line_scales = [1.0, 1.25, 1.5, 2.0]
 load_scales = [1.0, 1.1, 1.25, 1.5]
@@ -225,7 +225,7 @@ for line_scale in line_scales
         vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 7);
         plot!(plt, vr_ms_dyn, label = "V1_ms_dyn")
 
-        M = 5
+        M = 3
         p.M = M
         z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.z_km = z_km;
@@ -246,9 +246,12 @@ for line_scale in line_scales
     end
 end
 
-combined_plot = plot(plots..., layout=(3,3))
+combined_plot = plot(plots..., layout=(4,4))
 plot!(combined_plot, legend = false, title = "")
+plot!(combined_plot, ylims = (0.7, 1.8))
 plot!(combined_plot, xlims = (0.0, 2.0))
+savefig("../figures/Week 2/Monday/9bus_2s_NEW.png")
 plot!(combined_plot, xlims = (0.249, 0.260))
-plot!(combined_plot, ylims = (0.7,1.6))
-savefig("../figures/Week 2/Monday/9b_2s.png")
+savefig("../figures/Week 2/Monday/9bus_2s_NEW_zoom.png")
+plot!(combined_plot, xlims = (0.249, 0.255))
+savefig("../figures/Week 2/Monday/9bus_2s_NEW_zoom_zoom.png")
