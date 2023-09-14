@@ -308,14 +308,14 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
             base_power = 100.0,
             constant_active_power = 0.0,
             constant_reactive_power = 0.0,
-            impedance_active_power = p.p_load * p.load_scale,
-            impedance_reactive_power = p.q_load * p.load_scale,
+            impedance_active_power = p.p_load,
+            impedance_reactive_power = p.q_load,
             current_active_power = 0.0,
             current_reactive_power = 0.0,
             max_constant_active_power = 0.0,
             max_constant_reactive_power = 0.0,
-            max_impedance_active_power = p.p_load * p.load_scale,
-            max_impedance_reactive_power = p.q_load * p.load_scale,
+            max_impedance_active_power = p.p_load,
+            max_impedance_reactive_power = p.q_load,
             max_current_active_power = 0.0,
             max_current_reactive_power = 0.0,
         )
@@ -331,6 +331,10 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         transform_load_to_constant_impedance(l)
         l.impedance_active_power = l.impedance_active_power * p.load_scale 
         l.impedance_reactive_power = l.impedance_reactive_power * p.load_scale 
+    end
+    for g in get_components(PSY.Generator, sys)
+        set_active_power!(g, g.active_power * p.load_scale)
+        set_reactive_power!(g, g.reactive_power * p.load_scale)
     end
     # build segments model
     if (multi_segment == true)
