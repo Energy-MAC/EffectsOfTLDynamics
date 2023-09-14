@@ -247,11 +247,11 @@ plot!(combined_plot, ylabel = L" $||V_2|| \quad \mathrm{[ p.u.]}$")
 
 plot!(combined_plot, xlims = (0.0, 2.0))
 plot!(combined_plot, dpi = 300)
-Plots.savefig("../figures/Week 2/Weds/ivm_2s.png")
+Plots.savefig("../figures/Week 2/Thurs/ivm_2s.png")
 
 plot!(combined_plot, xlims = (0.249, 0.260))
 plot!(combined_plot, ylims = (0.85,1.1))
-Plots.savefig("../figures/Week 2/Weds/ivm_2s_zoom.png")
+Plots.savefig("../figures/Week 2/Thurs/ivm_2s_zoom.png")
 
 plot!(xlims=(0.249, 0.255))
 # plot!(ylims=(0.981,0.983))
