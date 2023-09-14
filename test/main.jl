@@ -206,19 +206,19 @@ for line_scale in line_scales
         sys = sim.sys
         s = small_signal_analysis(sim)
         vr_alg = get_voltage_magnitude_series(results_alg, 102);
-        plt = plot(vr_alg, label = L"$statpi$")
+        plt = plot(vr_alg, label = L"\mathrm{algebraic}")
 
         results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
         sys_dyn = sim_dyn.sys
         s_dyn = small_signal_analysis(sim_dyn)
         vr_dyn = get_voltage_magnitude_series(results_dyn, 102);
-        plot!(plt, vr_dyn, label = L"$dynpi$")
+        plot!(plt, vr_dyn, label = L"\mathrm{dynpi}")
 
         results_ms_dyn, sim_ms_dyn = run_experiment(file_name, line_model_3, p);
         sys_ms_dyn = sim_ms_dyn.sys
         s_ms_dyn = small_signal_analysis(sim_ms_dyn)            
         vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
-        plot!(plt, vr_ms_dyn, label = L"MSSB")
+        plot!(plt, vr_ms_dyn, label = L"\mathrm{MSSB}")
 
         M = 3
         p.M = M
@@ -234,7 +234,7 @@ for line_scale in line_scales
         sys_ms_mb = sim_ms_mb.sys
         s_ms_mb = small_signal_analysis(sim_ms_mb)            
         vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
-        plot!(plt, vr_ms_mb_dyn, label = L"MSMB")
+        plot!(plt, vr_ms_mb_dyn, label = L"\mathrm{MSMB}")
         
         plot!(plt, legend = true)        
         push!(plots, plt)
@@ -242,8 +242,8 @@ for line_scale in line_scales
 end
 
 combined_plot = plot(plots..., layout=(1,1))
-plot!(combined_plot, xlabel = L"$ Time \quad [s]$", title = "")
-plot!(combined_plot, ylabel = L" $||V_2|| \quad [p.u.]$")
+plot!(combined_plot, xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")
+plot!(combined_plot, ylabel = L" $||V_2|| \quad \mathrm{[ p.u.]}$")
 
 plot!(combined_plot, xlims = (0.0, 2.0))
 plot!(combined_plot, dpi = 300)
