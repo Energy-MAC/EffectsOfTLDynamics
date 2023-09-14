@@ -438,7 +438,7 @@ end
 
 
 function add_load_2bus(sys, p::ExpParams)
-# for adding pq loads to 2bus system 
+# for adding pq loads to 2bus system
     load = StandardLoad(
         name = "load1",
         available = true,
@@ -475,8 +475,28 @@ function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
     else
         sys = build_new_impedance_model!(sys, p, dyn_lines, "")
     end
-    add_load_2bus(sys, p)
 
+    # Add load
+    load = StandardLoad(
+        name = "load1",
+        available = true,
+        bus = get_component(Bus, sys, "BUS 2"),
+        base_power = 100.0,
+        constant_active_power = 0.0,
+        constant_reactive_power = 0.0,
+        impedance_active_power = p.p_load,
+        impedance_reactive_power = p.q_load,
+        current_active_power = 0.0,
+        current_reactive_power = 0.0,
+        max_constant_active_power = 0.0,
+        max_constant_reactive_power = 0.0,
+        max_impedance_active_power = p.p_load,
+        max_impedance_reactive_power = p.q_load,
+        max_current_active_power = 0.0,
+        max_current_reactive_power = 0.0,
+    )
+    add_component!(sys, load)
+    
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p);
     return sim 
 end
