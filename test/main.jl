@@ -235,7 +235,6 @@ for line_scale in line_scales
         s_ms_mb = small_signal_analysis(sim_ms_mb)            
         vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
         plot!(plt, vr_ms_mb_dyn, label = L"\mathrm{MSMB}")
-        
         plot!(plt, legend = true)        
         push!(plots, plt)
     end
@@ -243,12 +242,14 @@ end
 
 combined_plot = plot(plots..., layout=(1,1))
 plot!(combined_plot, xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")
-plot!(combined_plot, ylabel = L" $||V_2|| \quad \mathrm{[ p.u.]}$")
+plot!(combined_plot, ylabel = L"$||V_2|| \quad \mathrm{[\ p.u.]}$")
 
 plot!(combined_plot, xlims = (0.0, 2.0))
 plot!(combined_plot, dpi = 300)
 Plots.savefig("../figures/Week 2/Thurs/ivm_2s.png")
-
+plot!(combined_plot, title = L"$\mathrm{Load \ scale} = %$load_scale \ \mathrm{Line \ scale} = %$line_scale$")
+annotate!(0.5,1, (L"Label", 8, :red, :top))
+plot!(combined_plot, legend_title = L"$\mathrm{Load \ scale} = %$load_scale \ \mathrm{Line \ scale} = %$line_scale$")
 plot!(combined_plot, xlims = (0.249, 0.260))
 plot!(combined_plot, ylims = (0.85,1.1))
 Plots.savefig("../figures/Week 2/Thurs/ivm_2s_zoom.png")
