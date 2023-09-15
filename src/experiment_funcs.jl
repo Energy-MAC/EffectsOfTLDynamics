@@ -332,6 +332,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         l.impedance_active_power = l.impedance_active_power * p.load_scale 
         l.impedance_reactive_power = l.impedance_reactive_power * p.load_scale 
     end
+    
     for g in get_components(PSY.Generator, sys)
         set_base_power!(g, g.base_power * p.load_scale)
         set_active_power!(g, g.active_power * p.load_scale)
@@ -341,6 +342,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         set_reactive_power_limits!(g, (min = g.reactive_power_limits.min * p.load_scale, max = g.reactive_power_limits.max * p.load_scale ))
         set_ramp_limits!(g, (up = g.ramp_limits.up * p.load_scale, down = g.ramp_limits.down * p.load_scale))
     end
+    
     # build segments model
     if (multi_segment == true)
         sys = build_seg_model!(sys, p, dyn_lines, alg_line_name)

@@ -78,8 +78,8 @@ p_load = 1.0
 q_load = 0.25
 l_seg = 50 #km
 
-load_scale = 1.0
-line_scale = 1.0
+load_scale = 1.0;
+line_scale = 1.0;
 
 p = ExpParams(
     N, 
@@ -100,18 +100,29 @@ p = ExpParams(
     q_load,
     line_scale,
     load_scale
-)
+);
 
 # Verify impedance values of raw file vs CSV data
 # verifying(file_name, M, impedance_csv, capacitance_csv, p)
 
-line_model_1 = "Algebraic"
-line_model_2 = "Dynamic"
-line_model_3 = "Multi-Segment Dynamic"
+line_model_1 = "Algebraic";
+line_model_2 = "Dynamic";
+line_model_3 = "Multi-Segment Dynamic";
 
 results_alg, sim = run_experiment(file_name, line_model_1, p);
-sys = sim.sys
+sys = sim.sys;
+
+using PowerFlows
+sol = solve_powerflow(ACPowerFlow(), sys)
+sol["bus_results"]
 s = small_signal_analysis(sim)
+
+p.load_scale = 2.0
+results_alg2, sim2 = run_experiment(file_name, line_model_1, p);
+s2 = small_signal_analysis(sim2)
+sys2 = sim2.sys;
+sol2 = solve_powerflow(ACPowerFlow(), sys)
+sol2["bus_results"]
 
 """
 results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
