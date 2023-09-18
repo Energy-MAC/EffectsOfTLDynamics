@@ -441,30 +441,6 @@ function verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, fa
 end
 
 
-function add_load_2bus(sys, p::ExpParams)
-# for adding pq loads to 2bus system
-    load = StandardLoad(
-        name = "load1",
-        available = true,
-        bus = get_component(Bus, sys, "BUS 2"),
-        base_power = 100.0,
-        constant_active_power = 0.0,
-        constant_reactive_power = 0.0,
-        impedance_active_power = p.p_load,
-        impedance_reactive_power = p.q_load,
-        current_active_power = 0.0,
-        current_reactive_power = 0.0,
-        max_constant_active_power = 0.0,
-        max_constant_reactive_power = 0.0,
-        max_impedance_active_power = p.p_load,
-        max_impedance_reactive_power = p.q_load,
-        max_current_active_power = 0.0,
-        max_current_reactive_power = 0.0,
-    )
-    add_component!(sys, load)
-end
-
-
 function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams)
     # build system
     sys = System(joinpath(pwd(), file_name));
@@ -488,14 +464,14 @@ function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
         base_power = 100.0,
         constant_active_power = 0.0,
         constant_reactive_power = 0.0,
-        impedance_active_power = p.p_load,
-        impedance_reactive_power = p.q_load,
+        impedance_active_power = p.p_load*p.load_scale,
+        impedance_reactive_power = p.q_load*p.load_scale,
         current_active_power = 0.0,
         current_reactive_power = 0.0,
         max_constant_active_power = 0.0,
         max_constant_reactive_power = 0.0,
-        max_impedance_active_power = p.p_load,
-        max_impedance_reactive_power = p.q_load,
+        max_impedance_active_power = p.p_load*p.load_scale,
+        max_impedance_reactive_power = p.q_load*p.load_scale,
         max_current_active_power = 0.0,
         max_current_reactive_power = 0.0,
     )
@@ -503,6 +479,41 @@ function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
     
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p);
     return sim 
+end
+
+
+function build_9bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams)
+
+    # build system
+    sys = System(joinpath(pwd(), file_name));
+
+    # Simulation time span
+    tspan = (0.0, p.sim_params.t_max)
+    perturbation = choose_disturbance(sys, p.perturbation, p)
+
+    alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
+    
+    # load_scale = p.load_scale
+    for l in get_components(PSY.StandardLoad, sys)
+        transform_load_to_constant_impedance(l)
+        l.impedance_active_power = l.impedance_active_power * p.load_scale 
+        l.impedance_reactive_power = l.impedance_reactive_power * p.load_scale 
+    end
+    for g in get_components(PSY.Generator, sys)
+        set_active_power!(g, g.active_power * p.load_scale)
+        set_reactive_power!(g, g.reactive_power * p.load_scale)
+    end
+    
+    # build segments model
+    if (multi_segment == true)
+        sys = build_seg_model!(sys, p, dyn_lines, alg_line_name)
+    else
+        sys = build_new_impedance_model!(sys, p, dyn_lines, alg_line_name)
+    end
+
+    sim = build_sim(sys, tspan, perturbation, dyn_lines, p);
+    return sim 
+
 end
 
 export choose_disturbance

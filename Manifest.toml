@@ -230,12 +230,6 @@ git-tree-sha1 = "52cb3ec90e8a8bea0e62e275ba577ad0f74821f7"
 uuid = "ed09eef8-17a6-5b46-8889-db040fac31e3"
 version = "0.3.2"
 
-[[deps.ConcurrentUtilities]]
-deps = ["Serialization", "Sockets"]
-git-tree-sha1 = "5372dbbf8f0bdb8c700db5367132925c0771ef7e"
-uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
-version = "2.2.1"
-
 [[deps.Conda]]
 deps = ["Downloads", "JSON", "VersionParsing"]
 git-tree-sha1 = "8c86e48c0db1564a1d49548d3515ced5d604c408"
@@ -1512,7 +1506,7 @@ version = "0.1.4"
 deps = ["Distributed", "Printf"]
 git-tree-sha1 = "00099623ffee15972c16111bcf84c58a0051257c"
 uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
-version = "1.8.0"
+version = "1.9.0"
 
 [[deps.PyCall]]
 deps = ["Conda", "Dates", "Libdl", "LinearAlgebra", "MacroTools", "Serialization", "VersionParsing"]
@@ -1668,10 +1662,10 @@ uuid = "476501e8-09a2-5ece-8869-fb82de89a1fa"
 version = "0.6.39"
 
 [[deps.SciMLBase]]
-deps = ["ADTypes", "ArrayInterface", "ChainRulesCore", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "EnumX", "FunctionWrappersWrappers", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "Markdown", "PrecompileTools", "Preferences", "RecipesBase", "RecursiveArrayTools", "Reexport", "RuntimeGeneratedFunctions", "SciMLOperators", "StaticArraysCore", "Statistics", "SymbolicIndexingInterface", "Tables", "TruncatedStacktraces", "ZygoteRules"]
-git-tree-sha1 = "c0781c7ebb65776e9770d333b5e191d20dd45fcf"
+deps = ["ADTypes", "ArrayInterface", "ChainRulesCore", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "EnumX", "FillArrays", "FunctionWrappersWrappers", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "Markdown", "PrecompileTools", "Preferences", "RecipesBase", "RecursiveArrayTools", "Reexport", "RuntimeGeneratedFunctions", "SciMLOperators", "StaticArraysCore", "Statistics", "SymbolicIndexingInterface", "Tables", "TruncatedStacktraces", "ZygoteRules"]
+git-tree-sha1 = "827c87edbb5ad34a5e61accc99269285291c692e"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "1.97.0"
+version = "1.97.1"
 
 [[deps.SciMLNLSolve]]
 deps = ["DiffEqBase", "LineSearches", "NLsolve", "Reexport", "SciMLBase"]
