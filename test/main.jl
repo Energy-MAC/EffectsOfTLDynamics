@@ -78,8 +78,8 @@ p_load = 1.0
 q_load = 0.25
 l_seg = 50 #km
 
-load_scale = 1.0
-line_scale = 1.0
+load_scale = 1.0;
+line_scale = 1.0;
 
 p = ExpParams(
     N, 
@@ -100,18 +100,29 @@ p = ExpParams(
     q_load,
     line_scale,
     load_scale
-)
+);
 
 # Verify impedance values of raw file vs CSV data
 # verifying(file_name, M, impedance_csv, capacitance_csv, p)
 
-line_model_1 = "Algebraic"
-line_model_2 = "Dynamic"
-line_model_3 = "Multi-Segment Dynamic"
+line_model_1 = "Algebraic";
+line_model_2 = "Dynamic";
+line_model_3 = "Multi-Segment Dynamic";
 
 results_alg, sim = run_experiment(file_name, line_model_1, p);
-sys = sim.sys
+sys = sim.sys;
+
+using PowerFlows
+sol = solve_powerflow(ACPowerFlow(), sys)
+sol["bus_results"]
 s = small_signal_analysis(sim)
+
+p.load_scale = 2.0
+results_alg2, sim2 = run_experiment(file_name, line_model_1, p);
+s2 = small_signal_analysis(sim2)
+sys2 = sim2.sys;
+sol2 = solve_powerflow(ACPowerFlow(), sys)
+sol2["bus_results"]
 
 """
 results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
@@ -235,7 +246,6 @@ for line_scale in line_scales
         s_ms_mb = small_signal_analysis(sim_ms_mb)            
         vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
         plot!(plt, vr_ms_mb_dyn, label = L"\mathrm{MSMB}")
-        
         plot!(plt, legend = true)        
         push!(plots, plt)
     end
@@ -243,12 +253,14 @@ end
 
 combined_plot = plot(plots..., layout=(1,1))
 plot!(combined_plot, xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")
-plot!(combined_plot, ylabel = L" $||V_2|| \quad \mathrm{[ p.u.]}$")
+plot!(combined_plot, ylabel = L"$||V_2|| \quad \mathrm{[\ p.u.]}$")
 
 plot!(combined_plot, xlims = (0.0, 2.0))
 plot!(combined_plot, dpi = 300)
 Plots.savefig("../figures/Week 2/Thurs/ivm_2s.png")
-
+plot!(combined_plot, title = L"$\mathrm{Load \ scale} = %$load_scale \ \mathrm{Line \ scale} = %$line_scale$")
+annotate!(0.5,1, (L"Label", 8, :red, :top))
+plot!(combined_plot, legend_title = L"$\mathrm{Load \ scale} = %$load_scale \ \mathrm{Line \ scale} = %$line_scale$")
 plot!(combined_plot, xlims = (0.249, 0.260))
 plot!(combined_plot, ylims = (0.85,1.1))
 Plots.savefig("../figures/Week 2/Thurs/ivm_2s_zoom.png")
