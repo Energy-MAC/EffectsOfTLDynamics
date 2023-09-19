@@ -111,17 +111,20 @@ line_model_3 = "Multi-Segment Dynamic";
 
 results_alg, sim = run_experiment(file_name, line_model_1, p);
 sys = sim.sys;
+using JLD
+save("../results/test/myfile.jld", "results_alg $(p.line_scale) $(p.load_scale)", results_alg)
+
 
 using PowerFlows
 sol = solve_powerflow(ACPowerFlow(), sys)
 sol["bus_results"]
 s = small_signal_analysis(sim)
 
-p.load_scale = 2.0
+p.load_scale = 10.0
 results_alg2, sim2 = run_experiment(file_name, line_model_1, p);
 s2 = small_signal_analysis(sim2)
 sys2 = sim2.sys;
-sol2 = solve_powerflow(ACPowerFlow(), sys)
+sol2 = solve_powerflow(ACPowerFlow(), sys2)
 sol2["bus_results"]
 
 """
@@ -182,8 +185,8 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 # line_lengths = [100, 250, 500]
 # loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
-line_scales = [1.0]#, 1.25, 1.5, 2.0]
-load_scales = [1.0]#, 1.25, 1.5, 1.75]
+line_scales = collect(1.0:0.25:3.0)
+load_scales = collect(1.0:0.25:3.0)
 
 plots = []
 plt = []
@@ -272,7 +275,7 @@ plot!(xlims=(0.249, 0.255))
 
 l = get_component(Line, sys, "BUS 1-BUS 2-i_1")
 p_branch = get_activepower_branch_flow(results_alg, "BUS 1-BUS 2-i_1", :from)
-p_branch_dyn = get_activepower_branch_flow(results_dyn, "BUS 1-BUS 2-i_1", :from)
+p_branch_dyn = get_activepower_branch_flow(results_alg2, "BUS 1-BUS 2-i_1", :from)
 p_branch_ms = get_activepower_branch_flow(results_ms_dyn, "BUS 1-BUS 2-i_1_segment_1_branch_1", :from)
 p_branch_ms_mb = [get_activepower_branch_flow(results_ms_mb_dyn, "BUS 1-BUS 2-i_1_segment_1_branch_"*string(i), :from) for i in 1:5]
 

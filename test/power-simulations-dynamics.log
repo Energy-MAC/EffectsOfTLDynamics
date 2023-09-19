@@ -1,54 +1,42 @@
-┌ Info: 2023-09-15T21:46:23.797 [407343:1]: Pre-Initializing Simulation States
+┌ Info: 2023-09-19T17:32:27.149 [3652927:1]: Pre-Initializing Simulation States
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:265
-┌ Info: 2023-09-15T21:46:23.797 [407343:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
+┌ Info: 2023-09-19T17:32:27.170 [3652927:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
 └ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
-┌ Info: 2023-09-15T21:46:23.797 [407343:1]: PowerFlow solve converged, the results have been stored in the system
+┌ Info: 2023-09-19T17:32:27.804 [3652927:1]: PowerFlow solve converged, the results have been stored in the system
 └ @ PowerFlows /home/gabrielecr/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
-┌ Info: 2023-09-15T21:46:23.797 [407343:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
+┌ Info: 2023-09-19T17:32:27.805 [3652927:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
 └ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
-┌ Info: 2023-09-15T21:46:23.797 [407343:1]: Residual from initial guess: max = 0.1750447130984536 at 4, total = 1.138617551325203
+┌ Info: 2023-09-19T17:32:33.953 [3652927:1]: Residual from initial guess: max = 4.009956047767993e-10 at 4, total = 1.7132478483273715e-9
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:101
-┌ Warning: 2023-09-15T21:46:23.802 [407343:1]: Initialization non-linear solve convergence failed, initial conditions do not meet conditions for an stable equilibrium.
-│ Attempting again with reduced numeric tolerance and using another solver
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:72
-┌ Warning: 2023-09-15T21:46:23.803 [407343:1]: Initialization non-linear solve convergence failed, initial conditions do not meet conditions for an stable equilibrium.
-│ Attempting again with reduced numeric tolerance and using another solver
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:72
-┌ Warning: 2023-09-15T21:46:23.805 [407343:1]: Initialization non-linear solve convergence failed, initial conditions do not meet conditions for an stable equilibrium.
-│ Attempting again with reduced numeric tolerance and using another solver
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:72
-┌ Warning: 2023-09-15T21:46:23.805 [407343:1]: Initialization non-linear solve convergence failed, initial conditions do not meet conditions for an stable equilibrium.
-│ Attempting again with reduced numeric tolerance and using another solver
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:72
-┌ Info: 2023-09-15T21:46:23.805 [407343:1]: Residual from initial guess: max = 0.18032106170645656 at 7, total = 1.3095424274017875
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:101
-┌ Error: 2023-09-15T21:46:23.852 [407343:1]: MassMatrixModel failed to build
-│   exception = (ErrorException("The initial residual in the state located at 7 has a value of 0.18032106170645656.\n                Generator = generator-102-1, state = q_oc.\n               Residual error is too large to continue"), Union{Ptr{Nothing}, Base.InterpreterIP}[Ptr{Nothing} @0x00007fbd9e6c657b, Ptr{Nothing} @0x00007fbb7691e5aa, Ptr{Nothing} @0x00007fbb7693ba19, Ptr{Nothing} @0x00007fbb7693c66d, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbb768aab25, Ptr{Nothing} @0x00007fbb768b0be3, Ptr{Nothing} @0x00007fbb768b10af, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbd9e0400f8, Ptr{Nothing} @0x00007fbb76a0f490, Ptr{Nothing} @0x00007fbb76a0fab0, Ptr{Nothing} @0x00007fbb76a0fb19, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbb769a695b, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c13da4, Ptr{Nothing} @0x00007fbdb2c137c7, Ptr{Nothing} @0x00007fbdb2c14415, Ptr{Nothing} @0x00007fbdb2c152f1, Base.InterpreterIP in top-level CodeInfo for Main at statement 0, Ptr{Nothing} @0x00007fbdb2c3023b, Ptr{Nothing} @0x00007fbdb2c30a89, Ptr{Nothing} @0x00007fbdb2c30a89, Ptr{Nothing} @0x00007fbdb2c31e0a, Ptr{Nothing} @0x00007fbd9c35b4bf, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c06f58, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c08e60, Ptr{Nothing} @0x00007fbd9e0c397c, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c08e60, Ptr{Nothing} @0x00007fbd9e0c4892, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c08e60, Ptr{Nothing} @0x00007fbd9c336a1d, Ptr{Nothing} @0x00007fbd9c336a92, Ptr{Nothing} @0x00007fbd9c33809c, Ptr{Nothing} @0x00007fbd9c33a238, Ptr{Nothing} @0x00007fbd9c3d2ebd, Ptr{Nothing} @0x00007fbd9c3d32de, Ptr{Nothing} @0x00007fbd9c3d489b, Ptr{Nothing} @0x00007fbd9c3d48bf, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbd9e0400f8, Ptr{Nothing} @0x00007fbd9c3d468c, Ptr{Nothing} @0x00007fbd9c3d477f, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c06f58, Ptr{Nothing} @0x00007fbd9c334b52, Ptr{Nothing} @0x00007fbd9c334b72, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c08e60, Ptr{Nothing} @0x00007fbd9c31b228, Ptr{Nothing} @0x00007fbd9c31b4ff, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c195cf])
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:434
-┌ Info: 2023-09-15T21:46:23.866 [407343:1]: 
+┌ Info: 2023-09-19T17:32:33.966 [3652927:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:68
+┌ Info: 2023-09-19T17:32:33.967 [3652927:1]: Attaching Perturbations
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:296
+┌ Info: 2023-09-19T17:32:34.444 [3652927:1]: Simulations status = BUILT
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:428
+┌ Info: 2023-09-19T17:32:34.444 [3652927:1]: 
 │  ───────────────────────────────────────────────────────────────────────────────
 │                                                      Time          Allocations  
 │                                                ───────────────   ───────────────
-│                 Total measured:                    70.0ms            7.23MiB    
+│                 Total measured:                     9.25s            1.01GiB    
 │ 
 │  Section                               ncalls     time    %tot     alloc    %tot
 │  ───────────────────────────────────────────────────────────────────────────────
-│  Build Simulation                           1   70.0ms  100.0%   7.23MiB  100.0%
-│    Build Simulation Inputs                  1    398μs    0.6%   68.9KiB    0.9%
-│      Wrap Branches                          1   2.73μs    0.0%      240B    0.0%
-│      Wrap Dynamic Injectors                 1    241μs    0.3%   43.8KiB    0.6%
-│      Calculate MM, DAE_vector, Tota...      1   15.1μs    0.0%   1.80KiB    0.0%
-│      Wrap Static Injectors                  1   43.5μs    0.1%   5.69KiB    0.1%
-│    Pre-initialization                       1    767μs    1.1%    244KiB    3.3%
-│      Power Flow solution                    1    407μs    0.6%   91.1KiB    1.2%
-│      Initialize Static Injectors            1    561ns    0.0%     0.00B    0.0%
-│      Initialize Dynamic Injectors           1    285μs    0.4%    142KiB    1.9%
-│    Calculate Jacobian                       1   82.1μs    0.1%   62.3KiB    0.8%
-│    Make Model Function                      1   5.44μs    0.0%      928B    0.0%
-│    Initial Condition NLsolve refine...      1   8.14ms   11.6%   4.11MiB   56.9%
+│  Build Simulation                           1    9.25s  100.0%   1.01GiB  100.0%
+│    Build Simulation Inputs                  1    1.72s   18.6%    182MiB   17.5%
+│      Wrap Branches                          1   6.78μs    0.0%      240B    0.0%
+│      Wrap Dynamic Injectors                 1    1.12s   12.1%    120MiB   11.6%
+│      Calculate MM, DAE_vector, Tota...      1    138ms    1.5%   17.3MiB    1.7%
+│      Wrap Static Injectors                  1    154ms    1.7%   9.78MiB    0.9%
+│    Pre-initialization                       1    2.88s   31.1%    383MiB   36.9%
+│      Power Flow solution                    1    635ms    6.9%   47.7MiB    4.6%
+│      Initialize Static Injectors            1    371ns    0.0%     0.00B    0.0%
+│      Initialize Dynamic Injectors           1    1.98s   21.4%    310MiB   29.9%
+│    Calculate Jacobian                       1    2.99s   32.4%    404MiB   38.9%
+│    Make Model Function                      1   4.24ms    0.0%   98.7KiB    0.0%
+│    Initial Condition NLsolve refine...      1    1.18s   12.7%   42.7MiB    4.1%
+│    Build Perturbations                      1   83.5ms    0.9%   6.86MiB    0.7%
+│    Make DiffEq Problem                      1    390ms    4.2%   19.1MiB    1.8%
 │  ───────────────────────────────────────────────────────────────────────────────
 │ 
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:453
-┌ Error: 2023-09-15T21:46:23.910 [407343:1]: Execution failed
-│   exception = (ErrorException("The Simulation status is BUILD_FAILED. Can not continue, correct your inputs and build the simulation again."), Union{Ptr{Nothing}, Base.InterpreterIP}[Ptr{Nothing} @0x00007fbd9e6c657b, Ptr{Nothing} @0x00007fbb7694c44d, Ptr{Nothing} @0x00007fbb7694db31, Ptr{Nothing} @0x00007fbb7694f0ed, Ptr{Nothing} @0x00007fbb7694f378, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbd9e0400f8, Ptr{Nothing} @0x00007fbb54166148, Ptr{Nothing} @0x00007fbb769a69ed, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c13da4, Ptr{Nothing} @0x00007fbdb2c137c7, Ptr{Nothing} @0x00007fbdb2c14415, Ptr{Nothing} @0x00007fbdb2c152f1, Base.InterpreterIP in top-level CodeInfo for Main at statement 0, Ptr{Nothing} @0x00007fbdb2c3023b, Ptr{Nothing} @0x00007fbdb2c30a89, Ptr{Nothing} @0x00007fbdb2c30a89, Ptr{Nothing} @0x00007fbdb2c31e0a, Ptr{Nothing} @0x00007fbd9c35b4bf, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c06f58, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c08e60, Ptr{Nothing} @0x00007fbd9e0c397c, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c08e60, Ptr{Nothing} @0x00007fbd9e0c4892, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c08e60, Ptr{Nothing} @0x00007fbd9c336a1d, Ptr{Nothing} @0x00007fbd9c336a92, Ptr{Nothing} @0x00007fbd9c33809c, Ptr{Nothing} @0x00007fbd9c33a238, Ptr{Nothing} @0x00007fbd9c3d2ebd, Ptr{Nothing} @0x00007fbd9c3d32de, Ptr{Nothing} @0x00007fbd9c3d489b, Ptr{Nothing} @0x00007fbd9c3d48bf, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbd9e0400f8, Ptr{Nothing} @0x00007fbd9c3d468c, Ptr{Nothing} @0x00007fbd9c3d477f, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c06f58, Ptr{Nothing} @0x00007fbd9c334b52, Ptr{Nothing} @0x00007fbd9c334b72, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c08e60, Ptr{Nothing} @0x00007fbd9c31b228, Ptr{Nothing} @0x00007fbd9c31b4ff, Ptr{Nothing} @0x00007fbdb2bf7f5d, Ptr{Nothing} @0x00007fbdb2c195cf])
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:547
