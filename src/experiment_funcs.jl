@@ -326,22 +326,23 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
         alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
     end
 
-    # load_scale = p.load_scale
     for l in get_components(PSY.StandardLoad, sys)
         transform_load_to_constant_impedance(l)
         l.impedance_active_power = l.impedance_active_power * p.load_scale 
         l.impedance_reactive_power = l.impedance_reactive_power * p.load_scale 
     end
     
-    for g in get_components(PSY.Generator, sys)
-        set_base_power!(g, g.base_power * p.load_scale)
-        set_active_power!(g, g.active_power * p.load_scale)
-        set_reactive_power!(g, g.reactive_power * p.load_scale)
-        set_rating!(g, g.rating * p.load_scale)
-        set_active_power_limits!(g, (min = g.active_power_limits.min * p.load_scale, max = g.active_power_limits.max * p.load_scale ))
-        set_reactive_power_limits!(g, (min = g.reactive_power_limits.min * p.load_scale, max = g.reactive_power_limits.max * p.load_scale ))
-        set_ramp_limits!(g, (up = g.ramp_limits.up * p.load_scale, down = g.ramp_limits.down * p.load_scale))
-    end
+     for g in get_components(PSY.Generator, sys)
+        if g.bus.bustype == BusTypes.PV
+            # set_base_power!(g, g.base_power * p.load_scale)
+            set_active_power!(g, g.active_power * p.load_scale)
+            set_reactive_power!(g, g.reactive_power * p.load_scale)
+            # set_rating!(g, g.rating * p.load_scale)
+            # set_active_power_limits!(g, (min = g.active_power_limits.min * p.load_scale, max = g.active_power_limits.max * p.load_scale ))
+            # set_reactive_power_limits!(g, (min = g.reactive_power_limits.min * p.load_scale, max = g.reactive_power_limits.max * p.load_scale ))
+            # set_ramp_limits!(g, (up = g.ramp_limits.up * p.load_scale, down = g.ramp_limits.down * p.load_scale))      
+        end
+     end
     
     # build segments model
     if (multi_segment == true)
