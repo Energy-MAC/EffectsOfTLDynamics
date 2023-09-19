@@ -53,8 +53,8 @@ z_km_3, y_km_3, Z_c_abs_3, z_km_ω_3, z_km_ω_5_to_1_3, Z_c_5_to_1_abs_3 = get_l
 # Vnom = 230; # KV 
 # SIL = (Vnom^2)/Z_c_total
 
-p_load = 1.2;
-q_load = 0.3;
+p_load = 2.0;
+q_load = 0.0;
 
 load_scale = 1.0
 line_scale = 1.0
@@ -69,6 +69,7 @@ lRange = 220:10:300;
 #lRange = 600:50:1100;
 lRange = 900:20:1200;
 lRange = 200:50:600;
+lRange = 100:50:1200; # FULL RANGE 
 
 mssb_results = zeros(length(lRange),length(Nrange));
 msmb_results = zeros(length(lRange),length(Nrange));
@@ -87,7 +88,7 @@ for l = lRange;
         1, 
         l,
         l_seg, 
-        Z_c_abs, 
+        Z_c_abs_1, 
         z_km_1,
         y_km_1,
         z_km_ω_1,
@@ -143,7 +144,7 @@ for l = lRange;
             1, # M=1
             l,
             l_seg, 
-            Z_c_abs, 
+            Z_c_abs_1, 
             z_km_1,
             y_km_1,
             z_km_ω_1,
@@ -179,7 +180,7 @@ for l = lRange;
             3, #
             l,
             l_seg, 
-            Z_c_abs, 
+            Z_c_abs_3, 
             z_km_3,
             y_km_3,
             z_km_ω_3,
@@ -232,7 +233,7 @@ plot!(lRange, zeros(length(lRange)), fillrange = ones(length(lRange))*plt_ub, fi
 
 title!("p="*string(p_load*load_scale)*", q="*string(q_load*load_scale))
 
-savefig("../figures/Ruth/mach_v_mach/stability_margin_Nsweep_6.png")
+savefig("../figures/Ruth/mach_v_mach/stability_margin_Nsweep_large_range.png")
 
 
 ###### Heatmaps

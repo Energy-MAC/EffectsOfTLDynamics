@@ -506,10 +506,10 @@ function build_9bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
         l.impedance_active_power = l.impedance_active_power * p.load_scale 
         l.impedance_reactive_power = l.impedance_reactive_power * p.load_scale 
     end
-    for g in get_components(PSY.Generator, sys)
-        set_active_power!(g, g.active_power * p.load_scale)
-        set_reactive_power!(g, g.reactive_power * p.load_scale)
-    end
+    # for g in get_components(PSY.Generator, sys)
+    #     set_active_power!(g, g.active_power * p.load_scale)
+    #     set_reactive_power!(g, g.reactive_power * p.load_scale)
+    # end
     
     # build segments model
     if (multi_segment == true)

@@ -15,6 +15,20 @@ using DataFrames
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
+function save_max_nonzero_eig!(sim, output);
+    if sim.status != PSID.BUILD_FAILED;
+        ss = small_signal_analysis(sim);
+        if maximum(real(ss.eigenvalues)) == 0.0;
+            # Choose second largest eig 
+            push!(output, real(ss.eigenvalues[end-1]));
+        else
+            push!(output, maximum(real(ss.eigenvalues)));
+        end
+    else
+        push!(output, NaN)
+    end
+end
+
 file_name = "../data/json_data/inv_v_machine.json"; # choose system 
 line_dict = default_2_bus_line_dict
 
@@ -47,170 +61,160 @@ factor_y = 1.0
 z_km_3, y_km_3, Z_c_abs_3, z_km_ω_3, z_km_ω_5_to_1_3, Z_c_5_to_1_abs_3 = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
 
 
-# # Calculate SIL  
-# Z_c_total = sqrt(z_km_ω_5_to_1/y_km[1]);
-# Vnom = 230; # KV 
-# SIL = (Vnom^2)/Z_c_total
+# Calculate SIL  
+# SIL = VLL^2/ZC where ZC is in ohms, and VLL is in kV 
+# Typical values for SIL - 14 - 140 MW for voltages up to 230 kV, and 
+# 250 kV - 300-400 MW
+# 500 kV - 850-1000 MW 
 
-p_load = 1.2;
-q_load = 0.3;
+Vnom = 230; # kV 
+# Zc in units of ohms (p.u?)
+SIL = (Vnom^2)/Z_c_5_to_1_abs_3 # P in p.u., MW 
+
+p_load = 1.0;  # base for load is ? 100?
+q_load = 0.25;
 
 load_scale = 1.0
 line_scale = 1.0
 
-Nrange = [20];
+l_seg = 10; # 
+
+p1 = ExpParams(
+    nothing, 
+    1, 
+    l,
+    l_seg, 
+    Z_c_abs_1, 
+    z_km_1,
+    y_km_1,
+    z_km_ω_1,
+    z_km_ω_5_to_1_1,
+    Z_c_5_to_1_abs_1,
+    line_dict,
+    sim_p, 
+    perturbation_type, 
+    perturbation_params,
+    p_load,
+    q_load,
+    line_scale,
+    load_scale
+);
+
+p3 = ExpParams(
+    nothing, 
+    3, #
+    l,
+    l_seg, 
+    Z_c_abs_3, 
+    z_km_3,
+    y_km_3,
+    z_km_ω_3,
+    z_km_ω_5_to_1_3,
+    Z_c_5_to_1_abs_3,
+    line_dict,
+    sim_p, 
+    perturbation_type, 
+    perturbation_params,
+    p_load,
+    q_load,
+    line_scale,
+    load_scale
+);
+
+N = 10;
 
 # p=0.5, q=0.5
 #lRange = 475:5:580; 
-#lRange = 150:10:250;
+lRange = 50:10:150;
 lRange = 220:10:300;
 #lRange = 100:50:500;
-#lRange = 600:50:1100;
+lRange = 200:100:1200;
+
+
 lRange = 800:20:1100;
-lRange = 200:50:600;
+lRange = 1000:10:1100; # FULL RANGE 
 
-mssb_results = zeros(length(lRange),length(Nrange));
-msmb_results = zeros(length(lRange),length(Nrange));
-dyn_results = [];
-alg_results = [];
-l_idx = 1;
-for l = lRange;
-    line_dict["BUS 1-BUS 2-i_1"] = l;
-    line_dict["BUS 1-BUS 2-i_1_static"] = l;
-    
-    n_idx = 1;
-    l_seg = l;
-    
-    p = ExpParams(
-        nothing, 
-        1, 
-        l,
-        l_seg, 
-        Z_c_abs, 
-        z_km_1,
-        y_km_1,
-        z_km_ω_1,
-        z_km_ω_5_to_1_1,
-        Z_c_5_to_1_abs_1,
-        line_dict,
-        sim_p, 
-        perturbation_type, 
-        perturbation_params,
-        p_load,
-        q_load,
-        line_scale,
-        load_scale
-    );
 
-    sim_alg = build_2bus_sim_from_file(file_name, false, false, p);
 
-    if sim_alg.status != PSID.BUILD_FAILED;
-        ss_alg = small_signal_analysis(sim_alg);
-        if maximum(real(ss_alg.eigenvalues)) == 0.0;
-            # Choose second largest eig 
-            push!(alg_results, real(ss_alg.eigenvalues[end-1]));
-        else
-            push!(alg_results, maximum(real(ss_alg.eigenvalues)));
-        end
-    else
-        push!(alg_results, NaN)
-    end
+load_scales = [0, 0.1, 0.2, 0.3];
 
-    # Do dynamic pi  
-    sim_dyn = build_2bus_sim_from_file(file_name, true, false, p);
 
-    if sim_dyn.status != PSID.BUILD_FAILED;
-        ss_dyn = small_signal_analysis(sim_dyn);
-        if maximum(real(ss_dyn.eigenvalues)) == 0.0;
-            # Choose second largest eig 
-            push!(dyn_results, real(ss_dyn.eigenvalues[end-1]));
-        else
-            push!(dyn_results, maximum(real(ss_dyn.eigenvalues)));
-        end
-    else
-        push!(dyn_results, NaN)
-    end
+alg_lims = [];
+dyn_lims = [];
+mssb_lims = [];
+msmb_lims = [];
+for load_scale in load_scales;
+    mssb_results = [];
+    msmb_results = [];
+    dyn_results = [];
+    alg_results = [];
+    p1.load_scale = load_scale
+    p3.load_scale = load_scale
 
-    
-    for N in Nrange;
-        l_seg = l/N;
+    for l = lRange;
+        line_dict["BUS 1-BUS 2-i_1"] = l;
+        line_dict["BUS 1-BUS 2-i_1_static"] = l;
 
-        # Do MSSB 
+        p1.l = l; # update params 
+        p1.load_scale = load_scale
 
-        p = ExpParams(
-            nothing, 
-            1, # M=1
-            l,
-            l_seg, 
-            Z_c_abs, 
-            z_km_1,
-            y_km_1,
-            z_km_ω_1,
-            z_km_ω_5_to_1_1,
-            Z_c_5_to_1_abs_1,
-            line_dict,
-            sim_p, 
-            perturbation_type, 
-            perturbation_params,
-            p_load,
-            q_load,
-            line_scale,
-            load_scale
-        );
+        sim_alg = ETL.build_2bus_sim_from_file(file_name, false, false, p1);
+        save_max_nonzero_eig!(sim_alg, alg_results)
 
-        sim_ms = build_2bus_sim_from_file(file_name, true, true, p);
+        # Dynamic pi  
+        sim_dyn = ETL.build_2bus_sim_from_file(file_name, true, false, p1);
+        save_max_nonzero_eig!(sim_dyn, dyn_results)
 
-        if sim_ms.status != PSID.BUILD_FAILED
-            ss_ms = small_signal_analysis(sim_ms);
-            if maximum(real(ss_ms.eigenvalues)) == 0.0;
-                # Choose second largest eig 
-                mssb_results[l_idx, n_idx] = real(ss_ms.eigenvalues[end-1]);
-            else
-                mssb_results[l_idx, n_idx] = maximum(real(ss_ms.eigenvalues));
-            end
-        else
-            mssb_results[l_idx, n_idx] = NaN; # to indicate sim that hasn't run properly 
-        end
+        # MSSB
+        # Define MSSB l_seg
+        p1.l_seg = l/N; 
+        sim_ms = ETL.build_2bus_sim_from_file(file_name, true, true, p1);
+        save_max_nonzero_eig!(sim_ms, mssb_results)
 
         # Do MSMB 
-        p = ExpParams(
-            nothing, 
-            3, #
-            l,
-            l_seg, 
-            Z_c_abs, 
-            z_km_3,
-            y_km_3,
-            z_km_ω_3,
-            z_km_ω_5_to_1_3,
-            Z_c_5_to_1_abs_3,
-            line_dict,
-            sim_p, 
-            perturbation_type, 
-            perturbation_params,
-            p_load,
-            q_load,
-            line_scale,
-            load_scale
-        );
+        p3.l_seg = l/N; 
+        sim_msmb = ETL.build_2bus_sim_from_file(file_name, true, true, p3);
+        save_max_nonzero_eig!(sim_msmb, msmb_results)
 
-        sim_msmb = build_2bus_sim_from_file(file_name, true, true, p);
-
-        if sim_msmb.status != PSID.BUILD_FAILED
-            ss_msmb = small_signal_analysis(sim_msmb);
-            if maximum(real(ss_msmb.eigenvalues)) == 0.0;
-                # Choose second largest eig 
-                msmb_results[l_idx, n_idx] = real(ss_msmb.eigenvalues[end-1]);
-            else
-                msmb_results[l_idx, n_idx] = maximum(real(ss_msmb.eigenvalues));
-            end
-        else
-            msmb_results[l_idx, n_idx] = NaN; # to indicate sim that hasn't run properly 
-        end
-        n_idx += 1;  
     end
-    l_idx += 1
+
+    # Find first length where we lose stability 
+    if findfirst(alg_results.>0) !== nothing;
+        push!(alg_lims, lRange[findfirst(alg_results.>0)])
+    else
+        push!(alg_lims, NaN)
+    end
+    if findfirst(dyn_results.>0) !== nothing;
+        push!(dyn_lims, lRange[findfirst(dyn_results.>0)])
+    else
+        push!(dyn_lims, NaN)
+    end
+    if findfirst(mssb_results.>0) !== nothing;
+        push!(mssb_lims, lRange[findfirst(mssb_results.>0)])
+    else
+        push!(mssb_lims, NaN)
+    end
+    if findfirst(msmb_results.>0) !== nothing;
+        push!(msmb_lims, lRange[findfirst(msmb_results.>0)])
+    else
+        push!(msmb_lims, NaN)
+    end
 end
+
+alg_lims
+dyn_lims
+mssb_lims
+msmb_lims
+
+
+plot(load_scales, alg_lims,xlabel="Load scale", ylabel="Line length @ stability boundary", label="Algebraic", seriestype=:scatter)
+plot!(load_scales, dyn_lims, seriestype=:scatter, label="Dynpi")
+plot!(load_scales, mssb_lims, seriestype=:scatter, label="MSSB N="*string(N))
+plot!(load_scales, msmb_lims, seriestype=:scatter, label="MSMB N="*string(N))
+
+
+
+
 
 #### Stability margin plots 
 plot(lRange, alg_results, label="Algebraic",linestyle=:dash, legend = :outertopright, size=(800,600),xlabel="Line length (km)", ylabel="Largest real λ, != 0")
@@ -230,7 +234,7 @@ plot!(lRange, zeros(length(lRange)), fillrange = ones(length(lRange))*plt_ub, fi
 
 title!("p="*string(p_load*load_scale)*", q="*string(q_load*load_scale))
 
-savefig("../figures/Ruth/inv_v_mach/stability_margin_Nsweep_4.png")
+savefig("../figures/Ruth/inv_v_mach/stability_margin_Nsweep_large_range_2.png")
 
 
 ###### Heatmaps
@@ -330,6 +334,6 @@ xlims!(-1000,0.1)
 
 title!("System eigs, p="*string(p_load*load_scale)*", q="*string(q_load*load_scale))
 
-savefig("../figures/Ruth/dommel_params/eig_comparison_1.png")
+#savefig("../figures/Ruth/dommel_params/eig_comparison_1.png")
 
 # Analyse the participation in the least stable modes?
