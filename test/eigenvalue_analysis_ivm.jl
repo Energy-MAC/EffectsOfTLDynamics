@@ -48,8 +48,8 @@ z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_paramete
 # Vnom = 230; # KV 
 # SIL = (Vnom^2)/Z_c_total
 
-p_load = 0.5;
-q_load = 0.5;
+p_load = 1.0;
+q_load = 0.25;
 
 load_scale = 1.0
 line_scale = 1.0
@@ -61,7 +61,8 @@ lseg_max = [10, 50, 100];
 #lRange = 150:10:250;
 #lRange = 220:10:300;
 #lRange = 100:50:500;
-lRange = 900:20:1100;
+lRange = 900:50:1100;
+#lRange = 500:50:800;
 
 mssb_results = zeros(length(lRange),length(lseg_max));
 msmb_results = zeros(length(lRange),length(lseg_max));
@@ -207,8 +208,7 @@ for l = lRange;
 end
 
 
-save_name = "loading p="*string(p_load)*" q="*string(q_load)
-
+#### Stability margin plots 
 plot(lRange, alg_results, label="Algebraic",linestyle=:dash, legend = :outertopright, size=(800,600),xlabel="Line length (km)", ylabel="Largest real λ, != 0")
 plot!(lRange, dyn_results, label="Dynpi",linestyle=:dash)
 for k in 1:length(lseg_max);
@@ -223,28 +223,78 @@ end
 plt_ub = maximum([get_max(alg_results), get_max(dyn_results), get_max(mssb_results), get_max(msmb_results)])
 
 plot!(lRange, zeros(length(lRange)), fillrange = ones(length(lRange))*plt_ub, fillalpha = 0.1, linealpha=0, c = 1, label="Unstable")
-   
-#title!("Kundur params, loading: p="*string(p_load)*", q="*string(q_load))
 
-title!("p="*string(p_load)*"\nq="*string(q_load))
+title!("p="*string(p_load*load_scale)*", q="*string(q_load*load_scale))
 
 #savefig("../figures/Ruth/dommel_params/loading1_stability_margin.png")
 
-# Heatmaps
+
+###### Heatmaps
 clims = (0,0.2)
 
 # MSSB
-h1 = heatmap(lRange, lseg_max, mssb_results', clim=clims,colorbar_title="Largest real λ", size=(800,600), ylabel="MSSB - max l_seg", title="p="*string(p_load)*"\nq="*string(q_load))
+h1 = heatmap(lRange, lseg_max, mssb_results', clim=clims,colorbar_title="Largest real λ", size=(800,600), ylabel="MSSB - max l_seg", title="p="*string(p_load*load_scale)*"\nq="*string(q_load*load_scale));
 
 # MSMB
-h2 = heatmap(lRange, lseg_max, msmb_results', clim=clims,colorbar_title="Largest real λ",ylabel="MSMB - max l_seg")
+h2 = heatmap(lRange, lseg_max, msmb_results', clim=clims,colorbar_title="Largest real λ",ylabel="MSMB - max l_seg");
 
 # Dynpi 
-h3 = heatmap(lRange, [1], dyn_results', clim=clims, colorbar_title="Largest real λ", ylabel="Dynpi")
+h3 = heatmap(lRange, [1], dyn_results', clim=clims, colorbar_title="Largest real λ", ylabel="Dynpi");
 
 # Algebraic 
-h4 = heatmap(lRange, [1], alg_results', clim=clims,colorbar_title="Largest real λ", ylabel="Algebraic", xlabel="Line length (km)")
+h4 = heatmap(lRange, [1], alg_results', clim=clims,colorbar_title="Largest real λ", ylabel="Algebraic", xlabel="Line length (km)");
 
 plot(h1,h2,h3,h4, layout=@layout[a;b;c;d], size=(1000,800))
 
-savefig("../figures/Ruth/dommel_params/loading1_heatmap.png")
+#savefig("../figures/Ruth/dommel_params/loading1_heatmap.png")
+
+
+
+### Eigenvalue plots #####
+# Select params
+l_seg = 30;
+l = 300;
+
+line_dict["BUS 1-BUS 2-i_1"] = l;
+line_dict["BUS 1-BUS 2-i_1_static"] = l;
+
+p = ExpParams(
+    nothing, 
+    M, 
+    l,
+    l_seg, 
+    Z_c_abs, 
+    z_km,
+    y_km,
+    z_km_ω,
+    z_km_ω_5_to_1,
+    Z_c_5_to_1_abs,
+    line_dict,
+    sim_p, 
+    perturbation_type, 
+    perturbation_params,
+    p_load,
+    q_load,
+    line_scale,
+    load_scale
+)
+
+# Algebraic 
+sim_alg = build_2bus_sim_from_file(file_name, false, false, p)
+eigs_alg = small_signal_analysis(sim_alg).eigenvalues;
+sim_dyn = build_2bus_sim_from_file(file_name, true, false, p)
+eigs_dyn = small_signal_analysis(sim_dyn).eigenvalues;
+sim_mssb = build_2bus_sim_from_file(file_name, true, true, p)
+eigs_mssb = small_signal_analysis(sim_mssb).eigenvalues;
+p.M = 3;
+sim_msmb = build_2bus_sim_from_file(file_name, true, true, p)
+eigs_msmb = small_signal_analysis(sim_msmb).eigenvalues;
+
+
+plot(real(eigs_alg), imag(eigs_alg), seriestype=:scatter, xlabel="Real", ylabel="Imag", label="Algebraic",legend = :outertopright)
+plot!(real(eigs_dyn), imag(eigs_dyn), seriestype=:scatter,label="Dynpi")
+plot!(real(eigs_mssb), imag(eigs_mssb), seriestype=:scatter,label="MSSB")
+plot!(real(eigs_msmb), imag(eigs_msmb), seriestype=:scatter,label="MSMB")
+
+xlims!(-1000,0.1)
+#ylims!(-4,4)
