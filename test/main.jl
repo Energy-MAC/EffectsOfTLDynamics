@@ -111,9 +111,22 @@ line_model_3 = "Multi-Segment Dynamic";
 
 results_alg, sim = run_experiment(file_name, line_model_1, p);
 sys = sim.sys;
-using JLD
-save("../results/test/myfile.jld", "results_alg $(p.line_scale) $(p.load_scale)", results_alg)
 
+now_date = now()
+rn = string(now_date) 
+
+main_path = "../results/"*rn*"/"
+mkdir(main_path)
+
+partial_path = main_path*"$(p.line_scale)_$(p.load_scale)"
+mkdir(partial_path)
+
+folder_path = partial_path*"/statpi"
+mkdir(folder_path)
+
+store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
+store_filter_currents(results_alg, sys, folder_path*"/device_currents.csv")
+store_branch_power_flows()
 
 using PowerFlows
 sol = solve_powerflow(ACPowerFlow(), sys)

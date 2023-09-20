@@ -524,6 +524,39 @@ function build_9bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
 
 end
 
+function store_bus_voltages(res::PSID.SimulationResults, system::System, path::String)
+    bus_numbers = sort(get_number.(get_components(Bus, system)))
+    time, _ = get_voltage_magnitude_series(res, first(bus_numbers))
+    df_voltages = DataFrame()
+    # Store Time
+    df_voltages[!, "Time"] = time
+    for bus_n in bus_numbers
+        _, bus_mag = get_voltage_magnitude_series(res, bus_n)
+        _, bus_ang = get_voltage_angle_series(res, bus_n)
+        df_voltages[!, "Bus-$(bus_n)-Mag"] = bus_mag
+        df_voltages[!, "Bus-$(bus_n)-Ang"] = bus_ang
+    end
+    CSV.write(path, df_voltages, force = true)
+end
+
+function store_filter_currents(res::PSID.SimulationResults, sys::System, path::String)
+    time, _ = get_real_current_series(res, get_name(first(get_components(Generator, sys))))
+    df_currents = DataFrame()
+    # Store Time
+    df_currents[!, "Time"] = time
+    gens = collect(get_components(Generator, sys))
+    
+    for i in 1:length(gens)
+        gen_name = gens[i].name
+        _, I_R = get_real_current_series(res, gen_name)
+        _, I_I = get_imaginary_current_series(res, gen_name)
+        df_currents[!, "$(gen_name)_I_R"] = I_R
+        df_currents[!, "$(gen_name)_I_I"] = I_I
+    end
+
+    CSV.write(path, df_currents, force = true)
+end
+
 export choose_disturbance
 export build_sim
 export execute_sim
@@ -533,3 +566,5 @@ export build_seg_model
 export run_experiment
 export get_line_parameters
 export verifying
+export store_bus_voltages
+export store_filter_currents
