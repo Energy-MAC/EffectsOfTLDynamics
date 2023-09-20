@@ -8,6 +8,7 @@ using EffectsOfTLDynamics
 using CSV
 using DataFrames
 using Dates
+using LaTeXStrings
 
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
@@ -200,54 +201,55 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 # line_lengths = [100, 250, 500]
 # loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
-line_scales = collect(1.0:0.25:3.0)
-load_scales = collect(1.0:0.25:3.0)
+line_scales = collect(1.0:0.25:1.5)
+load_scales = collect(1.0:0.25:1.5)
 
-plots = []
-plt = []
-
-using LaTeXStrings
+now_date = now()
+rn = string(now_date)
+main_path = "../results/"*rn*"/"
+mkdir(main_path)
 
 for line_scale in line_scales
     p.line_scale = line_scale
-# for l in line_lengths
-#     p.l_dict["Bus 9-Bus 6-i_1"] = l
-#     p.l_dict["Bus 9-Bus 6-i_1_static"] = l
-    
-    for load_scale in load_scales
-    p.load_scale = load_scale
 
-    # for (p_load, q_load) in loading_scenarios
-    #    p.p_load = p_load
-    #    p.q_load = q_load
-    
+    for load_scale in load_scales
+        p.load_scale = load_scale
+        
+        partial_path = main_path*"$(p.line_scale)_$(p.load_scale)"
+        mkdir(partial_path)
+
         M = 1
-        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.M = M
+        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.z_km = z_km
     
-        results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
-        results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
-        results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
-        results_ms_mb_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
-
+        folder_path = partial_path*"/statpi"
+        mkdir(folder_path)
         results_alg, sim = run_experiment(file_name, line_model_1, p);
         sys = sim.sys
-        s = small_signal_analysis(sim)
-        vr_alg = get_voltage_magnitude_series(results_alg, 102);
-        plt = plot(vr_alg, label = L"\mathrm{algebraic}")
+        store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
+        store_filter_currents(results_alg, sys, folder_path*"/device_currents.csv")
+        store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
+        store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
 
+
+        folder_path = partial_path*"/dynpi"
+        mkdir(folder_path)
         results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
         sys_dyn = sim_dyn.sys
-        s_dyn = small_signal_analysis(sim_dyn)
-        vr_dyn = get_voltage_magnitude_series(results_dyn, 102);
-        plot!(plt, vr_dyn, label = L"\mathrm{dynpi}")
+        store_bus_voltages(results_dyn, sys_dyn, folder_path*"/bus_voltages.csv")
+        store_filter_currents(results_dyn, sys_dyn, folder_path*"/device_currents.csv")
+        store_branch_power_flows(results_dyn, sys_dyn, folder_path*"/branch_power_flows.csv")
+        store_generator_speeds(results_dyn, sys_dyn, folder_path*"/generator_speeds.csv")
 
+        folder_path = partial_path*"/MSSB"
+        mkdir(folder_path)
         results_ms_dyn, sim_ms_dyn = run_experiment(file_name, line_model_3, p);
         sys_ms_dyn = sim_ms_dyn.sys
-        s_ms_dyn = small_signal_analysis(sim_ms_dyn)            
-        vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
-        plot!(plt, vr_ms_dyn, label = L"\mathrm{MSSB}")
+        store_bus_voltages(results_ms_dyn, sys_ms_dyn, folder_path*"/bus_voltages.csv")
+        store_filter_currents(results_ms_dyn, sys_ms_dyn, folder_path*"/device_currents.csv")
+        store_branch_power_flows(results_ms_dyn, sys_ms_dyn, folder_path*"/branch_power_flows.csv")
+        store_generator_speeds(results_ms_dyn, sys_ms_dyn, folder_path*"/generator_speeds.csv")
 
         M = 3
         p.M = M
@@ -259,15 +261,34 @@ for line_scale in line_scales
         p.z_km_ω_5_to_1 = z_km_ω_5_to_1;
         p.Z_c_5_to_1_abs = Z_c_5_to_1_abs;
 
+        folder_path = partial_path*"/MSMB"
+        mkdir(folder_path)  
         results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p)
         sys_ms_mb = sim_ms_mb.sys
-        s_ms_mb = small_signal_analysis(sim_ms_mb)            
-        vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
-        plot!(plt, vr_ms_mb_dyn, label = L"\mathrm{MSMB}")
-        plot!(plt, legend = true)        
-        push!(plots, plt)
+        store_bus_voltages(results_ms_mb_dyn, sys_ms_mb, folder_path*"/bus_voltages.csv")
+        store_filter_currents(results_ms_mb_dyn, sys_ms_mb, folder_path*"/device_currents.csv")
+        store_branch_power_flows(results_ms_mb_dyn, sys_ms_mb, folder_path*"/branch_power_flows.csv")
+        store_generator_speeds(results_ms_mb_dyn, sys_ms_mb, folder_path*"/generator_speeds.csv")
+
     end
 end
+
+# Not necessary?
+# results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
+# results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
+# results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
+# results_ms_mb_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
+
+plots = []
+plt = []
+
+# Plotting loop
+plt = plot(vr_alg, label = L"\mathrm{algebraic}")
+plot!(plt, vr_dyn, label = L"\mathrm{dynpi}")
+plot!(plt, vr_ms_dyn, label = L"\mathrm{MSSB}")
+plot!(plt, vr_ms_mb_dyn, label = L"\mathrm{MSMB}")
+plot!(plt, legend = true)        
+push!(plots, plt)
 
 combined_plot = plot(plots..., layout=(1,1))
 plot!(combined_plot, xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")
