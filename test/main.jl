@@ -7,6 +7,7 @@ using EffectsOfTLDynamics
 
 using CSV
 using DataFrames
+using Dates
 
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
@@ -126,7 +127,8 @@ mkdir(folder_path)
 
 store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
 store_filter_currents(results_alg, sys, folder_path*"/device_currents.csv")
-store_branch_power_flows()
+store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
+store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
 
 using PowerFlows
 sol = solve_powerflow(ACPowerFlow(), sys)
