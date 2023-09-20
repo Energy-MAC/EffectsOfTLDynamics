@@ -4,7 +4,9 @@ using PowerSimulationsDynamics
 using Plots
 using Revise
 using LaTeXStrings
-#using EffectsOfTLDynamics
+using EffectsOfTLDynamics
+
+const ETL = EffectsOfTLDynamics
 
 include("../src/ExperimentStructs.jl")
 include("../src/experiment_funcs.jl")
@@ -50,19 +52,18 @@ z_km_3, y_km_3, Z_c_abs_3, z_km_ω_3, z_km_ω_5_to_1_3, Z_c_5_to_1_abs_3 = get_l
 
 p_load = 0.0; # do these matter for 9bus? no.
 q_load = 0.0;
+load_scale = 0.3 # does matter 
 
-load_scale = 1.0
+Nrange = [20];
 
-Nrange = [10];
-
-line_scales = [0.3, 0.8, 1, 1.5];
+line_scales = 0.5:0.5:5; 
 
 mssb_results = zeros(length(line_scales),length(Nrange));
 msmb_results = zeros(length(line_scales),length(Nrange));
 dyn_results = [];
 alg_results = [];
 l_idx = 1;
-l = 1000; # does this matter for 9bus?
+l = 10000; # does this matter for 9bus? no.
 for line_scale = line_scales;
     
     n_idx = 1;
@@ -89,7 +90,7 @@ for line_scale = line_scales;
         load_scale
     );
 
-    sim_alg = build_9bus_sim_from_file(file_name, false, false, p);
+    sim_alg = ETL.build_9bus_sim_from_file(file_name, false, false, p);
 
     if sim_alg.status != PSID.BUILD_FAILED;
         ss_alg = small_signal_analysis(sim_alg);
@@ -104,7 +105,7 @@ for line_scale = line_scales;
     end
 
     # Do dynamic pi  
-    sim_dyn = build_9bus_sim_from_file(file_name, true, false, p);
+    sim_dyn = ETL.build_9bus_sim_from_file(file_name, true, false, p);
 
     if sim_dyn.status != PSID.BUILD_FAILED;
         ss_dyn = small_signal_analysis(sim_dyn);
@@ -120,7 +121,7 @@ for line_scale = line_scales;
 
     
     for N in Nrange;
-        l_seg = l/N;
+        l_seg = 20;
 
         # Do MSSB 
 
@@ -145,7 +146,7 @@ for line_scale = line_scales;
             load_scale
         );
 
-        sim_ms = build_9bus_sim_from_file(file_name, true, true, p);
+        sim_ms = ETL.build_9bus_sim_from_file(file_name, true, true, p);
 
         if sim_ms.status != PSID.BUILD_FAILED
             ss_ms = small_signal_analysis(sim_ms);
@@ -181,7 +182,7 @@ for line_scale = line_scales;
             load_scale
         );
 
-        sim_msmb = build_9bus_sim_from_file(file_name, true, true, p);
+        sim_msmb = ETL.build_9bus_sim_from_file(file_name, true, true, p);
 
         if sim_msmb.status != PSID.BUILD_FAILED
             ss_msmb = small_signal_analysis(sim_msmb);
@@ -212,12 +213,15 @@ function get_max(itr)
 end
 
 plt_ub = maximum([get_max(alg_results), get_max(dyn_results), get_max(mssb_results), get_max(msmb_results)])
+if plt_ub < 0.0;
+    plt_ub = 0 
+end
 
-plot!(line_scales, zeros(length(line_scales)), fillrange = ones(length(lRange))*plt_ub, fillalpha = 0.1, linealpha=0, c = 1, label="Unstable")
+plot!(line_scales, zeros(length(line_scales)), fillrange = ones(length(line_scales))*plt_ub, fillalpha = 0.1, linealpha=0, c = 1, label="Unstable")
 
-title!("p="*string(p_load*load_scale)*", q="*string(q_load*load_scale))
+title!("load scale="*string(load_scale))
 
-savefig("../figures/Ruth/nine_bus/stability_margin_Nsweep_1.png")
+savefig("../figures/Ruth/nine_bus/stability_margin_Nsweep_2.png")
 
 
 ###### Heatmaps
