@@ -541,6 +541,72 @@ function build_9bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
 
 end
 
+function store_bus_voltages(res::PSID.SimulationResults, system::System, path::String)
+    bus_numbers = sort(get_number.(get_components(Bus, system)))
+    time, _ = get_voltage_magnitude_series(res, first(bus_numbers))
+    df_voltages = DataFrame()
+    # Store Time
+    df_voltages[!, "Time"] = time
+    for bus_n in bus_numbers
+        _, bus_mag = get_voltage_magnitude_series(res, bus_n)
+        _, bus_ang = get_voltage_angle_series(res, bus_n)
+        df_voltages[!, "Bus-$(bus_n)-Mag"] = bus_mag
+        df_voltages[!, "Bus-$(bus_n)-Ang"] = bus_ang
+    end
+    CSV.write(path, df_voltages, force = true)
+end
+
+function store_filter_currents(res::PSID.SimulationResults, sys::System, path::String)
+    time, _ = get_state_series(res, (get_name(first(get_components(Generator, sys))), :ir_cnv))
+    df_currents = DataFrame()
+    # Store Time
+    df_currents[!, "Time"] = time
+    invs = collect(get_components(DynamicInverter, sys))
+    
+    for i in 1:length(invs)
+        inv_name = invs[i].name
+        _, ir_cnv = get_state_series(res, (inv_name, :ir_cnv))
+        _, ii_cnv = get_state_series(res, (inv_name, :ii_cnv))
+        df_currents[!, "$(inv_name)_ir_cnv"] = ir_cnv
+        df_currents[!, "$(inv_name)_ii_cnv"] = ii_cnv
+    end
+
+    CSV.write(path, df_currents, force = true)
+end
+
+function store_branch_power_flows(res::PSID.SimulationResults, sys::System, path::String)
+    time, _ = get_activepower_branch_flow(res, get_name(first(get_components(Line, sys))), :from)
+    df_power = DataFrame()
+    # Store Time
+    df_power[!, "Time"] = time
+    lines = collect(get_components(Line, sys))
+    
+    for i in 1:length(lines)
+        line_name = lines[i].name
+        _, P = get_activepower_branch_flow(res, line_name, :from)
+        _, Q = get_reactivepower_branch_flow(res, line_name, :from)
+        df_power[!, "$(line_name)_P"] = P
+        df_power[!, "$(line_name)_Q"] = Q
+    end
+
+    CSV.write(path, df_power, force = true)
+end
+
+function store_generator_speeds(res::PSID.SimulationResults, sys::System, path::String)
+    time, _ = get_state_series(res, (get_name(first(get_components(DynamicGenerator, sys))), :ω))
+    df_speeds = DataFrame()
+    # Store Time
+    df_speeds[!, "Time"] = time
+    gens = collect(get_components(DynamicGenerator, sys))
+    
+    for i in 1:length(gens)
+        gen_name = gens[i].name
+        _, w = get_state_series(res, (gen_name, :ω))
+        df_speeds[!, "$(gen_name)_ω"] = w
+    end
+    CSV.write(path, df_speeds)
+end
+
 export choose_disturbance
 export build_sim
 export execute_sim
@@ -550,3 +616,7 @@ export build_seg_model
 export run_experiment
 export get_line_parameters
 export verifying
+export store_bus_voltages
+export store_filter_currents
+export store_branch_power_flows
+export store_generator_speeds
