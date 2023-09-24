@@ -14,8 +14,9 @@ using Plots
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-rn = "2023-09-24T22:01:10.063" #string date
-model = "mach_v_mach"
+
+rn = "results/twobus_2inv/2023-09-24T22:48:40.233" #string date
+model = "twobus_2inv"
 main_path = "../results/"*model*"/"*rn
 
 df_alg = nothing
@@ -29,11 +30,11 @@ sol_ms = nothing
 sol_msmb = nothing
 
 
-line_scales = collect(1.0:2.0:5.0)
+line_scales = collect(1.0:2.0:7.0)
 load_scales = collect(0.5:0.5:3.0)
 
-line_scales = collect(7.0)
-load_scales = collect(0.5:0.5:1.5)
+# line_scales = collect(7.0)
+# load_scales = collect(0.5:0.5:1.5)
 
 vars_to_measure = ["generator_speeds.csv"]
 

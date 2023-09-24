@@ -14,8 +14,8 @@ using Plots
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-rn = "2023-09-24T22:01:10.063" #string date
-model = "mach_v_mach"
+rn = "results/twobus_2inv/2023-09-24T22:48:40.233" #string date
+model = "twobus_2inv"
 main_path = "../results/"*model*"/"*rn
 
 df_alg = nothing
