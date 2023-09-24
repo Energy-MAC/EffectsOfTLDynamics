@@ -4,14 +4,15 @@ using PowerSimulationsDynamics
 using Plots
 using Revise
 using LaTeXStrings
-#using EffectsOfTLDynamics
+using EffectsOfTLDynamics
 
-include("../src/ExperimentStructs.jl")
-include("../src/experiment_funcs.jl")
+#include("../src/ExperimentStructs.jl")
+#include("../src/experiment_funcs.jl")
 
 using CSV
 using DataFrames
 
+const ETL = EffectsOfTLDynamics;
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
@@ -78,8 +79,9 @@ load_scale = 1.0
 line_scale = 1.0
 
 l_seg = 10; # 
+l = 100;
 
-p1 = ExpParams(
+p1 = ETL.ExpParams(
     nothing, 
     1, 
     l,
@@ -100,7 +102,7 @@ p1 = ExpParams(
     load_scale
 );
 
-p3 = ExpParams(
+p3 = ETL.ExpParams(
     nothing, 
     3, #
     l,
@@ -131,13 +133,12 @@ lRange = 220:10:300;
 lRange = 200:100:1200;
 
 
-lRange = 800:20:1100;
-lRange = 1000:10:1100; # FULL RANGE 
+lRange = 500:50:1100;
+load_scales = 1:0.25:2;
 
 
-
-load_scales = [0, 0.1, 0.2, 0.3];
-
+lRange = 1000:50:1500;
+load_scales = [0.2,0.4,0.6,0.8];
 
 alg_lims = [];
 dyn_lims = [];
@@ -207,10 +208,10 @@ mssb_lims
 msmb_lims
 
 
-plot(load_scales, alg_lims,xlabel="Load scale", ylabel="Line length @ stability boundary", label="Algebraic", seriestype=:scatter)
-plot!(load_scales, dyn_lims, seriestype=:scatter, label="Dynpi")
-plot!(load_scales, mssb_lims, seriestype=:scatter, label="MSSB N="*string(N))
-plot!(load_scales, msmb_lims, seriestype=:scatter, label="MSMB N="*string(N))
+plot(load_scales, alg_lims,xlabel="Load scale", ylabel="Line length @ stability boundary", label="Algebraic", seriestype=:line, size=(800,600))
+plot!(load_scales, dyn_lims, seriestype=:line, label="Dynpi")
+plot!(load_scales, mssb_lims, seriestype=:line, linestyle=:dashdot, label="MSSB N="*string(N))
+plot!(load_scales, msmb_lims, seriestype=:line, linestyle=:dash, label="MSMB N="*string(N))
 
 
 
