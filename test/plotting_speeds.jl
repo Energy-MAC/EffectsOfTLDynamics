@@ -29,11 +29,11 @@ sol_ms = nothing
 sol_msmb = nothing
 
 
-line_scales = collect(1.0:2.0:7.0)
-load_scales = collect(0.5:0.5:3.0)
+line_scales = collect(1.0:2.0:5.0)
+load_scales = collect(0.5:0.5:2.0)
 
-line_scales = collect(7.0)
-load_scales = collect(0.5:0.5:1.5)
+# line_scales = collect(7.0)
+# load_scales = collect(0.5:0.5:1.5)
 
 vars_to_measure = ["generator_speeds.csv"]
 
@@ -61,7 +61,7 @@ for var_to_measure in vars_to_measure
             plot!(plt, sol_msmb, label = L"\mathrm{MSMB}")
             plot!(plt, legend = true)    
             plot!(xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")  
-            plot!(ylabel = L"$||V_2|| \quad \mathrm{[\ p.u.]}$")
+            plot!(ylabel = L"$ω \quad \mathrm{[\ p.u.]}$")
             plot!(legend_title = L"$%$load_scale \ %$line_scale$")
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*".svg")
