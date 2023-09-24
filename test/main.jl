@@ -77,8 +77,12 @@ perturbation_params = get_default_perturbation(t_fault, perturbation)
 # perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
 # perturbation_params.branch_trip_params = BTParam("Bus 9-Bus 6-i_1")
 
-p_load = 1.0
-q_load = 0.25
+
+V_nom = 230 # kV
+Z_o = sqrt(z_km_ω_5_to_1/y_km)
+SIL = V_nom ^2/Z_o
+p_load = real(SIL)/100
+q_load = imag(SIL)/100
 l_seg = 50 #km
 
 load_scale = 1.0;
