@@ -61,7 +61,7 @@ for var_to_measure in vars_to_measure
             plot!(plt, sol_msmb, label = L"\mathrm{MSMB}")
             plot!(plt, legend = true)    
             plot!(xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")  
-            plot!(ylabel = L"$I_R \quad \mathrm{[\ p.u.]}$")
+            plot!(ylabel = L"$||V_2|| \quad \mathrm{[\ p.u.]}$")
             plot!(legend_title = L"$%$load_scale \ %$line_scale$")
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*".svg")
