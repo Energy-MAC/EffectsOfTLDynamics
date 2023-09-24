@@ -14,7 +14,7 @@ using Plots
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-rn = "2023-09-24T18:52:47.629" #string date
+rn = "2023-09-24T20:12:13.348" #string date
 model = "inv_v_machine"
 main_path = "../results/"*model*"/"*rn
 
@@ -23,17 +23,17 @@ df_dyn = nothing
 df_ms = nothing
 df_msmb = nothing
 
-var_alg = nothing
-var_dyn = nothing
-var_ms = nothing
-var_msmb = nothing
-t_alg = nothing
-t_dyn = nothing
-t_ms = nothing
-t_msmb = nothing
+sol_alg = nothing
+sol_dyn = nothing
+sol_ms = nothing
+sol_msmb = nothing
 
-line_scales = 1.0 #collect(1.0:0.25:1.5)
-load_scales = 1.0 #collect(1.0:0.25:1.5)
+
+line_scales = collect(1.0:2.0:7.0)
+load_scales = collect(0.5:0.5:3.0)
+
+line_scales = collect(7.0)
+load_scales = collect(0.5:0.5:1.5)
 
 vars_to_measure = ["inverter_currents.csv"]
 
@@ -72,8 +72,3 @@ for var_to_measure in vars_to_measure
         end 
     end
 end
-
-
-combined_plot = plot(plots..., layout=(1,1))
-plot!(combined_plot, xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")
-plot!(combined_plot, ylabel = L"$||V_2|| \quad \mathrm{[\ p.u.]}$")

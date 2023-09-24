@@ -83,6 +83,7 @@ Z_o = sqrt(z_km_ω_5_to_1/y_km)
 SIL = V_nom ^2/Z_o
 p_load = real(SIL)/100
 q_load = imag(SIL)/100
+
 l_seg = 50 #km
 
 load_scale = 1.0;
@@ -207,8 +208,8 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 # line_lengths = [100, 250, 500]
 # loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
-line_scales = collect(1.0:0.25:1.0)
-load_scales = collect(1.0:0.25:1.0)
+line_scales = collect(1.0:2.0:7.0)
+load_scales = collect(0.5:0.5:3.0)
 
 now_date = now()
 rn = string(now_date)
@@ -216,6 +217,9 @@ prim_path = "../results/"*model
 mkdir(prim_path)
 main_path = prim_path*"/"*rn*"/"
 mkdir(main_path)
+
+line_scales = collect(7.0)
+load_scales = collect(3.0)
 
 for line_scale in line_scales
     p.line_scale = line_scale
