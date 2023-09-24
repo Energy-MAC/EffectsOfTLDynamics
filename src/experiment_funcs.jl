@@ -590,6 +590,24 @@ function store_generator_speeds(res::PSID.SimulationResults, sys::System, path::
     CSV.write(path, df_speeds)
 end
 
+function store_branch_currents(res::PSID.SimulationResults, sys::System, path::String)
+    time, _ = get_real_current_branch_flow(res, get_name(first(get_components(Line, sys))))
+    df_currents = DataFrame()
+    # Store Time
+    df_currents[!, "Time"] = time
+    lines = collect(get_components(Line, sys))
+    
+    for i in 1:length(lines)
+        line_name = lines[i].name
+        _, I_R = get_real_current_branch_flow(res, line_name)
+        _, I_I = get_imaginary_current_branch_flow(res, line_name)
+        df_currents[!, "$(line_name)_I_R"] = I_R
+        df_currents[!, "$(line_name)_I_I"] = I_I
+    end
+
+    CSV.write(path, df_currents, force = true)
+end
+
 export choose_disturbance
 export build_sim
 export execute_sim
@@ -603,3 +621,4 @@ export store_bus_voltages
 export store_filter_currents
 export store_branch_power_flows
 export store_generator_speeds
+export store_branch_currents
