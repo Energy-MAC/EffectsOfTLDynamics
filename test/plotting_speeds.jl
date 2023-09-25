@@ -15,8 +15,8 @@ const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
 
-rn = "results/twobus_2inv/2023-09-24T22:48:40.233" #string date
-model = "twobus_2inv"
+rn = "2023-09-24T23:14:16.337" #string date
+model = "9bus_slackless"
 main_path = "../results/"*model*"/"*rn
 
 df_alg = nothing
@@ -30,8 +30,8 @@ sol_ms = nothing
 sol_msmb = nothing
 
 
-line_scales = collect(1.0:2.0:7.0)
-load_scales = collect(0.5:0.5:3.0)
+line_scales = collect(2.0:2.0:2.0)
+load_scales = collect(0.5:0.5:1.0)
 
 # line_scales = collect(7.0)
 # load_scales = collect(0.5:0.5:1.5)
@@ -51,10 +51,10 @@ for var_to_measure in vars_to_measure
             df_dyn = CSV.read(partial_path*"/dynpi/"*var_to_measure, DataFrame); 
             df_ms = CSV.read(partial_path*"/MSSB/"*var_to_measure, DataFrame);
             df_msmb = CSV.read(partial_path*"/MSMB/"*var_to_measure, DataFrame);
-            sol_alg = (df_alg."Time", df_alg."generator-101-1_ω")
-            sol_dyn = (df_dyn."Time", df_dyn."generator-101-1_ω")
-            sol_ms = (df_ms."Time", df_ms."generator-101-1_ω")
-            sol_msmb = (df_msmb."Time", df_msmb."generator-101-1_ω")
+            sol_alg = (df_alg."Time", df_alg."generator-2-1_ω")
+            sol_dyn = (df_dyn."Time", df_dyn."generator-2-1_ω")
+            sol_ms = (df_ms."Time", df_ms."generator-2-1_ω")
+            sol_msmb = (df_msmb."Time", df_msmb."generator-2-1_ω")
         
             plt = plot(sol_alg, label = L"\mathrm{statpi}")
             plot!(plt, sol_dyn, label = L"\mathrm{dynpi}")
