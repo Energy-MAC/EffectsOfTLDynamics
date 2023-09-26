@@ -31,8 +31,8 @@ sol_msmb = nothing
 line_scales = collect(1.0:2.0:7.0)
 load_scales = collect(0.5:0.5:3.0)
 
-line_scales = collect(7.0)
-load_scales = collect(0.5:0.5:1.5)
+line_scales = collect(1.0)
+load_scales = collect(1.0)
 
 vars_to_measure = ["inverter_currents.csv"]
 
@@ -49,10 +49,10 @@ for var_to_measure in vars_to_measure
             df_dyn = CSV.read(partial_path*"/dynpi/"*var_to_measure, DataFrame); 
             df_ms = CSV.read(partial_path*"/MSSB/"*var_to_measure, DataFrame);
             df_msmb = CSV.read(partial_path*"/MSMB/"*var_to_measure, DataFrame);
-            sol_alg = (df_alg."Time", df_alg."generator-102-1_i_mag")
-            sol_dyn = (df_dyn."Time", df_dyn."generator-102-1_i_mag")
-            sol_ms = (df_ms."Time", df_ms."generator-102-1_i_mag")
-            sol_msmb = (df_msmb."Time", df_msmb."generator-102-1_i_mag")
+            sol_alg = (df_alg."Time", df_alg."generator-1-1_i_mag")
+            sol_dyn = (df_dyn."Time", df_dyn."generator-1-1_i_mag")
+            sol_ms = (df_ms."Time", df_ms."generator-1-1_i_mag")
+            sol_msmb = (df_msmb."Time", df_msmb."generator-1-1_i_mag")
         
             plt = plot(sol_alg, label = L"\mathrm{statpi}")
             plot!(plt, sol_dyn, label = L"\mathrm{dynpi}")

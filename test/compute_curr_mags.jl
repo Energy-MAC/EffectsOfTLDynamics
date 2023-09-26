@@ -32,8 +32,8 @@ sol_msmb = nothing
 line_scales = collect(1.0:1:3.0)
 load_scales = collect(0.5:0.5:2.0)
 
-line_scales = collect(3.0)
-load_scales = collect(0.5:0.5:1)
+line_scales = collect(1.0)
+load_scales = collect(1.0)
 
 vars_to_measure = ["inverter_currents.csv"]
 

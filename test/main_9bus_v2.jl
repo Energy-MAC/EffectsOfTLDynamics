@@ -85,7 +85,7 @@ SIL = V_nom ^2/Z_o
 p_load = real(SIL)/100
 q_load = imag(SIL)/100
 
-l_seg = 50 #km
+l_seg = 10 #km
 
 load_scale = 1.0;
 line_scale = 1.0;
@@ -209,8 +209,8 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 # line_lengths = [100, 250, 500]
 # loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
-line_scales = collect(2.0)
-load_scales = collect(0.5:0.5:3.0)
+line_scales = collect(1.0)
+load_scales = collect(1.0)
 
 now_date = now()
 rn = string(now_date)

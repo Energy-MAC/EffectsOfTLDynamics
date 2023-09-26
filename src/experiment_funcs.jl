@@ -157,7 +157,6 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
         z_km_pu = z_km_ω_5_to_1/Z_c_5_to_1_abs
         y_km_pu = y_km*Z_c_5_to_1_abs
         z_km_ω_pu = z_km_ω_5_to_1/Z_c_5_to_1_abs
-        
     end
     
     for ll in collect(get_components(Line, sys_segs))
