@@ -14,7 +14,7 @@ using Plots
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-rn = "2023-09-27T01:07:39.795" #string date
+rn = "2023-09-27T01:29:18.988" #string date
 model = "GFL_v_machine"
 main_path = "../results/"*model*"/"*rn
 
@@ -29,8 +29,8 @@ sol_ms = nothing
 sol_msmb = nothing
 
 
-line_scales = collect(1.0)
-load_scales = collect(0.5:0.5:3.0)
+line_scales = collect(3.0)
+load_scales = collect(0.5)
 
 line_scales = collect(1.0)
 load_scales = collect(1.0)
@@ -47,12 +47,12 @@ for var_to_measure in vars_to_measure
             partial_path = main_path*"/$(line_scale)_$(load_scale)"
             folder_path = partial_path*"/statpi"
             
-            df_alg = CSV.read(partial_path*"/statpi/"*var_to_measure, DataFrame);
-            ir_alg = df_alg."generator-102-1_ir_cnv"
-            ii_alg = df_alg."generator-102-1_ii_cnv"
-            i_alg_mag = sqrt.(ir_alg.^2 + ii_alg.^2)
-            df_alg[!,"generator-102-1_i_mag"] = i_alg_mag
-            CSV.write(partial_path*"/statpi/"*var_to_measure, df_alg)
+            # df_alg = CSV.read(partial_path*"/statpi/"*var_to_measure, DataFrame);
+            # ir_alg = df_alg."generator-102-1_ir_cnv"
+            # ii_alg = df_alg."generator-102-1_ii_cnv"
+            # i_alg_mag = sqrt.(ir_alg.^2 + ii_alg.^2)
+            # df_alg[!,"generator-102-1_i_mag"] = i_alg_mag
+            # CSV.write(partial_path*"/statpi/"*var_to_measure, df_alg)
             
             df_dyn = CSV.read(partial_path*"/dynpi/"*var_to_measure, DataFrame); 
             ir_dyn = df_dyn."generator-102-1_ir_cnv"

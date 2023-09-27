@@ -1,46 +1,43 @@
-┌ Info: 2023-09-27T01:10:00.240 [946624:1]: Pre-Initializing Simulation States
+┌ Info: 2023-09-27T01:31:44.019 [946624:1]: Pre-Initializing Simulation States
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:265
-┌ Info: 2023-09-27T01:10:00.240 [946624:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
+┌ Info: 2023-09-27T01:31:44.019 [946624:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
 └ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
-┌ Info: 2023-09-27T01:10:00.240 [946624:1]: PowerFlow solve converged, the results have been stored in the system
+┌ Info: 2023-09-27T01:31:44.019 [946624:1]: PowerFlow solve converged, the results have been stored in the system
 └ @ PowerFlows /home/gabrielecr/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
-┌ Info: 2023-09-27T01:10:00.240 [946624:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
+┌ Info: 2023-09-27T01:31:44.019 [946624:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
 └ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
-┌ Info: 2023-09-27T01:10:00.240 [946624:1]: Residual from initial guess: max = 1.5494341920607724e-10 at 30, total = 1.7241378714831612e-10
+┌ Info: 2023-09-27T01:31:44.020 [946624:1]: Residual from initial guess: max = 1.5465309588513776e-10 at 76, total = 1.0529982052842188e-9
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:101
-┌ Info: 2023-09-27T01:10:00.240 [946624:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
+┌ Info: 2023-09-27T01:31:44.020 [946624:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:68
-┌ Info: 2023-09-27T01:10:00.240 [946624:1]: Attaching Perturbations
+┌ Info: 2023-09-27T01:31:44.020 [946624:1]: Attaching Perturbations
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:296
-┌ Info: 2023-09-27T01:10:00.241 [946624:1]: Simulations status = BUILT
+┌ Info: 2023-09-27T01:31:44.020 [946624:1]: Simulations status = BUILT
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:428
-┌ Info: 2023-09-27T01:10:00.241 [946624:1]: 
+┌ Info: 2023-09-27T01:31:44.020 [946624:1]: 
 │  ───────────────────────────────────────────────────────────────────────────────
 │                                                      Time          Allocations  
 │                                                ───────────────   ───────────────
-│                 Total measured:                    1.08ms             406KiB    
+│                 Total measured:                    5.78ms            1.45MiB    
 │ 
 │  Section                               ncalls     time    %tot     alloc    %tot
 │  ───────────────────────────────────────────────────────────────────────────────
-│  Build Simulation                           1   1.07ms  100.0%    405KiB  100.0%
-│    Build Simulation Inputs                  1    279μs   26.0%   68.0KiB   16.8%
-│      Wrap Branches                          1   2.10μs    0.2%      240B    0.1%
-│      Wrap Dynamic Injectors                 1    165μs   15.4%   42.9KiB   10.6%
-│      Calculate MM, DAE_vector, Tota...      1   9.25μs    0.9%   1.80KiB    0.4%
-│      Wrap Static Injectors                  1   27.9μs    2.6%   5.69KiB    1.4%
-│    Pre-initialization                       1    442μs   41.2%    156KiB   38.6%
-│      Power Flow solution                    1    262μs   24.4%   91.2KiB   22.5%
-│      Initialize Static Injectors            1    361ns    0.0%     0.00B    0.0%
-│      Initialize Dynamic Injectors           1    125μs   11.7%   54.0KiB   13.4%
-│    Calculate Jacobian                       1   58.1μs    5.4%   53.3KiB   13.2%
-│    Make Model Function                      1   4.04μs    0.4%      912B    0.2%
-│    Initial Condition NLsolve refine...      1    101μs    9.4%   73.0KiB   18.0%
-│    Build Perturbations                      1   31.2μs    2.9%   9.32KiB    2.3%
-│    Make DiffEq Problem                      1    129μs   12.0%   30.1KiB    7.4%
+│  Build Simulation                           1   5.78ms  100.0%   1.45MiB  100.0%
+│    Build Simulation Inputs                  1   4.46ms   77.1%    285KiB   19.3%
+│      Wrap Branches                          1    102μs    1.8%   30.1KiB    2.0%
+│      Wrap Dynamic Injectors                 1    150μs    2.6%   43.0KiB    2.9%
+│      Calculate MM, DAE_vector, Tota...      1   14.5μs    0.3%   5.44KiB    0.4%
+│      Wrap Static Injectors                  1   27.7μs    0.5%   5.75KiB    0.4%
+│    Pre-initialization                       1    622μs   10.8%    330KiB   22.3%
+│      Power Flow solution                    1    445μs    7.7%    257KiB   17.4%
+│      Initialize Static Injectors            1    351ns    0.0%     0.00B    0.0%
+│      Initialize Dynamic Injectors           1    114μs    2.0%   54.0KiB    3.6%
+│      Initialize Dynamic Branches            1   10.6μs    0.2%   6.75KiB    0.5%
+│    Calculate Jacobian                       1    246μs    4.2%    389KiB   26.2%
+│    Make Model Function                      1   4.71μs    0.1%   1.27KiB    0.1%
+│    Initial Condition NLsolve refine...      1    264μs    4.6%    421KiB   28.4%
+│    Build Perturbations                      1   32.6μs    0.6%   9.32KiB    0.6%
+│    Make DiffEq Problem                      1    126μs    2.2%   32.1KiB    2.2%
 │  ───────────────────────────────────────────────────────────────────────────────
 │ 
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:453
-┌ Warning: 2023-09-27T01:10:02.574 [946624:1]: dt(4.440892098500626e-16) <= dtmin(4.440892098500626e-16) at t=1.590920495319663, and step error estimate = 2.1718905517935254. Aborting. There is either an error in your model specification or the true solution is unstable.
-└ @ SciMLBase /home/gabrielecr/.julia/packages/SciMLBase/szsYq/src/integrator_interface.jl:599
-┌ Error: 2023-09-27T01:10:02.587 [946624:1]: The simulation failed with return code DtLessThanMin
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:521

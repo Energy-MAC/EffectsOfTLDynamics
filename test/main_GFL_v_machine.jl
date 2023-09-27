@@ -197,19 +197,18 @@ plot(ω_alg)
 plot!(ω_dyn)
 plot!(ω_ms_dyn)
 plot!(ω_ms_mb_dyn)
-
+"""
 results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
 results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
 results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
 results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
 
-"""
 
 # line_lengths = [100, 250, 500]
 # loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
-line_scales = collect(1.0:2.0:7.0)
-load_scales = collect(0.5:0.5:3.0)
+line_scales = collect(3.0)
+load_scales = collect(0.5)
 
 now_date = now()
 rn = string(now_date)
@@ -227,7 +226,7 @@ for line_scale in line_scales
     for load_scale in load_scales
         p.load_scale = load_scale
         
-        partial_path = main_path*"$(p.line_scale)_$(p.load_scale)"
+        partial_path = main_path*"/$(p.line_scale)_$(p.load_scale)"
         mkdir(partial_path)
 
         M = 1
@@ -235,15 +234,15 @@ for line_scale in line_scales
         z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.z_km = z_km
     
-        folder_path = partial_path*"/statpi"
-        mkdir(folder_path)
-        results_alg, sim = run_experiment(file_name, line_model_1, p);
-        sys = sim.sys
-        store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
-        store_filter_currents(results_alg, sys, folder_path*"/inverter_currents.csv")
-        #store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
-        store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
-        #store_branch_currents(results_alg, sys, folder_path*"/branch_currents.csv")
+        # folder_path = partial_path*"/statpi"
+        # mkdir(folder_path)
+        # results_alg, sim = run_experiment(file_name, line_model_1, p);
+        # sys = sim.sys
+        # store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
+        # store_filter_currents(results_alg, sys, folder_path*"/inverter_currents.csv")
+        # #store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
+        # store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
+        # #store_branch_currents(results_alg, sys, folder_path*"/branch_currents.csv")
 
 
         folder_path = partial_path*"/dynpi"
