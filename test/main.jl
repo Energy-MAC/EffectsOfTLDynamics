@@ -19,7 +19,8 @@ const PSID = PowerSimulationsDynamics;
 # "inv_v_machine.json"
 # "twobus_2inv.json"
 # "9bus_slackless.json"
-file_name = "../data/json_data/inv_v_machine.json"
+model = "inv_v_machine"
+file_name = "../data/json_data/"*model*".json"
 # default_2_bus_line_dict - For 2 bus system
 # default_9_bus_line_dict - For 9 bus system
 line_dict = default_2_bus_line_dict
@@ -76,8 +77,13 @@ perturbation_params = get_default_perturbation(t_fault, perturbation)
 # perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
 # perturbation_params.branch_trip_params = BTParam("Bus 9-Bus 6-i_1")
 
-p_load = 1.0
-q_load = 0.25
+
+V_nom = 230 # kV
+Z_o = sqrt(z_km_ω_5_to_1/y_km)
+SIL = V_nom ^2/Z_o
+p_load = real(SIL)/100
+q_load = imag(SIL)/100
+
 l_seg = 50 #km
 
 load_scale = 1.0;
@@ -127,9 +133,10 @@ folder_path = partial_path*"/statpi"
 mkdir(folder_path)
 
 store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
-store_filter_currents(results_alg, sys, folder_path*"/device_currents.csv")
+store_filter_currents(results_alg, sys, folder_path*"/filter_currents.csv")
 store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
 store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
+store_branch_currents(results_alg, sys, folder_path*"/branch_currents.csv")
 
 using PowerFlows
 sol = solve_powerflow(ACPowerFlow(), sys)
@@ -201,13 +208,18 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 # line_lengths = [100, 250, 500]
 # loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
-line_scales = collect(1.0:0.25:1.5)
-load_scales = collect(1.0:0.25:1.5)
+line_scales = collect(1.0:2.0:7.0)
+load_scales = collect(0.5:0.5:3.0)
 
 now_date = now()
 rn = string(now_date)
-main_path = "../results/"*rn*"/"
+prim_path = "../results/"*model
+mkdir(prim_path)
+main_path = prim_path*"/"*rn*"/"
 mkdir(main_path)
+
+line_scales = collect(7.0)
+load_scales = collect(3.0)
 
 for line_scale in line_scales
     p.line_scale = line_scale
@@ -228,9 +240,10 @@ for line_scale in line_scales
         results_alg, sim = run_experiment(file_name, line_model_1, p);
         sys = sim.sys
         store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
-        store_filter_currents(results_alg, sys, folder_path*"/device_currents.csv")
-        store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
+        store_filter_currents(results_alg, sys, folder_path*"/inverter_currents.csv")
+        #store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
         store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
+        #store_branch_currents(results_alg, sys, folder_path*"/branch_currents.csv")
 
 
         folder_path = partial_path*"/dynpi"
@@ -238,18 +251,20 @@ for line_scale in line_scales
         results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
         sys_dyn = sim_dyn.sys
         store_bus_voltages(results_dyn, sys_dyn, folder_path*"/bus_voltages.csv")
-        store_filter_currents(results_dyn, sys_dyn, folder_path*"/device_currents.csv")
-        store_branch_power_flows(results_dyn, sys_dyn, folder_path*"/branch_power_flows.csv")
+        store_filter_currents(results_dyn, sys_dyn, folder_path*"/inverter_currents.csv")
+        #store_branch_power_flows(results_dyn, sys_dyn, folder_path*"/branch_power_flows.csv")
         store_generator_speeds(results_dyn, sys_dyn, folder_path*"/generator_speeds.csv")
+        #store_branch_currents(results_dyn, sys_dyn, folder_path*"/branch_currents.csv")
 
         folder_path = partial_path*"/MSSB"
         mkdir(folder_path)
         results_ms_dyn, sim_ms_dyn = run_experiment(file_name, line_model_3, p);
         sys_ms_dyn = sim_ms_dyn.sys
         store_bus_voltages(results_ms_dyn, sys_ms_dyn, folder_path*"/bus_voltages.csv")
-        store_filter_currents(results_ms_dyn, sys_ms_dyn, folder_path*"/device_currents.csv")
-        store_branch_power_flows(results_ms_dyn, sys_ms_dyn, folder_path*"/branch_power_flows.csv")
+        store_filter_currents(results_ms_dyn, sys_ms_dyn, folder_path*"/inverter_currents.csv")
+        #store_branch_power_flows(results_ms_dyn, sys_ms_dyn, folder_path*"/branch_power_flows.csv")
         store_generator_speeds(results_ms_dyn, sys_ms_dyn, folder_path*"/generator_speeds.csv")
+        #store_branch_currents(results_ms_dyn, sys_ms_dyn, folder_path*"/branch_currents.csv")
 
         M = 3
         p.M = M
@@ -266,9 +281,10 @@ for line_scale in line_scales
         results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p)
         sys_ms_mb = sim_ms_mb.sys
         store_bus_voltages(results_ms_mb_dyn, sys_ms_mb, folder_path*"/bus_voltages.csv")
-        store_filter_currents(results_ms_mb_dyn, sys_ms_mb, folder_path*"/device_currents.csv")
-        store_branch_power_flows(results_ms_mb_dyn, sys_ms_mb, folder_path*"/branch_power_flows.csv")
+        store_filter_currents(results_ms_mb_dyn, sys_ms_mb, folder_path*"/inverter_currents.csv")
+        #store_branch_power_flows(results_ms_mb_dyn, sys_ms_mb, folder_path*"/branch_power_flows.csv")
         store_generator_speeds(results_ms_mb_dyn, sys_ms_mb, folder_path*"/generator_speeds.csv")
+        #store_branch_currents(results_ms_mb_dyn, sys_ms_mb, folder_path*"/branch_currents.csv")
 
     end
 end
