@@ -16,17 +16,21 @@ const ETL = EffectsOfTLDynamics;
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-function save_max_nonzero_eig!(sim, output);
+function save_max_nonzero_eig_and_participation!(sim, eig_output, participation_output);
     if sim.status != PSID.BUILD_FAILED;
         ss = small_signal_analysis(sim);
+        eig_sum = summary_eigenvalues(ss)
         if maximum(real(ss.eigenvalues)) == 0.0;
             # Choose second largest eig 
-            push!(output, real(ss.eigenvalues[end-1]));
+            push!(eig_output, real(ss.eigenvalues[end-1]));
+            push!(participation_output, eig_sum[end-1,:]["Most Associated"])
         else
-            push!(output, maximum(real(ss.eigenvalues)));
+            push!(eig_output, maximum(real(ss.eigenvalues)));
+            push!(participation_output, eig_sum[end,:]["Most Associated"])
         end
     else
-        push!(output, NaN)
+        push!(eig_output, NaN)
+        push!(participation_output, NaN)
     end
 end
 
@@ -61,30 +65,17 @@ factor_z = 1.0 # to get it closer to kundur
 factor_y = 1.0
 z_km_3, y_km_3, Z_c_abs_3, z_km_ω_3, z_km_ω_5_to_1_3, Z_c_5_to_1_abs_3 = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
 
-
-# Calculate SIL  
-# SIL = VLL^2/ZC where ZC is in ohms, and VLL is in kV 
 # Typical values for SIL - 14 - 140 MW for voltages up to 230 kV, and 
 # 250 kV - 300-400 MW
 # 500 kV - 850-1000 MW 
 
-Vnom = 230; # kV 
-# Zc in units of ohms (p.u?)
-SIL = (Vnom^2)/Z_c_5_to_1_abs_3 # P in p.u., MW 
-
 p_load = 1.0;  # base for load is ? 100?
 q_load = 0.25;
-
-load_scale = 1.0
-line_scale = 1.0
-
-l_seg = 10; # 
-l = 100;
 
 p1 = ETL.ExpParams(
     nothing, 
     1, 
-    l,
+    100,
     l_seg, 
     Z_c_abs_1, 
     z_km_1,
@@ -98,14 +89,14 @@ p1 = ETL.ExpParams(
     perturbation_params,
     p_load,
     q_load,
-    line_scale,
-    load_scale
+    1.0,
+    1.0
 );
 
 p3 = ETL.ExpParams(
     nothing, 
     3, #
-    l,
+    100, 
     l_seg, 
     Z_c_abs_3, 
     z_km_3,
@@ -119,93 +110,126 @@ p3 = ETL.ExpParams(
     perturbation_params,
     p_load,
     q_load,
-    line_scale,
-    load_scale
+    1.0,
+    1.0
 );
 
-N = 10;
+N = 20;
 
-# p=0.5, q=0.5
-#lRange = 475:5:580; 
-lRange = 50:10:150;
-lRange = 220:10:300;
-#lRange = 100:50:500;
-lRange = 200:100:1200;
+# Params for load at inv bus 
+load_scales = [1, 1.5, 2, 2.5, 3];
+lRange = [[1030:2:1060], [930:2:960],[710:2:760], [510:2:540], [350:2:400]]
 
+# Params for load at gen bus 
+load_scales = [1, 1.5, 2, 2.5, 3];
+lRange = [[1150:2:1200], [800:20:1000], [750:2:800], [550:2:600], [440:2:480]];
 
-lRange = 500:50:1100;
-load_scales = 1:0.25:2;
+load_scales = [2, 2.5, 3];
+lRange = [[760:1:790], [560:1:590], [440:1:460]];
+# lRange = 1000:50:1500;
+# load_scales = [0.2,0.4,0.6,0.8];
 
+load_scales = [2];
+lRange = [[400:100:1000]]
 
-lRange = 1000:50:1500;
-load_scales = [0.2,0.4,0.6,0.8];
+load_bus = "BUS 2"
 
 alg_lims = [];
 dyn_lims = [];
 mssb_lims = [];
 msmb_lims = [];
+
+mssb_results = [];
+msmb_results = [];
+dyn_results = [];
+alg_results = [];
+
+mssb_p = [];
+msmb_p = [];
+dyn_p = [];
+alg_p = [];
+
+idx = 1;
 for load_scale in load_scales;
-    mssb_results = [];
-    msmb_results = [];
-    dyn_results = [];
-    alg_results = [];
+    # mssb_results = [];
+    # msmb_results = [];
+    # dyn_results = [];
+    # alg_results = [];
     p1.load_scale = load_scale
     p3.load_scale = load_scale
-
-    for l = lRange;
+    current_lRange = lRange[idx][1];
+    for l = current_lRange;
         line_dict["BUS 1-BUS 2-i_1"] = l;
         line_dict["BUS 1-BUS 2-i_1_static"] = l;
 
         p1.l = l; # update params 
-        p1.load_scale = load_scale
+        p3.l = l
 
-        sim_alg = ETL.build_2bus_sim_from_file(file_name, false, false, p1);
-        save_max_nonzero_eig!(sim_alg, alg_results)
+        sim_alg = ETL.build_2bus_sim_from_file(file_name, false, false, p1, load_bus);
+        save_max_nonzero_eig_and_participation!(sim_alg, alg_results, alg_p)
 
         # Dynamic pi  
-        sim_dyn = ETL.build_2bus_sim_from_file(file_name, true, false, p1);
-        save_max_nonzero_eig!(sim_dyn, dyn_results)
+        sim_dyn = ETL.build_2bus_sim_from_file(file_name, true, false, p1, load_bus);
+        save_max_nonzero_eig_and_participation!(sim_dyn, dyn_results, dyn_p)
 
         # MSSB
         # Define MSSB l_seg
         p1.l_seg = l/N; 
-        sim_ms = ETL.build_2bus_sim_from_file(file_name, true, true, p1);
-        save_max_nonzero_eig!(sim_ms, mssb_results)
+        sim_ms = ETL.build_2bus_sim_from_file(file_name, true, true, p1, load_bus);
+        save_max_nonzero_eig_and_participation!(sim_ms, mssb_results, mssb_p)
 
         # Do MSMB 
         p3.l_seg = l/N; 
-        sim_msmb = ETL.build_2bus_sim_from_file(file_name, true, true, p3);
-        save_max_nonzero_eig!(sim_msmb, msmb_results)
+        sim_msmb = ETL.build_2bus_sim_from_file(file_name, true, true, p3, load_bus);
+        save_max_nonzero_eig_and_participation!(sim_msmb, msmb_results, msmb_p)
 
     end
 
-    # Find first length where we lose stability 
+    # display(alg_results)
+    # display(mssb_results)
+
+    # Find first length where we lose stability - NaN indicates that we don't encounter stability limit 
     if findfirst(alg_results.>0) !== nothing;
-        push!(alg_lims, lRange[findfirst(alg_results.>0)])
+        push!(alg_lims, current_lRange[findfirst(alg_results.>0)])
     else
         push!(alg_lims, NaN)
     end
     if findfirst(dyn_results.>0) !== nothing;
-        push!(dyn_lims, lRange[findfirst(dyn_results.>0)])
+        push!(dyn_lims, current_lRange[findfirst(dyn_results.>0)])
     else
         push!(dyn_lims, NaN)
     end
     if findfirst(mssb_results.>0) !== nothing;
-        push!(mssb_lims, lRange[findfirst(mssb_results.>0)])
+        push!(mssb_lims, current_lRange[findfirst(mssb_results.>0)])
     else
         push!(mssb_lims, NaN)
     end
     if findfirst(msmb_results.>0) !== nothing;
-        push!(msmb_lims, lRange[findfirst(msmb_results.>0)])
+        push!(msmb_lims, current_lRange[findfirst(msmb_results.>0)])
     else
         push!(msmb_lims, NaN)
     end
+    idx += 1
 end
 
-alg_lims
-dyn_lims
-mssb_lims
-msmb_lims
+# alg_lims
+# dyn_lims
+# mssb_lims
+# msmb_lims
+
+alg_p 
+dyn_p 
+mssb_p 
+msmb_p 
+
+plot(lRange[1], alg_results,xlabel="Line length (km)", ylabel="Max real λ != 0", label="Algebraic", seriestype=:line, size=(800,600))
+plot!(lRange[1], dyn_results, seriestype=:line, label="Dynpi")
+plot!(lRange[1], mssb_results, seriestype=:line, linewidth=2, label="MSSB N="*string(N))
+plot!(lRange[1], msmb_results, seriestype=:line, linestyle=:dashdot, linewidth=4, label="MSMB N="*string(N))
+title!("p="*string(p_load*load_scales[1])*", q="*string(q_load*load_scales[1]))
+
+savefig("../figures/Ruth/inv_v_mach/line_length_v_eig_no_load.png")
+
 
 
 plot(load_scales, alg_lims,xlabel="Load scale", ylabel="Line length @ stability boundary", label="Algebraic", seriestype=:line, size=(800,600))
@@ -213,6 +237,9 @@ plot!(load_scales, dyn_lims, seriestype=:line, label="Dynpi")
 plot!(load_scales, mssb_lims, seriestype=:line, linestyle=:dashdot, label="MSSB N="*string(N))
 plot!(load_scales, msmb_lims, seriestype=:line, linestyle=:dash, label="MSMB N="*string(N))
 
+title!("Base p="*string(p_load)*", q="*string(q_load))
+#
+savefig("../figures/Ruth/inv_v_mach/loading_bus1_v_line_lim_zoomed.png")
 
 
 
@@ -277,7 +304,7 @@ p1 = ExpParams(
     1, 
     l,
     l_seg, 
-    Z_c_abs, 
+    Z_c_abs_1, 
     z_km_1,
     y_km_1,
     z_km_ω_1,
@@ -298,7 +325,7 @@ p3 = ExpParams(
     3, #
     l,
     l_seg, 
-    Z_c_abs, 
+    Z_c_abs_3, 
     z_km_3,
     y_km_3,
     z_km_ω_3,
@@ -315,13 +342,15 @@ p3 = ExpParams(
 );
 
 # Algebraic 
-sim_alg = build_2bus_sim_from_file(file_name, false, false, p1)
+
+sim_alg = ETL.build_2bus_sim_from_file(file_name, false, false, p1,load_bus)
+
 eigs_alg = small_signal_analysis(sim_alg).eigenvalues;
-sim_dyn = build_2bus_sim_from_file(file_name, true, false, p1)
+sim_dyn = build_2bus_sim_from_file(file_name, true, false, p1, load_bus)
 eigs_dyn = small_signal_analysis(sim_dyn).eigenvalues;
-sim_mssb = build_2bus_sim_from_file(file_name, true, true, p1)
+sim_mssb = build_2bus_sim_from_file(file_name, true, true, p1, load_bus)
 eigs_mssb = small_signal_analysis(sim_mssb).eigenvalues;
-sim_msmb = build_2bus_sim_from_file(file_name, true, true, p3)
+sim_msmb = build_2bus_sim_from_file(file_name, true, true, p3, load_bus)
 eigs_msmb = small_signal_analysis(sim_msmb).eigenvalues;
 
 
