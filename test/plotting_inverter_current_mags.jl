@@ -37,8 +37,8 @@ vars_to_measure = ["inverter_currents.csv"]
 plots = []
 plt = []
 
-line_scales = 3.0
-load_scales = [0.5 1.0]
+line_scales = 1.0
+load_scales = [0.5]
 
 for var_to_measure in vars_to_measure
     for line_scale in line_scales
@@ -62,7 +62,7 @@ for var_to_measure in vars_to_measure
             plot!(plt, legend = false)    
             plot!(xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")  
             plot!(ylabel = L"$||I_f|| \quad \mathrm{[\ p.u.]}$")
-            plot!(legend_title = L"$%$load_scale \ %$line_scale$")
+            # plot!(legend_title = L"$%$load_scale \ %$line_scale$")
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.svg")
             plot!(ylims = (0.15,0.375))
