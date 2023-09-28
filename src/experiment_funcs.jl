@@ -448,26 +448,26 @@ function verifying(file_name, M, impedance_csv, capacitance_csv, p, factor_z, fa
 end
 
 
-function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams)
+function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams, load_bus::String)
     # build system
     sys = System(joinpath(pwd(), file_name));
 
     # Simulation time span
-    tspan = (0.0, p.sim_params.t_max)
-    perturbation = choose_disturbance(sys, p.perturbation, p)
+    tspan = (0.0, p.sim_params.t_max);
+    perturbation = choose_disturbance(sys, p.perturbation, p);
     
     # build segments model
     if (multi_segment == true)
-        sys = build_seg_model!(sys, p, dyn_lines, "")
+        sys = build_seg_model!(sys, p, dyn_lines, "");
     else
-        sys = build_new_impedance_model!(sys, p, dyn_lines, "")
+        sys = build_new_impedance_model!(sys, p, dyn_lines, "");
     end
 
     # Add load
     load = StandardLoad(
         name = "load1",
         available = true,
-        bus = get_component(Bus, sys, "BUS 2"),
+        bus = get_component(Bus, sys, load_bus),
         base_power = 100.0,
         constant_active_power = 0.0,
         constant_reactive_power = 0.0,
@@ -481,21 +481,23 @@ function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
         max_impedance_reactive_power = p.q_load*p.load_scale,
         max_current_active_power = 0.0,
         max_current_reactive_power = 0.0,
-    )
-    add_component!(sys, load)
+    );
+    add_component!(sys, load);
 
     # scale generation
 
     for g in get_components(PSY.Generator, sys)
         if g.bus.bustype == BusTypes.PV
-            set_active_power!(g, g.active_power * p.load_scale)
-            set_reactive_power!(g, g.reactive_power * p.load_scale)
+            set_active_power!(g, g.active_power * p.load_scale);
+            set_reactive_power!(g, g.reactive_power * p.load_scale);
         end
     end
     
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p);
     return sim 
 end
+
+
 
 
 function build_9bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams)
