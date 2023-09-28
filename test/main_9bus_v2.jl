@@ -219,7 +219,6 @@ mkdir(prim_path)
 main_path = prim_path*"/"*rn*"/"
 mkdir(main_path)
 
-p.l_seg = 25
 for line_scale in line_scales
     p.line_scale = line_scale
 
