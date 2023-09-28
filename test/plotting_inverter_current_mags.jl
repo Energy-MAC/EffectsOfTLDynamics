@@ -66,7 +66,7 @@ for var_to_measure in vars_to_measure
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.svg")
             plot!(ylims = (0.15,0.45))
-            plot!(xlims=(0.249, 0.26))
+            plot!(xlims=(0.249, 0.275))
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_100ms_zoom.svg")
             # push!(plots, plt)
         end 
