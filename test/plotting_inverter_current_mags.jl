@@ -59,7 +59,7 @@ for var_to_measure in vars_to_measure
             plot!(plt, sol_dyn, label = L"\mathrm{dynpi}")
             plot!(plt, sol_ms, label = L"\mathrm{MSSB}")
             plot!(plt, sol_msmb, label = L"\mathrm{MSMB}")
-            plot!(plt, legend = false)    
+            plot!(plt, legend = true)    
             plot!(xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")  
             plot!(ylabel = L"$||I_f|| \quad \mathrm{[\ p.u.]}$")
             # plot!(legend_title = L"$%$load_scale \ %$line_scale$")
