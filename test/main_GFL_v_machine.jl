@@ -46,7 +46,7 @@ sim_p = SimParams(
     maxiters = Int(1e10),
     dtmax = 1e-4,
     solver = "Rodas4",
-    t_max = 2.0,
+    t_max = 0.275,
 )
 
 ### Extract line data from files
@@ -84,7 +84,7 @@ SIL = V_nom ^2/Z_o
 p_load = real(SIL)/100
 q_load = imag(SIL)/100
 
-l_seg = 50 #km
+l_seg = 10 #km
 
 load_scale = 1.0;
 line_scale = 1.0;
@@ -207,8 +207,8 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 # line_lengths = [100, 250, 500]
 # loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
-line_scales = collect(3.0)
-load_scales = collect(0.5)
+line_scales = collect(1.0:2.0:7.0)
+load_scales = collect(0.5:0.5:3.0)
 
 now_date = now()
 rn = string(now_date)
@@ -217,7 +217,7 @@ prim_path = "../results/"*model
 main_path = prim_path*"/"*rn*"/"
 mkdir(main_path)
 
-# line_scales = collect(7.0)
+line_scales = collect(7.0)
 # load_scales = collect(3.0)
 
 for line_scale in line_scales
@@ -234,15 +234,15 @@ for line_scale in line_scales
         z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
         p.z_km = z_km
     
-        # folder_path = partial_path*"/statpi"
-        # mkdir(folder_path)
-        # results_alg, sim = run_experiment(file_name, line_model_1, p);
-        # sys = sim.sys
-        # store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
-        # store_filter_currents(results_alg, sys, folder_path*"/inverter_currents.csv")
-        # #store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
-        # store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
-        # #store_branch_currents(results_alg, sys, folder_path*"/branch_currents.csv")
+        folder_path = partial_path*"/statpi"
+        mkdir(folder_path)
+        results_alg, sim = run_experiment(file_name, line_model_1, p);
+        sys = sim.sys
+        store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
+        store_filter_currents(results_alg, sys, folder_path*"/inverter_currents.csv")
+        #store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
+        store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
+        #store_branch_currents(results_alg, sys, folder_path*"/branch_currents.csv")
 
 
         folder_path = partial_path*"/dynpi"

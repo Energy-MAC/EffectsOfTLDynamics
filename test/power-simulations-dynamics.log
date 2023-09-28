@@ -1,43 +1,42 @@
-┌ Info: 2023-09-28T03:32:19.944 [2177667:1]: Pre-Initializing Simulation States
+┌ Info: 2023-09-28T20:49:01.650 [2584413:1]: Pre-Initializing Simulation States
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:265
-┌ Info: 2023-09-28T03:32:19.944 [2177667:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
+┌ Info: 2023-09-28T20:49:01.650 [2584413:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
 └ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
-┌ Info: 2023-09-28T03:32:19.947 [2177667:1]: PowerFlow solve converged, the results have been stored in the system
-└ @ PowerFlows /home/gabrielecr/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
-┌ Info: 2023-09-28T03:32:19.947 [2177667:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
+┌ Error: 2023-09-28T20:49:01.657 [2584413:1]: The powerflow solver returned convergence = false
+└ @ PowerFlows /home/gabrielecr/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:50
+┌ Info: 2023-09-28T20:49:01.657 [2584413:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
 └ @ PowerSystems /home/gabrielecr/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
-┌ Info: 2023-09-28T03:32:19.955 [2177667:1]: Residual from initial guess: max = 4.82398404208495e-10 at 73, total = 4.486296445354985e-9
+┌ Error: 2023-09-28T20:49:01.657 [2584413:1]: PowerFlow failed to solve
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation_initialization.jl:16
+┌ Info: 2023-09-28T20:49:01.658 [2584413:1]: Residual from initial guess: max = 0.4761904761904756 at 1, total = 80.75350351848591
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:101
-┌ Info: 2023-09-28T03:32:20.121 [2177667:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/nlsolve_wrapper.jl:68
-┌ Info: 2023-09-28T03:32:20.122 [2177667:1]: Attaching Perturbations
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:296
-┌ Info: 2023-09-28T03:32:20.122 [2177667:1]: Simulations status = BUILT
-└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:428
-┌ Info: 2023-09-28T03:32:20.122 [2177667:1]: 
+┌ Error: 2023-09-28T20:49:01.701 [2584413:1]: MassMatrixModel failed to build
+│   exception = (UndefVarError(:bus_count), Union{Ptr{Nothing}, Base.InterpreterIP}[Ptr{Nothing} @0x00007ffbfe188c9f, Ptr{Nothing} @0x00007ffbfe12bc14, Ptr{Nothing} @0x00007ff9a134d5b9, Ptr{Nothing} @0x00007ff9a11dfb1d, Ptr{Nothing} @0x00007ff9a11f983d, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ff9a18d9255, Ptr{Nothing} @0x00007ff9a18defa3, Ptr{Nothing} @0x00007ff9a18df46f, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbe95a30f8, Ptr{Nothing} @0x00007ff9a1841dc3, Ptr{Nothing} @0x00007ff9a1842760, Ptr{Nothing} @0x00007ff9a18427c9, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ff9a17f5cd0, Ptr{Nothing} @0x00007ff9a16fe645, Ptr{Nothing} @0x00007ffbfe1495eb, Ptr{Nothing} @0x00007ffbfe149a89, Ptr{Nothing} @0x00007ffbfe14ae0a, Ptr{Nothing} @0x00007ff9a658cd8f, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe11ff58, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe121e60, Ptr{Nothing} @0x00007ffbe962697c, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe121e60, Ptr{Nothing} @0x00007ffbe9627892, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe121e60, Ptr{Nothing} @0x00007ffbe793656d, Ptr{Nothing} @0x00007ffbe79365e2, Ptr{Nothing} @0x00007ffbe7937bec, Ptr{Nothing} @0x00007ffbe7939d88, Ptr{Nothing} @0x00007ff9a656b66d, Ptr{Nothing} @0x00007ff9a656ba8e, Ptr{Nothing} @0x00007ff9a656d56b, Ptr{Nothing} @0x00007ff9a656d58f, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbe95a30f8, Ptr{Nothing} @0x00007ff9a656ce63, Ptr{Nothing} @0x00007ff9a656cf4f, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe11ff58, Ptr{Nothing} @0x00007ffbe7934b42, Ptr{Nothing} @0x00007ffbe7934b62, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe121e60, Ptr{Nothing} @0x00007ffbe791b218, Ptr{Nothing} @0x00007ffbe791b4ef, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe1325cf])
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:434
+┌ Info: 2023-09-28T20:49:01.714 [2584413:1]: 
 │  ───────────────────────────────────────────────────────────────────────────────
 │                                                      Time          Allocations  
 │                                                ───────────────   ───────────────
-│                 Total measured:                     180ms             101MiB    
+│                 Total measured:                    64.0ms            9.83MiB    
 │ 
 │  Section                               ncalls     time    %tot     alloc    %tot
 │  ───────────────────────────────────────────────────────────────────────────────
-│  Build Simulation                           1    180ms  100.0%    101MiB  100.0%
-│    Build Simulation Inputs                  1   1.70ms    0.9%   1.08MiB    1.1%
-│      Wrap Branches                          1    718μs    0.4%    346KiB    0.3%
-│      Wrap Dynamic Injectors                 1    189μs    0.1%   68.5KiB    0.1%
-│      Calculate MM, DAE_vector, Tota...      1   78.7μs    0.0%    194KiB    0.2%
-│      Wrap Static Injectors                  1   38.7μs    0.0%   9.70KiB    0.0%
-│    Pre-initialization                       1   3.29ms    1.8%   2.99MiB    3.0%
-│      Power Flow solution                    1   2.89ms    1.6%   2.67MiB    2.6%
-│      Initialize Static Injectors            1    461ns    0.0%     0.00B    0.0%
-│      Initialize Dynamic Injectors           1    257μs    0.1%    237KiB    0.2%
-│      Initialize Dynamic Branches            1   77.4μs    0.0%   77.6KiB    0.1%
-│    Calculate Jacobian                       1   8.31ms    4.6%   23.7MiB   23.5%
-│    Make Model Function                      1   5.98μs    0.0%   5.73KiB    0.0%
-│    Initial Condition NLsolve refine...      1    166ms   92.4%   73.1MiB   72.4%
-│    Build Perturbations                      1   76.7μs    0.0%   9.27KiB    0.0%
-│    Make DiffEq Problem                      1    222μs    0.1%   32.1KiB    0.0%
+│  Build Simulation                           1   64.0ms  100.0%   9.83MiB  100.0%
+│    Build Simulation Inputs                  1    256μs    0.4%   68.0KiB    0.7%
+│      Wrap Branches                          1   1.78μs    0.0%      240B    0.0%
+│      Wrap Dynamic Injectors                 1    145μs    0.2%   42.9KiB    0.4%
+│      Calculate MM, DAE_vector, Tota...      1   8.42μs    0.0%   1.80KiB    0.0%
+│      Wrap Static Injectors                  1   22.0μs    0.0%   5.69KiB    0.1%
+│    Pre-initialization                       1   7.10ms   11.1%   7.05MiB   71.7%
+│      Power Flow solution                    1   6.91ms   10.8%   6.98MiB   71.0%
+│      Initialize Static Injectors            1    681ns    0.0%     0.00B    0.0%
+│      Initialize Dynamic Injectors           1    137μs    0.2%   59.3KiB    0.6%
+│    Calculate Jacobian                       1   88.1μs    0.1%   53.3KiB    0.5%
+│    Make Model Function                      1   4.56μs    0.0%      912B    0.0%
+│    Initial Condition NLsolve refine...      1    920μs    1.4%   20.3KiB    0.2%
 │  ───────────────────────────────────────────────────────────────────────────────
 │ 
 └ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:453
+┌ Error: 2023-09-28T20:49:01.761 [2584413:1]: Execution failed
+│   exception = (ErrorException("The Simulation status is BUILD_FAILED. Can not continue, correct your inputs and build the simulation again."), Union{Ptr{Nothing}, Base.InterpreterIP}[Ptr{Nothing} @0x00007ffbe9c2957b, Ptr{Nothing} @0x00007ff9a11fea8d, Ptr{Nothing} @0x00007ff9a1200171, Ptr{Nothing} @0x00007ff9a120172d, Ptr{Nothing} @0x00007ff9a12019b8, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbe95a30f8, Ptr{Nothing} @0x00007ff9a17f256c, Ptr{Nothing} @0x00007ff9a17f5d58, Ptr{Nothing} @0x00007ff9a16fe645, Ptr{Nothing} @0x00007ffbfe1495eb, Ptr{Nothing} @0x00007ffbfe149a89, Ptr{Nothing} @0x00007ffbfe14ae0a, Ptr{Nothing} @0x00007ff9a658cd8f, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe11ff58, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe121e60, Ptr{Nothing} @0x00007ffbe962697c, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe121e60, Ptr{Nothing} @0x00007ffbe9627892, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe121e60, Ptr{Nothing} @0x00007ffbe793656d, Ptr{Nothing} @0x00007ffbe79365e2, Ptr{Nothing} @0x00007ffbe7937bec, Ptr{Nothing} @0x00007ffbe7939d88, Ptr{Nothing} @0x00007ff9a656b66d, Ptr{Nothing} @0x00007ff9a656ba8e, Ptr{Nothing} @0x00007ff9a656d56b, Ptr{Nothing} @0x00007ff9a656d58f, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbe95a30f8, Ptr{Nothing} @0x00007ff9a656ce63, Ptr{Nothing} @0x00007ff9a656cf4f, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe11ff58, Ptr{Nothing} @0x00007ffbe7934b42, Ptr{Nothing} @0x00007ffbe7934b62, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe121e60, Ptr{Nothing} @0x00007ffbe791b218, Ptr{Nothing} @0x00007ffbe791b4ef, Ptr{Nothing} @0x00007ffbfe110f5d, Ptr{Nothing} @0x00007ffbfe1325cf])
+└ @ PowerSimulationsDynamics /home/gabrielecr/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:547

@@ -46,7 +46,7 @@ sim_p = SimParams(
     maxiters = Int(1e10),
     dtmax = 1e-4,
     solver = "Rodas4",
-    t_max = 2.0,
+    t_max = 0.275,
 )
 
 ### Extract line data from files
@@ -209,8 +209,8 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 # line_lengths = [100, 250, 500]
 # loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
-line_scales = collect(3.0)
-load_scales = collect(0.5:0.5:1.0)
+line_scales = collect(1.0:2.0:3.0)
+load_scales = collect(0.5:0.5:2.0)
 
 now_date = now()
 rn = string(now_date)
