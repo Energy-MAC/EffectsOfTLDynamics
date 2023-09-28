@@ -14,7 +14,7 @@ using Plots
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-rn = "2023-09-28T01:03:02.243" #string date
+rn = "2023-09-28T03:12:14.315" #string date
 model = "9bus_slackless"
 main_path = "../results/"*model*"/"*rn
 
@@ -29,7 +29,7 @@ sol_ms = nothing
 sol_msmb = nothing
 
 
-line_scales = collect(1.0:2.0:3.0)
+line_scales = collect(3.0)
 load_scales = collect(0.5:0.5:1.0)
 
 vars_to_measure = ["inverter_currents.csv"]
