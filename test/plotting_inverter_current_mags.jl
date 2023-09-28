@@ -37,6 +37,9 @@ vars_to_measure = ["inverter_currents.csv"]
 plots = []
 plt = []
 
+line_scales = 1.0
+load_scales = 0.5
+
 for var_to_measure in vars_to_measure
     for line_scale in line_scales
         for load_scale in load_scales
@@ -52,7 +55,7 @@ for var_to_measure in vars_to_measure
             sol_ms = (df_ms."Time", df_ms."generator-1-1_i_mag")
             sol_msmb = (df_msmb."Time", df_msmb."generator-1-1_i_mag")
         
-            plt = plot(sol_alg, label = L"\mathrm{statpi}")
+            plt = plot(sol_alg, label = L"\mathrm{statpi}", legend = :bottomright)
             plot!(plt, sol_dyn, label = L"\mathrm{dynpi}")
             plot!(plt, sol_ms, label = L"\mathrm{MSSB}")
             plot!(plt, sol_msmb, label = L"\mathrm{MSMB}")
@@ -62,7 +65,7 @@ for var_to_measure in vars_to_measure
             plot!(legend_title = L"$%$load_scale \ %$line_scale$")
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.svg")
-
+            plot!(ylims = (0.15,0.45))
             plot!(xlims=(0.249, 0.26))
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_100ms_zoom.svg")
             # push!(plots, plt)
