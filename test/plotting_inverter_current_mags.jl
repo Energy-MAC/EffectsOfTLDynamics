@@ -51,10 +51,16 @@ for var_to_measure in vars_to_measure
             df_dyn = CSV.read(partial_path*"/dynpi/"*var_to_measure, DataFrame); 
             df_ms = CSV.read(partial_path*"/MSSB/"*var_to_measure, DataFrame);
             df_msmb = CSV.read(partial_path*"/MSMB/"*var_to_measure, DataFrame);
-            sol_alg = (df_alg."Time"[1:2772], df_alg."generator-102-1_i_mag"[1:2772])
-            sol_dyn = (df_dyn."Time"[1:2779], df_dyn."generator-102-1_i_mag"[1:2779])
-            sol_ms = (df_ms."Time"[1:2826], df_ms."generator-102-1_i_mag"[1:2826])
-            sol_msmb = (df_msmb."Time"[1:2858], df_msmb."generator-102-1_i_mag"[1:2858])
+
+            alg_idx = findall(df_alg."Time" .< 0.275)[end]
+            dyn_idx = findall(df_dyn."Time" .< 0.275)[end]
+            ms_idx = findall(df_ms."Time" .< 0.275)[end]
+            msmb_idx = findall(df_msmb."Time" .< 0.275)[end]
+
+            sol_alg = (df_alg."Time"[1:alg_idx], df_alg."generator-102-1_i_mag"[1:alg_idx])
+            sol_dyn = (df_dyn."Time"[1:dyn_idx], df_dyn."generator-102-1_i_mag"[1:dyn_idx])
+            sol_ms = (df_ms."Time"[1:ms_idx], df_ms."generator-102-1_i_mag"[1:ms_idx])
+            sol_msmb = (df_msmb."Time"[1:msmb_idx], df_msmb."generator-102-1_i_mag"[1:msmb_idx])
         
             plt = plot(sol_alg, label = L"\mathrm{statpi}", legend = :bottomright)
             plot!(plt, sol_dyn, label = L"\mathrm{dynpi}")
@@ -69,7 +75,6 @@ for var_to_measure in vars_to_measure
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.svg")
             plot!(xlims=(0.249, 0.275))
-            plot!(ylims = ())
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_100ms_zoom.svg")
             # push!(plots, plt)
         end 
