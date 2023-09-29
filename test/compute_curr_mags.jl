@@ -14,7 +14,7 @@ using Plots
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-rn = "2023-09-28T21:02:48.970" #string date
+rn = "2023-09-29T18:40:00.713" #string date
 model = "9bus_slackless"
 main_path = "../results/"*model*"/"*rn
 

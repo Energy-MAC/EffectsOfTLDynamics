@@ -14,7 +14,8 @@ using Plots
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-rn = "2023-09-28T21:02:48.970" #string date
+
+rn = "2023-09-29T18:40:00.713" #string date
 model = "9bus_slackless"
 main_path = "../results/"*model*"/"*rn
 
@@ -65,7 +66,7 @@ for var_to_measure in vars_to_measure
             # plot!(legend_title = L"$%$load_scale \ %$line_scale$")
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.svg")
-            plot!(ylims = (0.15,0.375))
+            plot!(ylims = ())
             plot!(xlims=(0.249, 0.275))
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_100ms_zoom.svg")
             # push!(plots, plt)
