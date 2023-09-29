@@ -51,10 +51,10 @@ for var_to_measure in vars_to_measure
             df_dyn = CSV.read(partial_path*"/dynpi/"*var_to_measure, DataFrame); 
             df_ms = CSV.read(partial_path*"/MSSB/"*var_to_measure, DataFrame);
             df_msmb = CSV.read(partial_path*"/MSMB/"*var_to_measure, DataFrame);
-            sol_alg = (df_alg."Time", df_alg."generator-1-1_i_mag")
-            sol_dyn = (df_dyn."Time", df_dyn."generator-1-1_i_mag")
-            sol_ms = (df_ms."Time", df_ms."generator-1-1_i_mag")
-            sol_msmb = (df_msmb."Time", df_msmb."generator-1-1_i_mag")
+            sol_alg = (df_alg."Time", df_alg."generator-3-1_i_mag")
+            sol_dyn = (df_dyn."Time", df_dyn."generator-3-1_i_mag")
+            sol_ms = (df_ms."Time", df_ms."generator-3-1_i_mag")
+            sol_msmb = (df_msmb."Time", df_msmb."generator-3-1_i_mag")
         
             plt = plot(sol_alg, label = L"\mathrm{statpi}", legend = :bottomright)
             plot!(plt, sol_dyn, label = L"\mathrm{dynpi}")
@@ -65,10 +65,10 @@ for var_to_measure in vars_to_measure
             plot!(ylabel = L"$||I_f|| \quad \mathrm{[\ p.u.]}$")
             # plot!(legend_title = L"$%$load_scale \ %$line_scale$")
             
-            savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.svg")
+            savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags3.svg")
             plot!(ylims = ())
             plot!(xlims=(0.249, 0.275))
-            savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_100ms_zoom.svg")
+            savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_100ms_zoom3.svg")
             # push!(plots, plt)
         end 
     end
