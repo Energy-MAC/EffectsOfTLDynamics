@@ -64,7 +64,7 @@ for var_to_measure in vars_to_measure
             plot!(xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")  
             plot!(ylabel = L"$||I_f|| \quad \mathrm{[\ p.u.]}$")
             plot!(framestyle=:box)
-            # plot!(legend_title = L"$%$load_scale \ %$line_scale$")
+            plot!(xguidefontsize=25, yguidefontsize=25, tickfontsize=16,legendfontsize=16,legend=:left)
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags3.svg")
             plot!(ylims = ())
