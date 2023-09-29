@@ -38,8 +38,8 @@ vars_to_measure = ["inverter_currents.csv"]
 plots = []
 plt = []
 
-line_scales = [5.0]
-load_scales = [0.5 1.0 2.0]
+line_scales = [1.0]
+load_scales = [1.0 2.0]
 
 for var_to_measure in vars_to_measure
     for line_scale in line_scales
