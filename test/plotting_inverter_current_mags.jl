@@ -38,8 +38,8 @@ vars_to_measure = ["inverter_currents.csv"]
 plots = []
 plt = []
 
-line_scales = [1.0 5.0]
-load_scales = [0.5 1.0 2.0]
+line_scales = [1.0]
+load_scales = [1.0 2.0]
 
 for var_to_measure in vars_to_measure
     for line_scale in line_scales
@@ -60,7 +60,7 @@ for var_to_measure in vars_to_measure
             plot!(plt, sol_dyn, label = L"\mathrm{dynpi}")
             plot!(plt, sol_ms, label = L"\mathrm{MSSB}")
             plot!(plt, sol_msmb, label = L"\mathrm{MSMB}")
-            plot!(plt, legend = true)    
+            plot!(plt, legend = false)    
             plot!(xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")  
             plot!(ylabel = L"$||I_f|| \quad \mathrm{[\ p.u.]}$")
             plot!(framestyle=:box)
