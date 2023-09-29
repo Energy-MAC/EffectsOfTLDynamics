@@ -38,8 +38,8 @@ vars_to_measure = ["inverter_currents.csv"]
 plots = []
 plt = []
 
-line_scales = [1.0]
-load_scales = [1.0 2.0]
+line_scales = [5.0]
+load_scales = [0.5 1.0 2.0]
 
 for var_to_measure in vars_to_measure
     for line_scale in line_scales
@@ -68,8 +68,8 @@ for var_to_measure in vars_to_measure
             plot!(xguidefontsize=25, yguidefontsize=25, tickfontsize=16,legendfontsize=16)
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.svg")
-            plot!(ylims = ())
             plot!(xlims=(0.249, 0.275))
+            plot!(ylims = ())
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_100ms_zoom.svg")
             # push!(plots, plt)
         end 
