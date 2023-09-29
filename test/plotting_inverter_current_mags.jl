@@ -38,8 +38,8 @@ vars_to_measure = ["inverter_currents.csv"]
 plots = []
 plt = []
 
-line_scales = [1.0]
-load_scales = [0.5]
+line_scales = [5.0]
+load_scales = [0.5 1.0 2.0]
 
 for var_to_measure in vars_to_measure
     for line_scale in line_scales
@@ -52,15 +52,15 @@ for var_to_measure in vars_to_measure
             df_ms = CSV.read(partial_path*"/MSSB/"*var_to_measure, DataFrame);
             df_msmb = CSV.read(partial_path*"/MSMB/"*var_to_measure, DataFrame);
             sol_alg = (df_alg."Time"[1:2772], df_alg."generator-102-1_i_mag"[1:2772])
-            sol_dyn = (df_dyn."Time"[1:2772], df_dyn."generator-102-1_i_mag"[1:2772])
-            sol_ms = (df_ms."Time"[1:2772], df_ms."generator-102-1_i_mag"[1:2772])
-            sol_msmb = (df_msmb."Time"[1:2772], df_msmb."generator-102-1_i_mag"[1:2772])
+            sol_dyn = (df_dyn."Time"[1:2779], df_dyn."generator-102-1_i_mag"[1:2779])
+            sol_ms = (df_ms."Time"[1:2826], df_ms."generator-102-1_i_mag"[1:2826])
+            sol_msmb = (df_msmb."Time"[1:2858], df_msmb."generator-102-1_i_mag"[1:2858])
         
             plt = plot(sol_alg, label = L"\mathrm{statpi}", legend = :bottomright)
             plot!(plt, sol_dyn, label = L"\mathrm{dynpi}")
             plot!(plt, sol_ms, label = L"\mathrm{MSSB}")
             plot!(plt, sol_msmb, label = L"\mathrm{MSMB}")
-            plot!(plt, legend = true)    
+            plot!(plt, legend = false)    
             plot!(xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")  
             plot!(ylabel = L"$||I_f|| \quad \mathrm{[\ p.u.]}$")
             plot!(framestyle=:box)
