@@ -6,6 +6,7 @@ using SparseArrays
 using OrdinaryDiffEq
 using CSV
 using JLD2
+using LaTeXStrings
 
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
@@ -71,6 +72,7 @@ function generate_2bus_loading_v_boundary_data(file_name::String, p1, p3, load_s
     dyn_lims = [];
     mssb_lims = [];
     msmb_lims = [];
+
     p1.l_seg = l_seg;
     p3.l_seg = l_seg;
 
@@ -84,7 +86,7 @@ function generate_2bus_loading_v_boundary_data(file_name::String, p1, p3, load_s
         p1.load_scale = load_scale
         p3.load_scale = load_scale
 
-        current_line_scales = line_scales[idx];
+        current_line_scales = collect(line_scales[idx]);
         for line_scale = current_line_scales;
             p1.line_scale = line_scale
             p3.line_scale = line_scale
@@ -129,12 +131,6 @@ function generate_2bus_loading_v_boundary_data(file_name::String, p1, p3, load_s
         end
         idx += 1
     end
-
-    # plot1 = plot(load_scales, alg_lims,xlabel="Load scale", ylabel="Line length @ stability boundary", label="Algebraic", seriestype=:line, size=(800,600))
-    # plot!(load_scales, dyn_lims, seriestype=:line, label="Dynpi")
-    # plot!(load_scales, mssb_lims, seriestype=:line, linestyle=:dashdot, label="MSSB lseg max="*string(l_seg))
-    # plot!(load_scales, msmb_lims, seriestype=:line, linestyle=:dash, label="MSMB lseg max="*string(l_seg))
-    # title!("Base p="*string(round(p1.p_load, digits=2))*", q="*string(round(p1.q_load, digits=2)))
 
     return alg_lims, dyn_lims, mssb_lims, msmb_lims
 
@@ -302,37 +298,39 @@ function generate_9bus_load_scale_v_boundary_data(file_name::String, p1, p3, loa
 end
 
 
-function plot_loading_v_boundary(alg, dyn, mssb, msmb, load_scales, l_seg, p1, size::Tuple, linewidth::Int, ylims::Tuple, ylabel::String, xlabel::String, title::String, legend_on::Bool)
+function plot_loading_v_boundary(alg, dyn, mssb, msmb, load_scales, size::Tuple, linewidth::Int, ylims::Tuple, xlims::Tuple, ylabel, xlabel, title, legend_on::Bool)
 
-    plot1 = plot(load_scales, alg,xlabel=xlabel, ylabel=ylabel, label="Algebraic", seriestype=:line, linewidth=linewidth, size=size,legend=:outertopright)
-    plot!(load_scales, dyn, seriestype=:line, linewidth=linewidth, label="Dynpi", legend=legend_on)
-    plot!(load_scales, mssb, seriestype=:line, linewidth=linewidth, linestyle=:dashdot, label="MSSB lseg max="*string(l_seg))
-    plot!(load_scales, msmb, seriestype=:line, linewidth=linewidth, linestyle=:dash, label="MSMB lseg max="*string(l_seg))
+    plot1 = plot(load_scales, alg,xlabel=xlabel, ylabel=ylabel, label=L"\mathrm{statpi}", seriestype=:line, linewidth=linewidth, size=size,legend=:outertopright)
+    plot!(load_scales, dyn, seriestype=:line, linewidth=linewidth, label=L"\mathrm{dynpi}", legend=legend_on)
+    plot!(load_scales, mssb, seriestype=:line, linewidth=linewidth, linestyle=:dashdot, label=L"\mathrm{MSSB}")
+    plot!(load_scales, msmb, seriestype=:line, linewidth=linewidth, linestyle=:dash, label=L"\mathrm{MSMB}")
     title!(title)
     #title!("Base p="*string(round(p1.p_load, digits=2))*", q="*string(round(p1.q_load, digits=2)))
     ylims!(ylims)
+    xlims!(xlims)
+    plot!(framestyle=:box)
     return plot1
 
 end
 
-function plot_2bus_line_sweep(alg, dyn, mssb, msmb, line_scales, l_seg, size, linewidth, title, legendloc)
+function plot_2bus_line_sweep(alg, dyn, mssb, msmb, line_scales, size, linewidth, title, legendloc)
 
-    plot1 = plot(line_scales, alg,xlabel="Line scale (base=100km)", ylabel="Max real λ != 0", label="Algebraic", legend=legendloc, seriestype=:line, linewidth=linewidth, size=size)
-    plot!(line_scales, dyn, seriestype=:line, linewidth=linewidth, label="Dynpi")
-    plot!(line_scales, mssb, seriestype=:line, linewidth=linewidth, label="MSSB max lseg="*string(l_seg))
-    plot!(line_scales, msmb, seriestype=:line, linestyle=:dashdot, linewidth=linewidth, label="MSMB max lseg="*string(l_seg))
+    plot1 = plot(line_scales, alg,xlabel="Line scale (base=100km)", ylabel="Max real λ != 0", label=L"\mathrm{statpi}", legend=legendloc, seriestype=:line, linewidth=linewidth, size=size)
+    plot!(line_scales, dyn, seriestype=:line, linewidth=linewidth, label=L"\mathrm{dynpi}")
+    plot!(line_scales, mssb, seriestype=:line, linewidth=linewidth, label=L"\mathrm{MSSB}")
+    plot!(line_scales, msmb, seriestype=:line, linestyle=:dashdot, linewidth=linewidth, label=L"\mathrm{MSMB}")
     title!(title)
 
     return plot1
 end
 
 
-function plot_9bus_line_sweep(alg, dyn, mssb, msmb, line_scales, l_seg, size, linewidth, title, legendloc)
+function plot_9bus_line_sweep(alg, dyn, mssb, msmb, line_scales, size, linewidth, title, legendloc)
 
-    plot1 = plot(line_scales, alg,xlabel="Line scale", ylabel="Max real λ != 0", label="Algebraic", legend=legendloc, seriestype=:line, linewidth=linewidth, size=size)
-    plot!(line_scales, dyn, seriestype=:line, linewidth=linewidth, label="Dynpi")
-    plot!(line_scales, mssb, seriestype=:line, linewidth=linewidth, label="MSSB max lseg="*string(l_seg))
-    plot!(line_scales, msmb, seriestype=:line, linestyle=:dashdot, linewidth=linewidth, label="MSMB max lseg="*string(l_seg))
+    plot1 = plot(line_scales, alg,xlabel=L"\mathrm{Line\ scale}", ylabel=L"\mathrm{Max\ real\ λ}", label=L"\mathrm{statpi}", legend=legendloc, seriestype=:line, linewidth=linewidth, size=size)
+    plot!(line_scales, dyn, seriestype=:line, linewidth=linewidth, label=L"\mathrm{dynpi}")
+    plot!(line_scales, mssb, seriestype=:line, linewidth=linewidth, label=L"\mathrm{MSSB}")
+    plot!(line_scales, msmb, seriestype=:line, linestyle=:dashdot, linewidth=linewidth, label=L"\mathrm{MSMB}")
     title!(title)
 
     return plot1
