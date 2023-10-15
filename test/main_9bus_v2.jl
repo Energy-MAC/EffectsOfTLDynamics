@@ -46,7 +46,7 @@ sim_p = SimParams(
     maxiters = Int(1e10),
     dtmax = 1e-4,
     solver = "Rodas4",
-    t_max = 2.0,
+    t_max = 0.275,
 )
 
 ### Extract line data from files
@@ -75,7 +75,7 @@ t_fault = 0.25
 ### Get perturbation struct
 perturbation_params = get_default_perturbation(t_fault, perturbation)
 # perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
-perturbation_params.branch_trip_params = BTParam("Bus 7-Bus 5-i_1")
+perturbation_params.branch_trip_params = BTParam("Bus 5-Bus 4-i_1")
 
 
 
@@ -141,7 +141,7 @@ store_branch_currents(results_alg, sys, folder_path*"/branch_currents.csv")
 
 using PowerFlows
 sol = solve_powerflow(ACPowerFlow(), sys)
-sol["bus_results"]
+sol["flow_results"]
 s = small_signal_analysis(sim)
 
 p.load_scale = 10.0
@@ -209,8 +209,8 @@ results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing
 # line_lengths = [100, 250, 500]
 # loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
 
-line_scales = collect(1.0)
-load_scales = collect(1.0)
+line_scales = collect(1.0:2.0:3.0)
+load_scales = collect(0.5:0.5:1.0)
 
 now_date = now()
 rn = string(now_date)

@@ -73,8 +73,8 @@ outer_control() = OuterControl(
 )
 
 GFL_outer_control() = OuterControl(
-    ActivePowerPI(Kp_p = 0.0059 , Ki_p = 7.360, ωz = 1000.0, P_ref = 1.0),
-    ReactivePowerPI(Kp_q = 0.0059, Ki_q = 7.360, ωf = 1000.0, V_ref = 1.0, Q_ref = 0.1)
+    ActivePowerPI(Kp_p = 0.0059 , Ki_p = 7.36, ωz = 1000.0, P_ref = 0.5),
+    ReactivePowerPI(Kp_q = 0.0059, Ki_q = 7.36, ωf = 1000.0, V_ref = 1.0, Q_ref = 0.1)
 )
 
 #Define an Inner Control as a Voltage+Current Controler with Virtual Impedance:
