@@ -456,12 +456,24 @@ function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
     tspan = (0.0, p.sim_params.t_max);
     perturbation = choose_disturbance(sys, p.perturbation, p);
     
-    # build segments model
-    if (multi_segment == true)
-        sys = build_seg_model!(sys, p, dyn_lines, "");
-    else
-        sys = build_new_impedance_model!(sys, p, dyn_lines, "");
-    end
+    # add extra algebraic line 
+    
+    ll = first(get_components(Line, sys))
+    
+    ll_alg = Line(
+                name = ll.name * "_static",
+                available = true,
+                active_power_flow = ll.active_power_flow,
+                reactive_power_flow = ll.reactive_power_flow,
+                arc = ll.arc,
+                r = ll.r,
+                x = ll.x,
+                b = (from = ll.b.from, to = ll.b.to),
+                rate = ll.rate,
+                angle_limits = ll.angle_limits,
+        )
+    alg_line_name = ll_alg.name
+    add_component!(sys, ll_alg)
 
     # Add load
     load = StandardLoad(
@@ -493,6 +505,14 @@ function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
         end
     end
     
+
+    # build segments model
+    if (multi_segment == true)
+        sys = build_seg_model!(sys, p, dyn_lines, alg_line_name);
+    else
+        sys = build_new_impedance_model!(sys, p, dyn_lines, alg_line_name);
+    end
+
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p);
     return sim 
 end
@@ -511,30 +531,23 @@ function build_9bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
 
     alg_line_name = p.perturbation_params.branch_trip_params.line_to_trip
     
-    # load_scale = p.load_scale
-    for l in get_components(PSY.StandardLoad, sys)
-        transform_load_to_constant_impedance(l)
-        l.impedance_active_power = l.impedance_active_power * p.load_scale 
-        l.impedance_reactive_power = l.impedance_reactive_power * p.load_scale 
-    end
-    # for g in get_components(PSY.Generator, sys)
-    #     set_active_power!(g, g.active_power * p.load_scale)
-    #     set_reactive_power!(g, g.reactive_power * p.load_scale)
-    # end
-    
-    # build segments model
     if (multi_segment == true)
         sys = build_seg_model!(sys, p, dyn_lines, alg_line_name)
     else
         sys = build_new_impedance_model!(sys, p, dyn_lines, alg_line_name)
     end
 
-    # scale generation 
+    # Scale loads according to load scale 
+    for l in get_components(PSY.StandardLoad, sys)
+        transform_load_to_constant_impedance(l)
+        l.impedance_active_power = l.impedance_active_power * p.load_scale 
+        l.impedance_reactive_power = l.impedance_reactive_power * p.load_scale 
+    end
+
+    # Scale generation by the load scale 
     for g in get_components(PSY.Generator, sys)
-        if g.bus.bustype == BusTypes.PV
-            set_active_power!(g, g.active_power * p.load_scale)
-            set_reactive_power!(g, g.reactive_power * p.load_scale)
-        end
+        set_active_power!(g, g.active_power * p.load_scale)
+        set_reactive_power!(g, g.reactive_power * p.load_scale)
     end
 
     sim = build_sim(sys, tspan, perturbation, dyn_lines, p);

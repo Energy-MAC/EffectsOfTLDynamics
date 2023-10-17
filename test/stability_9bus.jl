@@ -25,7 +25,6 @@ perturbation_type = "BranchTrip"
 perturbation_params = get_default_perturbation(t_fault, perturbation_type)
 perturbation_params.branch_trip_params = BTParam("Bus 7-Bus 5-i_1")
 
-
 ### Define simulation parameters
 sim_p = SimParams(
     abstol = 1e-13,
@@ -38,17 +37,16 @@ sim_p = SimParams(
 
 ### Extract line data from files for M=1 and M=3
 M = 1
-factor_z = 1.0 # to get it closer to kundur 
-factor_y = 1.0
+factor_z = 1.0; 
+factor_y = 1.0;
 z_km_1, y_km_1, Z_c_abs_1, z_km_ω_1, z_km_ω_5_to_1_1, Z_c_5_to_1_abs_1 = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
 
 M = 3
-factor_z = 1.0 # to get it closer to kundur 
-factor_y = 1.0
 z_km_3, y_km_3, Z_c_abs_3, z_km_ω_3, z_km_ω_5_to_1_3, Z_c_5_to_1_abs_3 = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
 
 
 l_seg = 10.0; # km 
+
 p1 = ETL.ExpParams(
     nothing, 
     1, 
@@ -93,19 +91,31 @@ p3 = ETL.ExpParams(
 
 
 file_name = "../data/json_data/9bus_slackless.json"; # choose system  
-l_seg = 10.0;
+
 load_scale = 1.0;
-line_scales = collect(1.0:1.0:10.0)
+line_scales = collect(1.0:7.0)
 
 #line_scales = [0.2,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,5.0,6.0, 7.0] 
-#alg, dyn, mssb, msmb = generate_9bus_line_sweep_data(file_name, p1, p3, load_scale, line_scales, l_seg)
-line_to_scale = "Bus 7-Bus 8-i_1";
-#line_to_scale = "Bus 9-Bus 6-i_1";
+alg, dyn, mssb, msmb = generate_9bus_line_sweep_data(file_name, p1, p3, load_scale, line_scales, l_seg)
+plot_9bus_line_sweep(alg, dyn, mssb, msmb, line_scales, (800,600), 2, L"Load\ scale "*string(load_scale), :top)
+
+#line_to_scale = "Bus 7-Bus 8-i_1";
+line_to_scale = "Bus 5-Bus 4-i_1"; # line from inverter ?
 alg, dyn, mssb, msmb = generate_9bus_individual_line_sweep_data(file_name, p1, p3, load_scale, line_scales, l_seg, line_to_scale)
 
-plot_9bus_line_sweep(alg, dyn, mssb, msmb, line_scales, l_seg, (800,600), 2, "Load scale "*string(load_scale), :top)
+plot_9bus_line_sweep(alg, dyn, mssb, msmb, line_scales, (800,600), 2, "Load scale "*string(load_scale), :top)
 
-savefig(foldername*"/load_20_shortest_line_scaled.png")
+
+
+# Scaling all lines 
+load_scale = 1.2;
+line_scales = collect(1.0:5.0)
+alg, dyn, mssb, msmb = generate_9bus_line_sweep_data(file_name, p1, p3, load_scale, line_scales, l_seg)
+
+plot_9bus_line_sweep(alg, dyn, mssb, msmb, line_scales, (800,600), 2, "Load scale "*string(load_scale), :top)
+
+
+#savefig(foldername*"/load_20_shortest_line_scaled.png")
 
 
 # # Save all these results in a jld2 file in a new folder 
