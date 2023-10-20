@@ -1,0 +1,20 @@
+┌ Error: 2023-10-20T16:22:36.512 [90846:1]: MassMatrixModel failed to build
+│   exception = (KeyError(:ω_oc), Union{Ptr{Nothing}, Base.InterpreterIP}[Ptr{Nothing} @0x00000001d6778acf, Ptr{Nothing} @0x00000001d6778b47, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x00000001799fe125, Ptr{Nothing} @0x0000000179a028e4, Ptr{Nothing} @0x0000000179a03df5, Ptr{Nothing} @0x0000000179a0593a, Ptr{Nothing} @0x0000000179a11437, Ptr{Nothing} @0x0000000179a11a3f, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000012790ddcc, Ptr{Nothing} @0x00000001799422ff, Ptr{Nothing} @0x0000000179942c8a, Ptr{Nothing} @0x0000000179942d3b, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000010ad2d45d, Ptr{Nothing} @0x000000010ad2b921, Ptr{Nothing} @0x000000010ad2bf8a, Base.InterpreterIP in top-level CodeInfo for Main at statement 0, Ptr{Nothing} @0x000000010ad4a21d, Ptr{Nothing} @0x000000010ad4a00d, Ptr{Nothing} @0x000000010ad4a00d, Ptr{Nothing} @0x000000010ad4b255, Ptr{Nothing} @0x000000010df7b8ab, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000010ad206f9, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000010ad204d8, Ptr{Nothing} @0x0000000127f6e553, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000010ad204d8, Ptr{Nothing} @0x0000000127f0c06a, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000010ad204d8, Ptr{Nothing} @0x000000010df4c370, Ptr{Nothing} @0x000000011f61fcad, Ptr{Nothing} @0x000000011f6223c0, Ptr{Nothing} @0x000000011f623e6f, Ptr{Nothing} @0x000000011f6244a1, Ptr{Nothing} @0x000000011f625ba1, Ptr{Nothing} @0x000000011f625bcf, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000012790ddcc, Ptr{Nothing} @0x000000011f6258a6, Ptr{Nothing} @0x000000011f62598f, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000010ad206f9, Ptr{Nothing} @0x000000010df487bd, Ptr{Nothing} @0x000000010df487d2, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000010ad204d8, Ptr{Nothing} @0x000000010df2b28d, Ptr{Nothing} @0x000000010df2b4df, Ptr{Nothing} @0x000000010ad13f4d, Ptr{Nothing} @0x000000010ad31d71])
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:434
+┌ Info: 2023-10-20T16:22:36.542 [90846:1]: 
+│  ───────────────────────────────────────────────────────────────────────────────
+│                                                      Time          Allocations  
+│                                                ───────────────   ───────────────
+│                 Total measured:                    46.1ms            3.19MiB    
+│ 
+│  Section                               ncalls     time    %tot     alloc    %tot
+│  ───────────────────────────────────────────────────────────────────────────────
+│  Build Simulation                           1   46.1ms  100.0%   3.19MiB  100.0%
+│    Build Simulation Inputs                  1   1.18ms    2.6%   81.5KiB    2.5%
+│      Wrap Branches                          1   4.21μs    0.0%      240B    0.0%
+│      Wrap Dynamic Injectors                 1    303μs    0.7%   58.3KiB    1.8%
+│      Calculate MM, DAE_vector, Tota...      1   28.2μs    0.1%   2.30KiB    0.1%
+│      Wrap Static Injectors                  1   54.0μs    0.1%   5.66KiB    0.2%
+│  ───────────────────────────────────────────────────────────────────────────────
+│ 
+└ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/knFrY/src/base/simulation.jl:453
