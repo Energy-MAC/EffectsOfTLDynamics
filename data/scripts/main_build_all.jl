@@ -135,8 +135,8 @@ add_component!(sys, gen1)
 sys_droop_mach = deepcopy(sys)
 sys_dvoc_mach = deepcopy(sys)
 sys_vsm_gfl = deepcopy(sys)
-sys_droop_gfl = deepcopy(sys)
-sys_dvoc_gfl = deepcopy(sys)
+sys_vsm_droop = deepcopy(sys)
+sys_vsm_dvoc = deepcopy(sys)
 
 # Droop GFM v Machine
 for g in get_components(Generator, sys_droop_mach)
@@ -206,15 +206,15 @@ end
 # Save as json 
 to_json(sys_dvoc_mach, joinpath(pwd(), "../json_data/dvoc_v_machine.json"), force = true)
 
-# Droop GFM v GFL
-for g in get_components(Generator, sys_droop_gfl)
+# Droop VSM v droop
+for g in get_components(Generator, sys_vsm_droop)
     if get_number(get_bus(g)) == 101;
         case_inv = DynamicInverter(
                     get_name(g),
                     1.0, # ω_ref,
                     converter_high_power(), #converter
-                    GFL_outer_control(), #outer control
-                    GFL_inner_control(), #inner control voltage source
+                    VSM_outer_control(), #outer control
+                    GFM_inner_control(), #inner control voltage source
                     dc_source_lv(), #dc source
                     pll(), #pll
                     filt(), #filter
@@ -222,7 +222,7 @@ for g in get_components(Generator, sys_droop_gfl)
         #case_gen.bus.BusTypes = BusTypes.REF
         #Attach the dynamic generator to the system by
         # specifying the dynamic and static components
-        add_component!(sys_droop_gfl, case_inv, g)
+        add_component!(sys_vsm_droop, case_inv, g)
     elseif get_number(get_bus(g)) == 102;
         case_inv = DynamicInverter(
                     get_name(g),
@@ -234,22 +234,22 @@ for g in get_components(Generator, sys_droop_gfl)
                     pll(), #pll
                     filt(), #filter
                 )
-        add_component!(sys_droop_gfl, case_inv, g)
+        add_component!(sys_vsm_droop, case_inv, g)
     end
 end
 
 # Save as json 
-to_json(sys_droop_gfl, joinpath(pwd(), "../json_data/droop_v_GFL.json"), force = true)
+to_json(sys_vsm_droop, joinpath(pwd(), "../json_data/VSM_v_droop.json"), force = true)
 
-# VSM GFM v GFL
-for g in get_components(Generator, sys_vsm_gfl)
+# VSM v dVOC
+for g in get_components(Generator, sys_vsm_dvoc)
     if get_number(get_bus(g)) == 101;
         case_inv = DynamicInverter(
                     get_name(g),
                     1.0, # ω_ref,
                     converter_high_power(), #converter
-                    GFL_outer_control(), #outer control
-                    GFL_inner_control(), #inner control voltage source
+                    dVOC_outer_control(), #outer control
+                    GFM_inner_control(), #inner control voltage source
                     dc_source_lv(), #dc source
                     pll(), #pll
                     filt(), #filter
@@ -257,7 +257,7 @@ for g in get_components(Generator, sys_vsm_gfl)
         #case_gen.bus.BusTypes = BusTypes.REF
         #Attach the dynamic generator to the system by
         # specifying the dynamic and static components
-        add_component!(sys_vsm_gfl, case_inv, g)
+        add_component!(sys_vsm_dvoc, case_inv, g)
     elseif get_number(get_bus(g)) == 102;
         case_inv = DynamicInverter(
                     get_name(g),
@@ -269,12 +269,12 @@ for g in get_components(Generator, sys_vsm_gfl)
                     pll(), #pll
                     filt(), #filter
                 )
-        add_component!(sys_vsm_gfl, case_inv, g)
+        add_component!(sys_vsm_dvoc, case_inv, g)
     end
 end
 
 # Save as json 
-to_json(sys_vsm_gfl, joinpath(pwd(), "../json_data/VSM_v_GFL.json"), force = true)
+to_json(sys_vsm_gfl, joinpath(pwd(), "../json_data/VSM_v_dVOC.json"), force = true)
 
 # dVOC GFM v GFL
 for g in get_components(Generator, sys_dvoc_gfl)
