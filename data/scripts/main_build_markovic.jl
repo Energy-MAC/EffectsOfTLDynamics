@@ -52,7 +52,7 @@ tg_none() = TGTypeI(
     0.0,
     0.1,
     10,
-    (min = 0.3, max = 1.2)
+    (min = 0.0, max = 1000.0)
 ) #efficiency
 
 #No PSS
