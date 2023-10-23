@@ -36,7 +36,7 @@ p1 = dommel_M1
 
 inv_share = 0.5;
 rating_scale = 1.0;
-sim = build_sim_from_file(file_name, false, false, p1, load_bus, inv_share, rating_scale);
+sim = build_sim_from_file(file_name, false, false, p1, load_bus, inv_share, rating_scale, false);
 inv = get_component(Generator, sim.sys,"generator-102-1");
 sm = get_component(Generator, sim.sys, "generator-101-1");
 eta = inv.active_power/(inv.active_power + sm.active_power)
@@ -47,7 +47,7 @@ plot(real(alg_eigs), imag(alg_eigs), label="Algebraic", seriestype=:scatter, ms=
 xlabel!(L"\mathrm{Re}\ [\lambda]")
 ylabel!(L"\mathrm{Im}\ [\lambda]")
 
-sim_d = build_sim_from_file(file_name, true, false, p1, load_bus, frac, rating_scale);
+sim_d = build_sim_from_file(file_name, true, false, p1, load_bus, frac, rating_scale, false);
 inv_d = get_component(Generator, sim_d.sys,"generator-102-1");
 sm_d = get_component(Generator, sim_d.sys, "generator-101-1");
 eta_d = inv_d.active_power/(inv_d.active_power + sm_d.active_power);
@@ -55,7 +55,7 @@ ss_dyn = small_signal_analysis(sim_d)
 dyn_eigs = ss_dyn.eigenvalues
 plot!(real(dyn_eigs), imag(dyn_eigs), label="Dynamic", seriestype=:scatter, ms=4)
 
-sim_ms = build_sim_from_file(file_name, true, true, p1, load_bus, frac, rating_scale);
+sim_ms = build_sim_from_file(file_name, true, true, p1, load_bus, frac, rating_scale, false);
 inv_ms = get_component(Generator, sim_ms.sys,"generator-102-1");
 sm_ms = get_component(Generator, sim_ms.sys, "generator-101-1");
 eta_ms = inv_ms.active_power/(inv_ms.active_power + sm_ms.active_power);

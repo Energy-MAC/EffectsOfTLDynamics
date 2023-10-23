@@ -129,10 +129,18 @@ ognjen_M1.p_load = 1.0;
 ognjen_M1.q_load = 0.05;
 
 
-function build_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams, load_bus::String, inv_share, rating_scale)
+function build_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams, load_bus::String, inv_share, rating_scale, update_reference_bus::Bool)
 
     # build system
     sys = System(joinpath(pwd(), file_name));
+
+    if update_reference_bus
+        b1 = get_component(Bus, sys, "BUS 1")
+        b1.bustype = BusTypes.PV
+
+        b2 = get_component(Bus, sys, "BUS 2")
+        b2.bustype = BusTypes.REF
+    end
 
     # Simulation time span
     tspan = (0.0, p.sim_params.t_max);
@@ -165,7 +173,6 @@ function build_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::
         # if g.bus.name == inv_bus # at the inverter bus 
         #     set_active_power!(g, g.rating * inv_share); # adjust P setpoint to be correct fraction of rating 
         # end
-        
     end
     
     # build segments model
@@ -179,4 +186,10 @@ function build_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::
     return sim 
 
 end
+
+
+function get_system(file_name)
+    sys = System(joinpath(pwd(), file_name));
+    return sys 
+end 
 
