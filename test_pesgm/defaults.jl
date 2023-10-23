@@ -179,3 +179,4 @@ function build_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::
     return sim 
 
 end
+
