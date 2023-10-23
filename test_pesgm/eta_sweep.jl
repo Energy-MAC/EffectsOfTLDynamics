@@ -22,12 +22,13 @@ include("../test/eig_analysis_funcs.jl")
 # inv_v_machine
 # twobus_2inv
 # mach_v_mach
-# droop_v_GFL
 # droop_v_machine
-# dVOC_v_GFL
 # dvoc_v_machine
 # GFL_v_machine
 # VSM_v_GFL
+# VSM_v_dVOC
+# VSM_V_droop
+
 
 p1 = dommel_M1
 
