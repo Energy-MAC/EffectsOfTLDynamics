@@ -47,12 +47,12 @@ avr_type1() = AVRTypeI(
 #No TG
 tg_none() = TGTypeI(
     0.02,
-    0.5,
+    0.1,
     0.45,
     0.0,
-    0.1,
-    10,
-    (min = 0.0, max = 1000.0)
+    12.0,
+    50.0,
+    (min = 0.3, max = 1.2)
 ) #efficiency
 
 #No PSS
