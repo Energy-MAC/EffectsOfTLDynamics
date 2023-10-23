@@ -45,15 +45,17 @@ avr_type1() = AVRTypeI(
 )
 
 #No TG
-tg_none() = TGTypeI(
-    0.02,
-    0.1,
-    0.45,
-    0.0,
-    12.0,
-    50.0,
-    (min = 0.3, max = 1.2)
-) #efficiency
+tg_none() = TGFixed(1.0)
+
+# TGTypeI(
+#     0.02,
+#     0.1,
+#     0.45,
+#     0.0,
+#     12.0,
+#     50.0,
+#     (min = 0.3, max = 1.2)
+# ) #efficiency
 
 #No PSS
 pss_none() = STAB1(
