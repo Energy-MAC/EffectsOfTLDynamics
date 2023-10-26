@@ -29,7 +29,7 @@ include("../test/eig_analysis_funcs.jl")
 
 p1 = dommel_M1 # default dommel parameters, with no line or load scaling, SIL load. 
 
-file_name = "../data/json_data/inv_v_machine.json"; 
+file_name = "../data/json_data/gorno.json"; 
 update_ref_bus = false;
 
 inv_bus = "generator-102-1"; # bus with generator we want to adjust share of 
