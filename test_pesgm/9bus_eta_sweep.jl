@@ -28,11 +28,17 @@ samples = DataFrame(CSV.File("nrel_parameters.csv"))
 samples_shuffled = shuffle(MersenneTwister(123), samples)
 samples_cut = samples_shuffled[1:N,:]
 
+@time begin
 alg, stab_alg, unst_alg = get_small_signal_results_from_samples(file_name, samples_cut, gfm_bus, gfl_bus, sm_bus, false, false, false)
+end
 
+@time begin
 dyn, stab_dyn, unst_dyn = get_small_signal_results_from_samples(file_name, samples_cut, gfm_bus, gfl_bus, sm_bus, true, false, false)
+end
 
+@time begin
 mssb, stab_mssb, unst_mssb = get_small_signal_results_from_samples(file_name, samples_cut, gfm_bus, gfl_bus, sm_bus, true, true, false)
+end 
 
 msmb, stab_msmb, unst_msmb = get_small_signal_results_from_samples(file_name, samples_cut, gfm_bus, gfl_bus, sm_bus, true, true, true)
 
