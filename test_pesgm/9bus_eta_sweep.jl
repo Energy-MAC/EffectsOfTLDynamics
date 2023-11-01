@@ -40,7 +40,7 @@ end
 mssb, stab_mssb, unst_mssb = get_small_signal_results_from_samples(file_name, samples_cut, gfm_bus, gfl_bus, sm_bus, true, true, false)
 end 
 
-msmb, stab_msmb, unst_msmb = get_small_signal_results_from_samples(file_name, samples_cut, gfm_bus, gfl_bus, sm_bus, true, true, true)
+@time msmb, stab_msmb, unst_msmb = get_small_signal_results_from_samples(file_name, samples_cut, gfm_bus, gfl_bus, sm_bus, true, true, true);
 
 #mssb_df = filter(:stable => x -> !any(f -> f(x), (ismissing, isnan)), mssb_df)
 
