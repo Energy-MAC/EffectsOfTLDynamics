@@ -6,6 +6,7 @@ using EffectsOfTLDynamics
 const ETL = EffectsOfTLDynamics;
 
 ### Define simulation parameters
+# Default simulation parameters 
 sim_p = SimParams(
     abstol = 1e-13,
     reltol = 1e-10,
@@ -15,8 +16,8 @@ sim_p = SimParams(
     t_max = 0.1,
 )
 
+# TWO BUS PARAMETERS
 line_dict = default_2_bus_line_dict
-
 impedance_csv = "../data/cable_data/dommel_data.csv"
 capacitance_csv = "../data/cable_data/dommel_data_C.csv"
 
@@ -41,23 +42,12 @@ SIL = V_nom ^2/Z_o;
 p_load = real(SIL)/100;
 q_load = imag(SIL)/100;
 
-l_seg = 10.0; # km 
-
 ### Define simulation parameters
-sim_p = SimParams(
-    abstol = 1e-13,
-    reltol = 1e-10,
-    maxiters = Int(1e10),
-    dtmax = 1e-4,
-    solver = "Rodas4",
-    t_max = 0.1,
-)
-
 dommel_M1 = ETL.ExpParams(
     nothing, # N 
     1, # M
     100, # base line length 
-    l_seg, 
+    10.0, # lseg 
     Z_c_abs_1, 
     z_km_1,
     y_km_1,
@@ -78,7 +68,7 @@ dommel_M3 = ETL.ExpParams(
     nothing, # N
     3, # M
     100, # base line length 
-    l_seg, 
+    10.0, # lseg  
     Z_c_abs_3, 
     z_km_3,
     y_km_3,
@@ -95,13 +85,11 @@ dommel_M3 = ETL.ExpParams(
     1.0 # load_scale
 );
 
-
-
 ognjen_M1 = ETL.ExpParams(
     nothing, # N 
     1, # M
     100, # base line length 
-    l_seg, 
+    10.0, # lseg  
     Z_c_abs_1, 
     z_km_1,
     y_km_1,
@@ -127,7 +115,6 @@ ognjen_M1.line_scale = 0.5; # 50 km
 ognjen_M1.l_seg = 5; 
 ognjen_M1.p_load = 1.0;
 ognjen_M1.q_load = 0.05;
-
 
 function build_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams, load_bus::String, inv_share, rating_scale, update_reference_bus::Bool)
 

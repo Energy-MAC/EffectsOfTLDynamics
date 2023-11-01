@@ -518,8 +518,6 @@ function build_2bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segm
 end
 
 
-
-
 function build_9bus_sim_from_file(file_name::String, dyn_lines::Bool, multi_segment::Bool, p::ExpParams)
 
     # build system
