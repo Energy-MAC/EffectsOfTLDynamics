@@ -25,6 +25,7 @@ function get_small_signal_results_from_samples(file_name, df, gfm_bus, gfl_bus, 
         kic = df[n,:kic]
         inv_share = df[n,:inv_share]
         gfm_share = df[n, :gfm_share]
+        load_scale = df[n,:load_scale]
 
         # Create system  
         sys, p1, p3, perturbation1, perturbation3 = create_sys_with_params(file_name, kpv, kiv, kq, kpc, kic, load_scale, inv_share, gfm_share, gfm_bus, gfl_bus);

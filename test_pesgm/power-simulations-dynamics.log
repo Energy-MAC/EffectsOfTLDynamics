@@ -1,43 +1,42 @@
-┌ Info: 2023-11-01T11:53:45.540 [11076:1]: Pre-Initializing Simulation States
+┌ Info: 2023-11-01T13:01:14.764 [11076:1]: Pre-Initializing Simulation States
 └ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/Pcklx/src/base/simulation.jl:265
-┌ Info: 2023-11-01T11:53:45.541 [11076:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
+┌ Info: 2023-11-01T13:01:14.764 [11076:1]: Unit System changed to UnitSystem.SYSTEM_BASE = 0
 └ @ PowerSystems /Users/ruthkravis/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
-┌ Info: 2023-11-01T11:53:45.541 [11076:1]: PowerFlow solve converged, the results have been stored in the system
+┌ Info: 2023-11-01T13:01:14.765 [11076:1]: PowerFlow solve converged, the results have been stored in the system
 └ @ PowerFlows /Users/ruthkravis/.julia/packages/PowerFlows/TDLGc/src/nlsolve_ac_powerflow.jl:45
-┌ Info: 2023-11-01T11:53:45.541 [11076:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
+┌ Info: 2023-11-01T13:01:14.765 [11076:1]: Unit System changed to UnitSystem.DEVICE_BASE = 1
 └ @ PowerSystems /Users/ruthkravis/.julia/packages/PowerSystems/9ugJZ/src/base.jl:395
-┌ Info: 2023-11-01T11:53:45.542 [11076:1]: Residual from initial guess: max = 3.559623928950373e-9 at 4, total = 3.063614799079101e-8
+┌ Info: 2023-11-01T13:01:14.766 [11076:1]: Residual from initial guess: max = 1.0360854396651575e-9 at 4, total = 4.450561267601986e-9
 └ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/Pcklx/src/base/nlsolve_wrapper.jl:101
-┌ Info: 2023-11-01T11:53:45.548 [11076:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
+┌ Info: 2023-11-01T13:01:14.772 [11076:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
 └ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/Pcklx/src/base/nlsolve_wrapper.jl:68
-┌ Info: 2023-11-01T11:53:45.548 [11076:1]: Attaching Perturbations
+┌ Info: 2023-11-01T13:01:14.772 [11076:1]: Attaching Perturbations
 └ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/Pcklx/src/base/simulation.jl:296
-┌ Info: 2023-11-01T11:53:45.549 [11076:1]: Simulations status = BUILT
+┌ Info: 2023-11-01T13:01:14.772 [11076:1]: Simulations status = BUILT
 └ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/Pcklx/src/base/simulation.jl:428
-┌ Info: 2023-11-01T11:53:45.549 [11076:1]: 
+┌ Info: 2023-11-01T13:01:14.772 [11076:1]: 
 │  ───────────────────────────────────────────────────────────────────────────────
 │                                                      Time          Allocations  
 │                                                ───────────────   ───────────────
-│                 Total measured:                    8.90ms            1.84MiB    
+│                 Total measured:                    8.58ms            1.44MiB    
 │ 
 │  Section                               ncalls     time    %tot     alloc    %tot
 │  ───────────────────────────────────────────────────────────────────────────────
-│  Build Simulation                           1   8.89ms  100.0%   1.84MiB  100.0%
-│    Build Simulation Inputs                  1    744μs    8.4%    140KiB    7.4%
-│      Wrap Branches                          1   91.3μs    1.0%   10.2KiB    0.5%
-│      Wrap Dynamic Injectors                 1    327μs    3.7%   78.6KiB    4.2%
-│      Calculate MM, DAE_vector, Tota...      1   30.3μs    0.3%   7.36KiB    0.4%
-│      Wrap Static Injectors                  1   54.9μs    0.6%   9.64KiB    0.5%
-│    Pre-initialization                       1   1.10ms   12.3%    459KiB   24.4%
-│      Power Flow solution                    1    698μs    7.8%    295KiB   15.7%
-│      Initialize Static Injectors            1    541ns    0.0%     0.00B    0.0%
-│      Initialize Dynamic Injectors           1    324μs    3.6%    154KiB    8.2%
-│      Initialize Dynamic Branches            1   12.5μs    0.1%   2.25KiB    0.1%
-│    Calculate Jacobian                       1    214μs    2.4%    272KiB   14.5%
-│    Make Model Function                      1   5.29μs    0.1%   1.45KiB    0.1%
-│    Initial Condition NLsolve refine...      1   6.59ms   74.1%    967KiB   51.3%
-│    Build Perturbations                      1   40.0μs    0.5%   4.66KiB    0.2%
-│    Make DiffEq Problem                      1    176μs    2.0%   30.9KiB    1.6%
+│  Build Simulation                           1   8.58ms  100.0%   1.43MiB  100.0%
+│    Build Simulation Inputs                  1    763μs    8.9%    126KiB    8.6%
+│      Wrap Branches                          1   8.25μs    0.1%      240B    0.0%
+│      Wrap Dynamic Injectors                 1    399μs    4.6%   78.6KiB    5.3%
+│      Calculate MM, DAE_vector, Tota...      1   29.9μs    0.3%   6.45KiB    0.4%
+│      Wrap Static Injectors                  1   59.5μs    0.7%   9.64KiB    0.7%
+│    Pre-initialization                       1   1.24ms   14.4%    520KiB   35.4%
+│      Power Flow solution                    1    838μs    9.8%    359KiB   24.4%
+│      Initialize Static Injectors            1    708ns    0.0%     0.00B    0.0%
+│      Initialize Dynamic Injectors           1    321μs    3.7%    154KiB   10.5%
+│    Calculate Jacobian                       1    148μs    1.7%    160KiB   10.9%
+│    Make Model Function                      1   5.42μs    0.1%   1.36KiB    0.1%
+│    Initial Condition NLsolve refine...      1   6.18ms   72.1%    617KiB   42.0%
+│    Build Perturbations                      1   39.8μs    0.5%   4.66KiB    0.3%
+│    Make DiffEq Problem                      1    174μs    2.0%   30.9KiB    2.1%
 │  ───────────────────────────────────────────────────────────────────────────────
 │ 
 └ @ PowerSimulationsDynamics /Users/ruthkravis/.julia/packages/PowerSimulationsDynamics/Pcklx/src/base/simulation.jl:453
