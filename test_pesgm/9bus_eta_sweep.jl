@@ -15,7 +15,7 @@ const PSID = PowerSimulationsDynamics;
 include("9bus_defaults.jl")
 include("../test/eig_analysis_funcs.jl")
 
-file_name = "../data/json_data/9bus_VSM3_SM1_GFL2.json"
+file_name = "../data/json_data/9bus_VSM3_SM1_GFL2_industrial.json"
 
 # defaults 
 gfm_bus = "generator-3-1";
