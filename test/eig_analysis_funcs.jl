@@ -16,8 +16,12 @@ function save_max_nonzero_eig!(sim, output);
     if sim.status != PSID.BUILD_FAILED;
         ss = small_signal_analysis(sim);
         if maximum(real(ss.eigenvalues)) == 0.0;
-            # Choose second largest eig 
-            push!(output, real(ss.eigenvalues[end-1]));
+            # Choose next largest eig != 0 
+            i = 1;
+            while real(ss.eigenvalues[end-i]) == 0.0;
+                i += 1
+            end
+            push!(output, real(ss.eigenvalues[end-i]));
         else
             push!(output, maximum(real(ss.eigenvalues)));
         end

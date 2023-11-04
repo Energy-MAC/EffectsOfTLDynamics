@@ -8,6 +8,26 @@ const PSID = PowerSimulationsDynamics;
 file ="../ThreeBus_REN_A_DEFAULT_FLAG.dyr"
 sys = System("../raw_data/WSCC_9bus.raw", "../raw_data/ThreeBus_REN_A_DEFAULT_FLAG.dyr")
 
+sys = System(joinpath(pwd(), "../raw_data/WSCC_9bus.raw"))
+
+gfm = collect(get_components(Generator, sys))[1]
+sm = collect(get_components(Generator, sys))[2]
+gfl = collect(get_components(Generator, sys))[3]
+
+dyr_file = "../raw_data/ThreeBus_REN_A_DEFAULT_FLAG.dyr";
+add_dyn_injectors!(sys, dyr_file)
+
+gfl_industrial = first(get_components(Generator, sys))
+source1 = collect(get_components(Source, sys))[1]
+source2 = collect(get_components(Source, sys))[2]
+
+remove_component!(sys, source1)
+remove_component!(sys, source2)
+
+add_component!(sys, gfm)
+add_component!(sys, sm)
+
+
 slack_bus =[b for b in get_components(Bus, sys) if get_bustype(b) == BusTypes.REF][1]
 
 #Define machine
