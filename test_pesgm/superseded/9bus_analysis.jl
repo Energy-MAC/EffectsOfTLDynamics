@@ -18,7 +18,7 @@ gfl_bus = "generator-2-1";
 sm_bus = "generator-1-1";
 
 # Parameters that stay constant across imulations
-line_scale = 3.0;
+line_scale = 1.0;
 inv_share = 0.4;
 N = 200; # Number of samples of parameters 
 legend_loc = :outerright

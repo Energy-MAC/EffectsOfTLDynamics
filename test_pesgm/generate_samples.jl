@@ -1,6 +1,6 @@
 using CSV
 using DataFrames
-
+using Random 
 ### BASELINE DATA ####
 # Parameters that will give stable system 
 col_names = ["line_scale", "load_scale", "Ta", "kd", "kq", "kpv", "kiv", "kpc", "kic", "inv_share", "gfm_share"]
@@ -416,7 +416,6 @@ function generate_case_param_csvs(inv_share, low_load_scale, high_load_scale, lo
     CSV.write("nom_load_high_gfl.csv", df)
 end
 
-
 function generate_single_case_params(inv_share, fixed_load_scale, gfl_share, line_scale) 
     ### ------- #####
     gfm_kq_range = collect(0.05:0.05:0.2) # (min=NREL, max=d'arco)
@@ -472,3 +471,56 @@ function generate_single_case_params(inv_share, fixed_load_scale, gfl_share, lin
 
     return df 
 end
+
+function generate_single_case_gain_params() 
+    ### ------- #####
+    gfm_kq_range = collect(0.05:0.05:0.2) # (min=NREL, max=d'arco)
+    gfm_Ta_range = collect(0.5:0.4:2.0) # (min=NREL, max=d'arco)
+    gfm_kd_range = collect(100:100:400) # (min=NREL, max=d'arco)
+
+    # Inner loop voltage loop 
+    kpv_range = collect(0.5:0.03:0.6) # range centred on D'Arco value (0.59?)
+    kiv_range = collect(400:100:800) # range centred on D'Arco value (736) 
+
+    # Inner loop current gains 
+    kpc_range = collect(0.74:0.15:1.27) # min=markovic max=d'arco
+    kic_range = collect(1.19:4.0:14.3) # min=markovic, max=d'arco
+
+    col_names = ["Ta", "kd", "kq", "kpv", "kiv", "kpc", "kic"]
+
+    df = DataFrame([name => [] for name in col_names])
+
+    for kq = gfm_kq_range;
+        for kpv = kpv_range;
+            for kiv = kiv_range;
+                for kpc = kpc_range;
+                    for kic = kic_range;
+                        for Ta = gfm_Ta_range;
+                            for kd = gfm_kd_range;
+                                # Check conditions 
+                                c1 = kic/kpc >= 10 # integral gain 
+                                c2 = kiv/kpv >= 10
+                                c3 = kpc > kpv 
+                                #c4 = kpv > kq #? unsure about this one 
+
+                                if c1 & c2 & c3
+                                    push!(df, [Ta, kd, kq, kpv, kiv, kpc, kic])
+                                end 
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return df 
+end
+
+function get_random_sample(df, N)
+    samples_shuffled = shuffle(MersenneTwister(123), df);
+    samples_cut = samples_shuffled[1:N,:]
+    return samples_cut
+end 
+
+
