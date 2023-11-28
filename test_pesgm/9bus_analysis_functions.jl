@@ -110,7 +110,7 @@ function make_case_boxplot_3(alg, dyn, mssb, legend_toggle, case_name, exp_folde
     height_adj(bp, yaxis_height)
 
     savefig(exp_folder*"/boxplot_"*case_name*".png")
-    #savefig(exp_folder*"/boxplot_"*case_name*".svg")
+    savefig(exp_folder*"/boxplot_"*case_name*".svg")
 
 end
 
@@ -170,7 +170,7 @@ function make_gain_boxplots(sel, labels, legend_key, case_name, exp_folder)
     end
 
     savefig(exp_folder*"kpv_case_"*case_name*".png")
-    #savefig(exp_folder*"kpv_case_"*case_name*".svg")
+    savefig(exp_folder*"kpv_case_"*case_name*".svg")
 
     # KIV 
     w = 20.0
@@ -179,7 +179,7 @@ function make_gain_boxplots(sel, labels, legend_key, case_name, exp_folder)
         @df sel[i] boxplot!(:kiv.+get_o(w,i), :stable, bar_width=w, label=labels[i], xlabel=L"k_{iv}", ylabel=L"\Re \ (\lambda)", legend=false)
     end
     savefig(exp_folder*"kiv_case_"*case_name*".png")
-    #savefig(exp_folder*"kiv_case_"*case_name*".svg")
+    savefig(exp_folder*"kiv_case_"*case_name*".svg")
 
     # KPC 
     w = 0.03;
@@ -188,7 +188,7 @@ function make_gain_boxplots(sel, labels, legend_key, case_name, exp_folder)
         @df sel[i] boxplot!(:kpc.+get_o(w,i), :stable, bar_width=w, label=labels[i], xlabel=L"k_{pc}", ylabel=L"\Re \ (\lambda)", legend=false)
     end
     savefig(exp_folder*"kpc_case_"*case_name*".png")
-    #savefig(exp_folder*"kpc_case_"*case_name*".svg")
+    savefig(exp_folder*"kpc_case_"*case_name*".svg")
 
     # KIC 
     w = 0.2;
@@ -197,7 +197,7 @@ function make_gain_boxplots(sel, labels, legend_key, case_name, exp_folder)
         @df sel[i] boxplot!(:kic.+get_o(w,i), :stable, bar_width=w, label=labels[i], xlabel=L"k_{ic}", ylabel=L"\Re \ (\lambda)", legend=false)
     end
     savefig(exp_folder*"kic_case_"*case_name*".png")
-    #savefig(exp_folder*"kic_case_"*case_name*".svg")
+    savefig(exp_folder*"kic_case_"*case_name*".svg")
 
     # kd
     w = 15
@@ -206,7 +206,7 @@ function make_gain_boxplots(sel, labels, legend_key, case_name, exp_folder)
         @df sel[i] boxplot!(:kd.+get_o(w,i), :stable, bar_width=w, label=labels[i], legend=legend_key, xlabel=L"k_{d}", ylabel=L"\Re \ (\lambda)")
     end
     savefig(exp_folder*"kd_case_"*case_name*".png")
-    #savefig(exp_folder*"kd_case_"*case_name*".svg")
+    savefig(exp_folder*"kd_case_"*case_name*".svg")
 
     # Ta
     w = 0.07
@@ -215,7 +215,7 @@ function make_gain_boxplots(sel, labels, legend_key, case_name, exp_folder)
         @df sel[i] boxplot!(:Ta.+get_o(w,i), :stable, bar_width=w, label=labels[i], xlabel=L"T_a", ylabel=L"\Re \ (\lambda)", legend=false)
     end
     savefig(exp_folder*"Ta_case_"*case_name*".png")
-    #savefig(exp_folder*"Ta_case_"*case_name*".svg")
+    savefig(exp_folder*"Ta_case_"*case_name*".svg")
 
 end
 

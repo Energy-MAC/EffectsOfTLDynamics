@@ -49,6 +49,7 @@ yscales = [case1_scale, case1_scale, case2_scale, case2_scale*10, case3_scale, c
 legend_key = [:bottomright, false, false, false, false, false, false, false]
 
 include("9bus_analysis_functions.jl")
+save_folder = "Extra_figs/"
 # Make boxplots 
 for i = 1:size(exp_df)[1];
     load_scale = exp_df[i,:load_scale]
@@ -59,7 +60,7 @@ for i = 1:size(exp_df)[1];
     dyn = DataFrame(CSV.File(exp_folder*"/dyn_"*suffix))
     mssb = DataFrame(CSV.File(exp_folder*"/mssb_"*suffix))
 
-    make_case_boxplot_3(alg, dyn, mssb, legend_key[i], case_name, exp_folder, yscales[i])
+    make_case_boxplot_3(alg, dyn, mssb, legend_key[i], case_name, save_folder, yscales[i])
 end
 
 # choose case to make gain plots for 
@@ -74,4 +75,4 @@ mssb = DataFrame(CSV.File(exp_folder*"/mssb_"*suffix))
 
 
 include("9bus_analysis_functions.jl")
-make_gain_boxplots([alg, dyn, mssb], [L"\mathrm{statpi}", L"\mathrm{dynpi}", L"\mathrm{MSSB}"], :inside, case_name, exp_folder)
+make_gain_boxplots([alg, dyn, mssb], [L"\mathrm{statpi}", L"\mathrm{dynpi}", L"\mathrm{MSSB}"], :inside, case_name, save_folder)
