@@ -14,8 +14,9 @@ using Plots
 const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
-rn = "2023-09-29T18:40:00.713" #string date
-model = "9bus_slackless"
+
+rn = "2024-03-13T21:29:19.193" #string date
+model = "9bus_TPS"
 main_path = "../results/"*model*"/"*rn
 
 df_alg = nothing
@@ -48,31 +49,31 @@ for var_to_measure in vars_to_measure
             folder_path = partial_path*"/statpi"
             
             df_alg = CSV.read(partial_path*"/statpi/"*var_to_measure, DataFrame);
-            ir_alg = df_alg."generator-3-1_ir_cnv"
-            ii_alg = df_alg."generator-3-1_ii_cnv"
+            ir_alg = df_alg."generator-1-1_ir_cnv"
+            ii_alg = df_alg."generator-1-1_ii_cnv"
             i_alg_mag = sqrt.(ir_alg.^2 + ii_alg.^2)
-            df_alg[!,"generator-3-1_i_mag"] = i_alg_mag
+            df_alg[!,"generator-1-1_i_mag"] = i_alg_mag
             CSV.write(partial_path*"/statpi/"*var_to_measure, df_alg)
             
             df_dyn = CSV.read(partial_path*"/dynpi/"*var_to_measure, DataFrame); 
-            ir_dyn = df_dyn."generator-3-1_ir_cnv"
-            ii_dyn = df_dyn."generator-3-1_ii_cnv"
+            ir_dyn = df_dyn."generator-1-1_ir_cnv"
+            ii_dyn = df_dyn."generator-1-1_ii_cnv"
             i_dyn_mag = sqrt.(ir_dyn.^2 + ii_dyn.^2)
-            df_dyn[!,"generator-3-1_i_mag"] = i_dyn_mag
+            df_dyn[!,"generator-1-1_i_mag"] = i_dyn_mag
             CSV.write(partial_path*"/dynpi/"*var_to_measure, df_dyn)
 
             df_ms = CSV.read(partial_path*"/MSSB/"*var_to_measure, DataFrame);
-            ir_ms = df_ms."generator-3-1_ir_cnv"
-            ii_ms = df_ms."generator-3-1_ii_cnv"
+            ir_ms = df_ms."generator-1-1_ir_cnv"
+            ii_ms = df_ms."generator-1-1_ii_cnv"
             i_ms_mag = sqrt.(ir_ms.^2 + ii_ms.^2)
-            df_ms[!,"generator-3-1_i_mag"] = i_ms_mag
+            df_ms[!,"generator-1-1_i_mag"] = i_ms_mag
             CSV.write(partial_path*"/MSSB/"*var_to_measure, df_ms)
 
             df_msmb = CSV.read(partial_path*"/MSMB/"*var_to_measure, DataFrame);
-            ir_msmb = df_msmb."generator-3-1_ir_cnv"
-            ii_msmb = df_msmb."generator-3-1_ii_cnv"
+            ir_msmb = df_msmb."generator-1-1_ir_cnv"
+            ii_msmb = df_msmb."generator-1-1_ii_cnv"
             i_msmb_mag = sqrt.(ir_msmb.^2 + ii_msmb.^2)
-            df_msmb[!,"generator-3-1_i_mag"] = i_msmb_mag
+            df_msmb[!,"generator-1-1_i_mag"] = i_msmb_mag
             CSV.write(partial_path*"/MSMB/"*var_to_measure, df_msmb)
 
         end 

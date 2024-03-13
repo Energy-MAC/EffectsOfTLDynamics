@@ -186,10 +186,10 @@ function build_seg_model!(sys_segs, p::ExpParams, dyn_lines::Bool, alg_line_name
         start_bus = bus_from
         for b_ix in 1 : N - 1
             println(b_ix)
-            bus_to_create = Bus(
+            bus_to_create = ACBus(
                 number = 1000000000 + 100000*bus_from.number + 100*bus_to.number + b_ix,
                 name = bus_from.name * "-" * bus_to.name * "-internal-bus_" * string(b_ix),
-                bustype = BusTypes.PQ,
+                bustype = ACBusTypes.PQ,
                 angle = bus_from.angle,
                 magnitude = bus_from.magnitude,
                 voltage_limits = bus_from.voltage_limits,
@@ -332,7 +332,7 @@ function run_experiment(file_name::String, line_model::String, p::ExpParams)
     end
     
      for g in get_components(PSY.Generator, sys)
-        if g.bus.bustype == BusTypes.PV
+        if g.bus.bustype == ACBusTypes.PV
             # set_base_power!(g, g.base_power * p.load_scale)
             set_active_power!(g, g.active_power * p.load_scale)
             set_reactive_power!(g, g.reactive_power * p.load_scale)
@@ -569,7 +569,7 @@ function store_bus_voltages(res::PSID.SimulationResults, system::System, path::S
 end
 
 function store_filter_currents(res::PSID.SimulationResults, sys::System, path::String)
-    time, _ = get_state_series(res, (get_name(first(get_components(Generator, sys))), :ir_cnv))
+    time, _ = get_state_series(res, (get_name(first(get_components(DynamicInverter, sys))), :ir_cnv))
     df_currents = DataFrame()
     # Store Time
     df_currents[!, "Time"] = time

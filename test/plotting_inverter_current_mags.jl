@@ -15,8 +15,8 @@ const PSY = PowerSystems;
 const PSID = PowerSimulationsDynamics;
 
 
-rn = "2023-09-24T20:12:13.348" #string date
-model = "inv_v_machine"
+rn = "2024-03-13T21:29:19.193" #string date
+model = "9bus_TPS"
 main_path = "../results/"*model*"/"*rn
 
 df_alg = nothing
@@ -30,7 +30,7 @@ sol_ms = nothing
 sol_msmb = nothing
 
 
-line_scales = collect(1.0:4.0:5.0)
+line_scales = collect(1.0:2.0:3.0)
 load_scales = collect(0.5:0.5:1.0)
 
 vars_to_measure = ["inverter_currents.csv"]
@@ -57,10 +57,10 @@ for var_to_measure in vars_to_measure
             ms_idx = findall(df_ms."Time" .< 0.275)[end]
             msmb_idx = findall(df_msmb."Time" .< 0.275)[end]
 
-            sol_alg = (df_alg."Time"[1:alg_idx], df_alg."generator-102-1_i_mag"[1:alg_idx])
-            sol_dyn = (df_dyn."Time"[1:dyn_idx], df_dyn."generator-102-1_i_mag"[1:dyn_idx])
-            sol_ms = (df_ms."Time"[1:ms_idx], df_ms."generator-102-1_i_mag"[1:ms_idx])
-            sol_msmb = (df_msmb."Time"[1:msmb_idx], df_msmb."generator-102-1_i_mag"[1:msmb_idx])
+            sol_alg = (df_alg."Time"[1:alg_idx], df_alg."generator-1-1_i_mag"[1:alg_idx])
+            sol_dyn = (df_dyn."Time"[1:dyn_idx], df_dyn."generator-1-1_i_mag"[1:dyn_idx])
+            sol_ms = (df_ms."Time"[1:ms_idx], df_ms."generator-1-1_i_mag"[1:ms_idx])
+            sol_msmb = (df_msmb."Time"[1:msmb_idx], df_msmb."generator-1-1_i_mag"[1:msmb_idx])
         
             plt = plot(sol_alg, label = L"\mathrm{statpi}", legend = :bottomright)
             plot!(plt, sol_dyn, label = L"\mathrm{dynpi}")
@@ -74,8 +74,12 @@ for var_to_measure in vars_to_measure
             plot!(xguidefontsize=25, yguidefontsize=25, tickfontsize=16,legendfontsize=16)
             
             savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.svg")
+            #savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.eps")
+            savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags.png")
             plot!(xlims=(0.249, 0.275))
-            savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_100ms_zoom.svg")
+            savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_zoom.svg")
+            #savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_zoom.eps")
+            savefig(partial_path*"/"*var_to_measure[1:end-4]*"_mags_zoom.png")
             # push!(plots, plt)
         end 
     end
