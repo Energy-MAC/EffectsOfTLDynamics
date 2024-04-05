@@ -583,6 +583,53 @@ function store_filter_currents(res::PSID.SimulationResults, sys::System, path::S
         df_currents[!, "$(inv_name)_ii_cnv"] = ii_cnv
     end
 
+    function store_tx_currents(res::PSID.SimulationResults, sys::System, path::String)
+        time, _ = get_state_series(res, (get_name(first(get_components(DynamicInverter, sys))), :ir))
+        df_currents = DataFrame()
+        # Store Time
+        df_currents[!, "Time"] = time
+        invs = collect(get_components(DynamicInverter, sys))
+        
+        for i in 1:length(invs)
+            inv_name = invs[i].name
+            _, ir = get_state_series(res, (inv_name, :ir))
+            _, ii = get_state_series(res, (inv_name, :ii))
+            df_currents[!, "$(inv_name)_ir"] = ir
+            df_currents[!, "$(inv_name)_ii"] = ii
+            df_currents[!, "$(inv_name)_i_mag"] = sqrt(ir.^2+ ii.^2)
+        end
+    
+        CSV.write(path, df_currents, force = true)
+    end
+
+    CSV.write(path, df_currents, force = true)
+end
+
+function store_stator_currents(res::PSID.SimulationResults, sys::System, path::String)
+    time, _ = get_state_series(res, (get_name(first(get_components(DynamicGenerator, sys))), :ψ_d))
+    df_currents = DataFrame()
+    # Store Time
+    df_currents[!, "Time"] = time
+    gens = collect(get_components(DynamicGenerator, sys))
+    
+    for i in 1:length(gens)
+        gen_name = gens[i].name
+        _, ψ_d = get_state_series(res, (gen_name, :ψ_d))
+        _, ψ_q = get_state_series(res, (gen_name, :ψ_q))
+        _, ed_pp = get_state_series(res, (gen_name, :ed_pp))
+        _, eq_pp = get_state_series(res, (gen_name, :eq_pp))
+
+        xd_pp = get_Xd_pp(gens[i])
+        xq_pp = get_Xq_pp(gens[i])
+        
+        id = 1/xd_pp * (eq_pp - ψ_d)
+        iq = 1/xq_pp * (- ed_pp - ψ_q)
+        
+        df_currents[!, "$(gen_name)_id"] = id
+        df_currents[!, "$(gen_name)_iq"] = iq
+        df_currents[!, "$(gen_name)_i_mag"] = sqrt(id.^2+ iq.^2)
+    end
+
     CSV.write(path, df_currents, force = true)
 end
 
