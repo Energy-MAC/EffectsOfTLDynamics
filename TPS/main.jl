@@ -1,340 +1,167 @@
 cd(@__DIR__)
+cd("..")
+using Pkg
+Pkg.activate(".")
 using PowerSystems
+const PSY = PowerSystems
 using PowerSimulationsDynamics
+const PSID = PowerSimulationsDynamics
+using InfrastructureSystems
 using Plots
-using Revise
-using EffectsOfTLDynamics
-
+using PlotlyJS, DataFrames
+using TLmodels
 using CSV
-using DataFrames
-using Dates
+using DataFramesMeta
 using LaTeXStrings
+using Logging
+Logging.disable_logging(Logging.Error)
 
-const PSY = PowerSystems;
-const PSID = PowerSimulationsDynamics;
+using PowerSystemsExperiments
+include("../../PowerSystemsExperiments.jl/src/sysbuilder.jl")
+include("device_models.jl")
 
-### Choose test case
-# "SIIB.json"
-# "9bus.json"
-# "inv_v_machine.json"
-# "twobus_2inv.json"
-# "9bus_slackless.json"
-model = "9bus_TPS"
-file_name = "../data/json_data/"*model*".json"
-# default_2_bus_line_dict - For 2 bus system
-# default_9_bus_line_dict - For 9 bus system
-line_dict = default_9_bus_line_dict
+s = System(joinpath(pwd(), "data/raw_data/WSCC_9bus.raw"))
 
-### Load relevant line data
-impedance_csv = "../data/cable_data/dommel_data.csv"
-capacitance_csv = "../data/cable_data/dommel_data_C.csv"
-
-### Choose perturbation to be applied
-# "BIC"
-# "GenTrip"
-# "CRC"
-# "LoadChange"
-# "LoadTrip"
-# "InfBusChange"
-# "BranchTrip"
-perturbation = "BranchTrip"
-
-### Define simulation parameters
-sim_p = SimParams(
-    abstol = 1e-13,
-    reltol = 1e-10,
-    maxiters = Int(1e10),
-    dtmax = 1e-4,
-    solver = "Rodas4",
-    t_max = 0.275,
+gfm_inj() = DynamicInverter(
+    "I", # stands for "Inverter"
+    1.0, # ω_ref,
+    converter_high_power(), #converter
+    VSM_outer_control(), #outer control
+    GFM_inner_control(), #inner control voltage source
+    dc_source_lv(), #dc source
+    pll(), #pll
+    filt(), #filter
 )
 
-### Extract line data from files
+gfl_inj() = DynamicInverter(
+    "I", # stands for "Inverter"
+    1.0, # ω_ref,
+    converter_high_power(), #converter
+    GFL_outer_control(), #outer control
+    GFL_inner_control(), #inner control voltage source
+    dc_source_lv(), #dc source
+    pll(), #pll
+    filt(), #filter
+)
+
+sm_inj() = DynamicGenerator(
+    "G", # stands for "Generator"
+    1.0, # ω_ref,
+    AF_machine(), #machine
+    shaft_no_damping(), #shaft
+    avr_type1(), #avr
+    tg_none(), #tg
+    pss_none(), #pss
+)
+
+# taken from TLModels.jl `TLmodels_tutorial.ipynb`
+impedance_csv = "data/cable_data/dommel_data.csv"
+capacitance_csv = "data/cable_data/dommel_data_C.csv"
+
 M = 3
+z_km, y_km, z_km_ω, Z_c = get_line_parameters_from_data(impedance_csv, capacitance_csv, M)
 
-# Do not change these factors for the 2 bus case
-factor_z = 1.0
-factor_y = 1.0
-z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
+line_length_dict = Dict(
+    "Bus 5-Bus 4-i_1" => 90,
+    "Bus 7-Bus 8-i_1" => 80,
+    "Bus 6-Bus 4-i_1" => 100,
+    "Bus 7-Bus 5-i_1" => 170,
+    "Bus 8-Bus 9-i_1" => 110,
+    "Bus 9-Bus 6-i_1" => 180,
+)
 
-# Kundur parameters for testing
-# Z_c = 380 # Ω
-# r_km = 0.05 # Ω/km
-# x_km = 0.488 # Ω/km
-# g_km = 0.0 # S/km
-# b_km = 3.371e-6 # S/km
+line_params = LineModelParams(
+    z_km, 
+    y_km, 
+    z_km_ω, 
+    Z_c,
+    M,
+    line_length_dict,    
+    get_name(first(get_components(Line, s))),
+    10.0,
+    1.0,
+    1.0
+)
 
-### Define more data
-l = 100 #km
-line_dict["BUS 1-BUS 2-i_1"] = l
-line_dict["BUS 1-BUS 2-i_1_static"] = l
-
-N = nothing
-t_fault = 0.25
-
-### Get perturbation struct
-perturbation_params = get_default_perturbation(t_fault, perturbation)
-# perturbation_params.crc_params = CRCParam(DynamicInverter, "generator-1-1", :V_ref, 0.95)# 
-perturbation_params.branch_trip_params = BTParam("Bus 5-Bus 4-i_1")
-
-
-
-V_nom = 230 # kV
-Z_o = sqrt(z_km_ω_5_to_1/y_km)
-SIL = V_nom ^2/Z_o
-p_load = real(SIL)/100
-q_load = imag(SIL)/100
-
-l_seg = 10 #km
-
-load_scale = 1.0;
-line_scale = 1.0;
-
-p = ExpParams(
-    N, 
-    M, 
-    l,
-    l_seg, 
-    Z_c_abs, 
-    z_km,
-    y_km,
-    z_km_ω,
-    z_km_ω_5_to_1,
-    Z_c_5_to_1_abs,
-    line_dict,
-    sim_p, 
-    perturbation, 
-    perturbation_params,
-    p_load,
-    q_load,
-    line_scale,
-    load_scale
-);
-
-# Verify impedance values of raw file vs CSV data
-# verifying(file_name, M, impedance_csv, capacitance_csv, p)
-
-line_model_1 = "Algebraic";
-line_model_2 = "Dynamic";
-line_model_3 = "Multi-Segment Dynamic";
-
-# results_alg, sim = run_experiment(file_name, line_model_1, p);
-# sys = sim.sys;
-
-# now_date = now()
-# rn = string(now_date) 
-
-# main_path = "../results/"*rn*"/"
-# mkdir(main_path)
-
-# partial_path = main_path*"$(p.line_scale)_$(p.load_scale)"
-# mkdir(partial_path)
-
-# folder_path = partial_path*"/statpi"
-# mkdir(folder_path)
-
-# store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
-# store_filter_currents(results_alg, sys, folder_path*"/filter_currents.csv")
-# store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
-# store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
-# store_branch_currents(results_alg, sys, folder_path*"/branch_currents.csv")
-
-# using PowerFlows
-# sol = solve_powerflow(ACPowerFlow(), sys)
-# sol["flow_results"]
-# s = small_signal_analysis(sim)
-
-# p.load_scale = 10.0
-# results_alg2, sim2 = run_experiment(file_name, line_model_1, p);
-# s2 = small_signal_analysis(sim2)
-# sys2 = sim2.sys;
-# sol2 = solve_powerflow(ACPowerFlow(), sys2)
-# sol2["bus_results"]
-
-"""
-results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
-sys_dyn = sim_dyn.sys
-s_dyn = small_signal_analysis(sim_dyn)
-
-vr_alg = get_voltage_magnitude_series(results_alg, 102);
-vr_dyn = get_voltage_magnitude_series(results_dyn, 102);
-#ω_alg = get_state_series(results_alg, ("generator-101-1", :ω))
-#ω_dyn = get_state_series(results_dyn, ("generator-101-1", :ω))
-
-
-plot(vr_alg, xlabel = "time", ylabel = "vr p.u.", label = "V1")
-plot!(vr_dyn, xlabel = "time", ylabel = "vr p.u.", label = "V1_dyn")
-plot!(title = "Line length = "*string(p.l_dict["BUS 1-BUS 2-i_1"])*" km, perturbation = "*perturbation)
-
-results_ms_dyn, sim_ms_dyn = run_experiment(file_name, line_model_3, p);
-sys_ms_dyn = sim_ms_dyn.sys
-s_ms_dyn = small_signal_analysis(sim_ms_dyn)            
-vr_ms_dyn = get_voltage_magnitude_series(results_ms_dyn, 102);
-plot!(vr_ms_dyn, label = "V1_ms_dyn")
-#ω_ms_dyn = get_state_series(results_ms_dyn, ("generator-101-1", :ω))
-
-M = 5
-p.M = M
-z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M)
-p.z_km = z_km;
-p.y_km = y_km;
-p.Z_c_abs = Z_c_abs;
-p.z_km_ω = z_km_ω;
-p.z_km_ω_5_to_1 = z_km_ω_5_to_1;
-p.Z_c_5_to_1_abs = Z_c_5_to_1_abs;
-
-results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p);
-sys_ms_mb = sim_ms_mb.sys
-s_ms_mb = small_signal_analysis(sim_ms_mb)            
-vr_ms_mb_dyn = get_voltage_magnitude_series(results_ms_mb_dyn, 102);
-#ω_ms_mb_dyn = get_state_series(results_ms_mb_dyn, ("generator-101-1", :ω))
-
-plot!(vr_ms_mb_dyn, label = "V1_ms_mb_dyn")
-plot!(title = "Line length = "*string(p.l)*" km, perturbation = "*perturbation)
-
-#savefig("../figures/diff M.png")
-
-plot(ω_alg)
-plot!(ω_dyn)
-plot!(ω_ms_dyn)
-plot!(ω_ms_mb_dyn)
-
-results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
-results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
-results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
-results_ms_b_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
-
-"""
-
-# line_lengths = [100, 250, 500]
-# loading_scenarios = [(0.5, 0.5), (0.75, 0.25), (1.0, 0.0)]
-
-line_scales = collect(1.0:2.0:3.0)
-load_scales = collect(0.5:0.5:1.0)
-
-now_date = now()
-rn = string(now_date)
-prim_path = "../results/"*model
-mkdir(prim_path)
-main_path = prim_path*"/"*rn*"/"
-mkdir(main_path)
-
-for line_scale in line_scales
-    p.line_scale = line_scale
-
-    for load_scale in load_scales
-        p.load_scale = load_scale
-        
-        partial_path = main_path*"$(p.line_scale)_$(p.load_scale)"
-        mkdir(partial_path)
-
-        M = 1
-        p.M = M
-        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
-        p.z_km = z_km
-    
-        folder_path = partial_path*"/statpi"
-        mkdir(folder_path)
-        results_alg, sim = run_experiment(file_name, line_model_1, p);
-        sys = sim.sys
-        store_bus_voltages(results_alg, sys, folder_path*"/bus_voltages.csv")
-        store_filter_currents(results_alg, sys, folder_path*"/inverter_currents.csv")
-        #store_branch_power_flows(results_alg, sys, folder_path*"/branch_power_flows.csv")
-        store_generator_speeds(results_alg, sys, folder_path*"/generator_speeds.csv")
-        #store_branch_currents(results_alg, sys, folder_path*"/branch_currents.csv")
-
-
-        folder_path = partial_path*"/dynpi"
-        mkdir(folder_path)
-        results_dyn, sim_dyn = run_experiment(file_name, line_model_2, p);
-        sys_dyn = sim_dyn.sys
-        store_bus_voltages(results_dyn, sys_dyn, folder_path*"/bus_voltages.csv")
-        store_filter_currents(results_dyn, sys_dyn, folder_path*"/inverter_currents.csv")
-        #store_branch_power_flows(results_dyn, sys_dyn, folder_path*"/branch_power_flows.csv")
-        store_generator_speeds(results_dyn, sys_dyn, folder_path*"/generator_speeds.csv")
-        #store_branch_currents(results_dyn, sys_dyn, folder_path*"/branch_currents.csv")
-
-        folder_path = partial_path*"/MSSB"
-        mkdir(folder_path)
-        results_ms_dyn, sim_ms_dyn = run_experiment(file_name, line_model_3, p);
-        sys_ms_dyn = sim_ms_dyn.sys
-        store_bus_voltages(results_ms_dyn, sys_ms_dyn, folder_path*"/bus_voltages.csv")
-        store_filter_currents(results_ms_dyn, sys_ms_dyn, folder_path*"/inverter_currents.csv")
-        #store_branch_power_flows(results_ms_dyn, sys_ms_dyn, folder_path*"/branch_power_flows.csv")
-        store_generator_speeds(results_ms_dyn, sys_ms_dyn, folder_path*"/generator_speeds.csv")
-        #store_branch_currents(results_ms_dyn, sys_ms_dyn, folder_path*"/branch_currents.csv")
-
-        M = 3
-        p.M = M
-        z_km, y_km, Z_c_abs, z_km_ω, z_km_ω_5_to_1, Z_c_5_to_1_abs = get_line_parameters(impedance_csv, capacitance_csv, M, factor_z, factor_y)
-        p.z_km = z_km;
-        p.y_km = y_km;
-        p.Z_c_abs = Z_c_abs;
-        p.z_km_ω = z_km_ω;
-        p.z_km_ω_5_to_1 = z_km_ω_5_to_1;
-        p.Z_c_5_to_1_abs = Z_c_5_to_1_abs;
-
-        folder_path = partial_path*"/MSMB"
-        mkdir(folder_path)  
-        results_ms_mb_dyn, sim_ms_mb = run_experiment(file_name, line_model_3, p)
-        sys_ms_mb = sim_ms_mb.sys
-        store_bus_voltages(results_ms_mb_dyn, sys_ms_mb, folder_path*"/bus_voltages.csv")
-        store_filter_currents(results_ms_mb_dyn, sys_ms_mb, folder_path*"/inverter_currents.csv")
-        #store_branch_power_flows(results_ms_mb_dyn, sys_ms_mb, folder_path*"/branch_power_flows.csv")
-        store_generator_speeds(results_ms_mb_dyn, sys_ms_mb, folder_path*"/generator_speeds.csv")
-        #store_branch_currents(results_ms_mb_dyn, sys_ms_mb, folder_path*"/branch_currents.csv")
-
-    end
+function no_change(sys::System, params::LineModelParams)
+    return sys
 end
 
-# Not necessary?
-# results_alg, sim, sys, s, vr_alg = nothing, nothing, nothing, nothing, nothing;
-# results_dyn, sim_dyn, sys_dyn, s_dyn, vr_dyn = nothing, nothing, nothing, nothing, nothing;
-# results_ms_dyn, seg_sim, seg_sys, s_seg, vr_ms_dyn = nothing, nothing, nothing, nothing, nothing;
-# results_ms_mb_dyn, sim_ms_mb, sys_ms_mb, s_ms_mb, vr_ms_mb_dyn = nothing, nothing, nothing, nothing, nothing;
+function set_power_setpt!(sys::System, scale::Real)
+    for load in get_components(StandardLoad, sys)
+        set_impedance_active_power!(load, get_impedance_active_power(load)*scale)
+        set_current_active_power!(load, get_current_active_power(load)*scale)
+        set_constant_active_power!(load, get_constant_active_power(load)*scale)
+        
+        set_impedance_reactive_power!(load, get_impedance_reactive_power(load)*scale)
+        set_current_reactive_power!(load, get_current_reactive_power(load)*scale)
+        set_constant_reactive_power!(load, get_constant_reactive_power(load)*scale)
+    end
+    # if scale <= 1.0 return sys end
+    for gen in get_components(Generator, sys)
+        if gen.bus.bustype == ACBusTypes.PV
+            # set_base_power!(g, g.base_power * p.load_scale)
+            set_active_power!(gen, get_active_power(gen) * scale)
+            set_reactive_power!(gen, get_reactive_power(gen) * scale)
+        end
+    end
+    return sys
+end
 
-plots = []
-plt = []
+### Defining a function to scale the line impedance
+function scale_line_impedance!(sys::System, scale::Real)
+    for line in get_components(Line, sys)
+        line.r = line.r * scale
+        line.x = line.x * scale
+    end
+    return sys
+end
 
-# Plotting loop
-plt = plot(vr_alg, label = L"\mathrm{algebraic}")
-plot!(plt, vr_dyn, label = L"\mathrm{dynpi}")
-plot!(plt, vr_ms_dyn, label = L"\mathrm{MSSB}")
-plot!(plt, vr_ms_mb_dyn, label = L"\mathrm{MSMB}")
-plot!(plt, legend = true)        
-push!(plots, plt)
 
-combined_plot = plot(plots..., layout=(1,1))
-plot!(combined_plot, xlabel = L"$ \mathrm{Time} \quad [s]$", title = "")
-plot!(combined_plot, ylabel = L"$||V_2|| \quad \mathrm{[\ p.u.]}$")
+function small_signal_tripped(gss::GridSearchSys, sim::Union{Simulation, Missing}, sm::Union{PSID.SmallSignalOutput, Missing}, error::Union{String, Missing})
+    if isnothing(sim) return missing end
+    sys = deepcopy(sim.sys)
+    remove_component!(Line, sys, sim.perturbations[1].branch_name)
+    newsim = Simulation(ResidualModel, sys, mktempdir(), (0.0, 1.0), disable_timer_outputs=true)
+    sm = small_signal_analysis(newsim)
+    return sm
+end
 
-plot!(combined_plot, xlims = (0.0, 2.0))
-plot!(combined_plot, dpi = 300)
-Plots.savefig("../figures/Week 2/Thurs/ivm_2s.png")
-plot!(combined_plot, title = L"$\mathrm{Load \ scale} = %$load_scale \ \mathrm{Line \ scale} = %$line_scale$")
-annotate!(0.5,1, (L"Label", 8, :red, :top))
-plot!(combined_plot, legend_title = L"$\mathrm{Load \ scale} = %$load_scale \ \mathrm{Line \ scale} = %$line_scale$")
-plot!(combined_plot, xlims = (0.249, 0.260))
-plot!(combined_plot, ylims = (0.85,1.1))
-Plots.savefig("../figures/Week 2/Thurs/ivm_2s_zoom.png")
+gss = GridSearchSys(s, [[sm_inj() sm_inj() sm_inj();]],
+                        ["Bus1", "Bus 2", "Bus 3"])
 
-plot!(xlims=(0.249, 0.255))
-# plot!(ylims=(0.981,0.983))
-# plot!(legend = false)
-# plot!(legend=:bottomright)
+# gss = GridSearchSys(s, [[sm_inj() sm_inj() sm_inj();],
+#                         [gfm_inj() sm_inj() gfm_inj();],
+#                         [sm_inj() gfm_inj() gfm_inj();],
+#                         [sm_inj() gfm_inj() gfl_inj();],
+#                         [sm_inj() gfl_inj() gfm_inj();]],
+#                         ["Bus1", "Bus 2", "Bus 3"]) # just make sure the busses are in the right order
+set_chunksize!(gss, 200)
 
-l = get_component(Line, sys, "BUS 1-BUS 2-i_1")
-p_branch = get_activepower_branch_flow(results_alg, "BUS 1-BUS 2-i_1", :from)
-p_branch_dyn = get_activepower_branch_flow(results_alg2, "BUS 1-BUS 2-i_1", :from)
-p_branch_ms = get_activepower_branch_flow(results_ms_dyn, "BUS 1-BUS 2-i_1_segment_1_branch_1", :from)
-p_branch_ms_mb = [get_activepower_branch_flow(results_ms_mb_dyn, "BUS 1-BUS 2-i_1_segment_1_branch_"*string(i), :from) for i in 1:5]
+line_adders = Dict{String, Function}([
+    "statpi (dommel)"=>create_statpi_system,
+    "dynpi (dommel)"=>create_dynpi_system,
+    "MSSB"=>create_MSSB_system,
+    "MSMB"=>create_MSMB_system,
+])
+load_scale_range = collect(0.25:0.25:2.0)
+line_scale_range = collect(1.0:0.25:3.0)
 
-plot(p_branch)
-plot!(p_branch_dyn)
-plot!(p_branch_ms)
-plot!(ylim = (0, 1))
+add_lines_sweep!(gss, [line_params], line_adders)
+add_generic_sweep!(gss, "Power Setpoint", set_power_setpt!, load_scale_range)
+add_generic_sweep!(gss, "Line impedance increase", scale_line_impedance!, line_scale_range)
 
-q_branch = get_reactivepower_branch_flow(results_alg, "BUS 1-BUS 2-i_1", :from)
-q_branch_dyn = get_reactivepower_branch_flow(results_dyn, "BUS 1-BUS 2-i_1", :from)
-plot(q_branch)
-plot!(q_branch_dyn)
+add_result!(gss,
+    ["Bus 1 Injector Current", "Bus 2 Injector Current", "Bus 3 Injector Current"],
+    PSE.get_injector_currents,
+)
+# tell it to record the timestamps
+add_result!(gss, "Time", PSE.get_time)
+
+# add_result!(gss, "initial_sm", get_sm)
+# add_result!(gss, "final_sm", small_signal_tripped)
+# add_result!(gss, "time", get_time)
+# add_result!(gss, ["Load Voltage at $busname" for busname in get_name.(get_bus.(get_components(StandardLoad, gss.base)))], get_zipe_load_voltages)
+
+add_result!(gss, "Eigs", get_eigenvalues)
+execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 5.5), dtmax=0.05, run_transient=true, log_path="data/gab_tests")

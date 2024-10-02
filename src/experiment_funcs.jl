@@ -684,6 +684,25 @@ function store_branch_currents(res::PSID.SimulationResults, sys::System, path::S
     CSV.write(path, df_currents, force = true)
 end
 
+function extract_simulation_data(sim, dt=nothing)
+    # Initialize the dictionary to hold all the data
+    res_dict = Dict()
+    # Iterate over each key in the global index (assuming these are your device names like "V_1", "generator-102-1")
+    for (device_name, vars) in sim.results.global_index
+        # Ensure each device has its own sub-dictionary
+        res_dict[device_name] = Dict()
+        # Iterate over each variable and its index within the device
+        for (var_name, index) in vars
+            # Get the time series for the specific variable at all times
+            ts, state = PSID.get_state_series(sim.results, (device_name, var_name), dt=dt)  # Assuming you have a function that can do this
+            # Assign the time series to the correct variable in the nested dictionary
+            res_dict[device_name][var_name] = (ts, state)
+        end
+    end
+
+    return res_dict
+end
+
 export choose_disturbance
 export build_sim
 export execute_sim
@@ -698,3 +717,4 @@ export store_filter_currents
 export store_branch_power_flows
 export store_generator_speeds
 export store_branch_currents
+export extract_simulation_data
