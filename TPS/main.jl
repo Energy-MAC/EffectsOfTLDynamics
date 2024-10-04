@@ -14,44 +14,45 @@ using CSV
 using DataFramesMeta
 using LaTeXStrings
 using Logging
-Logging.disable_logging(Logging.Error)
+# Logging.disable_logging(Logging.Error)
 
 using PowerSystemsExperiments
-include("../../PowerSystemsExperiments.jl/src/sysbuilder.jl")
-include("device_models.jl")
+const PSE = PowerSystemsExperiments
+# include("../../PowerSystemsExperiments.jl/src/sysbuilder.jl")
+# include("device_models.jl")
 
 s = System(joinpath(pwd(), "data/raw_data/WSCC_9bus.raw"))
 
 gfm_inj() = DynamicInverter(
     "I", # stands for "Inverter"
     1.0, # ω_ref,
-    converter_high_power(), #converter
-    VSM_outer_control(), #outer control
-    GFM_inner_control(), #inner control voltage source
-    dc_source_lv(), #dc source
-    pll(), #pll
-    filt(), #filter
+    PSE.converter_high_power(), #converter
+    PSE.VSM_outer_control(), #outer control
+    PSE.GFM_inner_control(), #inner control voltage source
+    PSE.dc_source_lv(), #dc source
+    PSE.pll(), #pll
+    PSE.filt(), #filter
 )
 
 gfl_inj() = DynamicInverter(
     "I", # stands for "Inverter"
     1.0, # ω_ref,
-    converter_high_power(), #converter
-    GFL_outer_control(), #outer control
-    GFL_inner_control(), #inner control voltage source
-    dc_source_lv(), #dc source
-    pll(), #pll
-    filt(), #filter
+    PSE.converter_high_power(), #converter
+    PSE.GFL_outer_control(), #outer control
+    PSE.GFL_inner_control(), #inner control voltage source
+    PSE.dc_source_lv(), #dc source
+    PSE.pll(), #pll
+    PSE.filt(), #filter
 )
 
 sm_inj() = DynamicGenerator(
     "G", # stands for "Generator"
     1.0, # ω_ref,
-    AF_machine(), #machine
-    shaft_no_damping(), #shaft
-    avr_type1(), #avr
-    tg_none(), #tg
-    pss_none(), #pss
+    PSE.AF_machine(), #machine
+    PSE.shaft_no_damping(), #shaft
+    PSE.avr_type1(), #avr
+    PSE.tg_none(), #tg
+    PSE. pss_none(), #pss
 )
 
 # taken from TLModels.jl `TLmodels_tutorial.ipynb`
@@ -127,15 +128,22 @@ function small_signal_tripped(gss::GridSearchSys, sim::Union{Simulation, Missing
     return sm
 end
 
-gss = GridSearchSys(s, [[sm_inj() sm_inj() sm_inj();]],
+gss = GridSearchSys(s, [sm_inj() sm_inj() sm_inj();],
                         ["Bus1", "Bus 2", "Bus 3"])
 
-# gss = GridSearchSys(s, [[sm_inj() sm_inj() sm_inj();],
-#                         [gfm_inj() sm_inj() gfm_inj();],
-#                         [sm_inj() gfm_inj() gfm_inj();],
-#                         [sm_inj() gfm_inj() gfl_inj();],
-#                         [sm_inj() gfl_inj() gfm_inj();]],
-#                         ["Bus1", "Bus 2", "Bus 3"]) # just make sure the busses are in the right order
+  
+gss = GridSearchSys(s, [sm_inj() sm_inj() sm_inj()
+                gfm_inj() sm_inj() gfm_inj()],
+                ["Bus1", "Bus 2", "Bus 3"]) #                      
+
+cases = [sm_inj() sm_inj() sm_inj()
+        gfm_inj() sm_inj() gfm_inj()
+        sm_inj() gfm_inj() gfm_inj()                        
+        sm_inj() gfm_inj() gfl_inj()
+        sm_inj() gfl_inj() gfm_inj()]
+
+gss = GridSearchSys(s, cases,
+                        ["Bus1", "Bus 2", "Bus 3"]) # just make sure the busses are in the right order
 set_chunksize!(gss, 200)
 
 line_adders = Dict{String, Function}([
