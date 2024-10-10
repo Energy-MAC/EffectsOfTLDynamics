@@ -24,7 +24,7 @@ const PSE = PowerSystemsExperiments
 s = System(joinpath(pwd(), "data/raw_data/WSCC_9bus.raw"))
 
 gfm_inj() = DynamicInverter(
-    "I", # stands for "Inverter"
+    "GFM", # stands for "Inverter"
     1.0, # ω_ref,
     PSE.converter_high_power(), #converter
     PSE.VSM_outer_control(), #outer control
@@ -35,7 +35,7 @@ gfm_inj() = DynamicInverter(
 )
 
 gfl_inj() = DynamicInverter(
-    "I", # stands for "Inverter"
+    "GFL", # stands for "Inverter"
     1.0, # ω_ref,
     PSE.converter_high_power(), #converter
     PSE.GFL_outer_control(), #outer control
@@ -46,7 +46,7 @@ gfl_inj() = DynamicInverter(
 )
 
 sm_inj() = DynamicGenerator(
-    "G", # stands for "Generator"
+    "SM", # stands for "Generator"
     1.0, # ω_ref,
     PSE.AF_machine(), #machine
     PSE.shaft_no_damping(), #shaft
@@ -127,49 +127,54 @@ function small_signal_tripped(gss::GridSearchSys, sim::Union{Simulation, Missing
     sm = small_signal_analysis(newsim)
     return sm
 end
+                    
 
-gss = GridSearchSys(s, [sm_inj() sm_inj() sm_inj();],
-                        ["Bus1", "Bus 2", "Bus 3"])
+cases = [sm_inj() sm_inj() gfl_inj()
+        sm_inj() gfl_inj() gfl_inj()
+        sm_inj() gfm_inj() gfl_inj()                        
+        sm_inj() sm_inj() gfm_inj()
+        sm_inj() gfm_inj() gfm_inj()]
 
-  
-gss = GridSearchSys(s, [sm_inj() sm_inj() sm_inj()
-                gfm_inj() sm_inj() gfm_inj()],
-                ["Bus1", "Bus 2", "Bus 3"]) #                      
+cases = [sm_inj() sm_inj() gfl_inj()
+        sm_inj() gfl_inj() gfl_inj()
+        sm_inj() gfm_inj() gfl_inj()]
 
-cases = [sm_inj() sm_inj() sm_inj()
-        gfm_inj() sm_inj() gfm_inj()
-        sm_inj() gfm_inj() gfm_inj()                        
-        sm_inj() gfm_inj() gfl_inj()
-        sm_inj() gfl_inj() gfm_inj()]
+cases = [sm_inj() sm_inj() gfl_inj()]
+
+cases = [sm_inj() gfm_inj() gfm_inj()]
 
 gss = GridSearchSys(s, cases,
                         ["Bus1", "Bus 2", "Bus 3"]) # just make sure the busses are in the right order
 set_chunksize!(gss, 200)
 
 line_adders = Dict{String, Function}([
-    "statpi (dommel)"=>create_statpi_system,
-    "dynpi (dommel)"=>create_dynpi_system,
-    "MSSB"=>create_MSSB_system,
-    "MSMB"=>create_MSMB_system,
+    "dynpi"=>create_dynpi_system,
 ])
-load_scale_range = collect(0.25:0.25:2.0)
-line_scale_range = collect(1.0:0.25:3.0)
+
+# line_adders = Dict{String, Function}([
+#     "statpi"=>create_statpi_system,
+#     "dynpi"=>create_dynpi_system,
+#     "MSSB"=>create_MSSB_system,
+#     "MSMB"=>create_MSMB_system,
+# ])
+load_scale_range = collect(0.5:0.5:0.5)
+line_scale_range = collect(1.0:0.5:1.0)
 
 add_lines_sweep!(gss, [line_params], line_adders)
-add_generic_sweep!(gss, "Power Setpoint", set_power_setpt!, load_scale_range)
-add_generic_sweep!(gss, "Line impedance increase", scale_line_impedance!, line_scale_range)
+add_generic_sweep!(gss, "Load scale", set_power_setpt!, load_scale_range)
+add_generic_sweep!(gss, "Line scale", scale_line_impedance!, line_scale_range)
 
-add_result!(gss,
-    ["Bus 1 Injector Current", "Bus 2 Injector Current", "Bus 3 Injector Current"],
-    PSE.get_injector_currents,
-)
+# add_result!(gss,
+#     ["Bus 1 Injector Current", "Bus 2 Injector Current", "Bus 3 Injector Current"],
+#     PSE.get_injector_currents,
+# )
 # tell it to record the timestamps
-add_result!(gss, "Time", PSE.get_time)
+# add_result!(gss, "Time", PSE.get_time)
 
 # add_result!(gss, "initial_sm", get_sm)
 # add_result!(gss, "final_sm", small_signal_tripped)
 # add_result!(gss, "time", get_time)
 # add_result!(gss, ["Load Voltage at $busname" for busname in get_name.(get_bus.(get_components(StandardLoad, gss.base)))], get_zipe_load_voltages)
 
-add_result!(gss, "Eigs", get_eigenvalues)
+# add_result!(gss, "Eigs", PSE.get_eigenvalues)
 execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 5.5), dtmax=0.05, run_transient=true, log_path="data/gab_tests")
