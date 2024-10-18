@@ -14,6 +14,7 @@ using CSV
 using DataFramesMeta
 using LaTeXStrings
 using Logging
+using ZIPE_loads
 # Logging.disable_logging(Logging.Error)
 
 using PowerSystemsExperiments
@@ -22,6 +23,12 @@ const PSE = PowerSystemsExperiments
 # include("device_models.jl")
 
 s = System(joinpath(pwd(), "data/raw_data/WSCC_9bus.raw"))
+
+for l in get_components(PSY.StandardLoad, s)
+    transform_load_to_constant_impedance(l)
+    l.impedance_active_power = l.impedance_active_power 
+    l.impedance_reactive_power = l.impedance_reactive_power 
+end
 
 gfm_inj() = DynamicInverter(
     "GFM", # stands for "Inverter"
@@ -118,7 +125,6 @@ function scale_line_impedance!(sys::System, scale::Real)
     return sys
 end
 
-
 function small_signal_tripped(gss::GridSearchSys, sim::Union{Simulation, Missing}, sm::Union{PSID.SmallSignalOutput, Missing}, error::Union{String, Missing})
     if isnothing(sim) return missing end
     sys = deepcopy(sim.sys)
@@ -128,37 +134,36 @@ function small_signal_tripped(gss::GridSearchSys, sim::Union{Simulation, Missing
     return sm
 end
                     
-
 cases = [sm_inj() sm_inj() gfl_inj()
         sm_inj() gfl_inj() gfl_inj()
         sm_inj() gfm_inj() gfl_inj()                        
         sm_inj() sm_inj() gfm_inj()
         sm_inj() gfm_inj() gfm_inj()]
 
-cases = [sm_inj() sm_inj() gfl_inj()
-        sm_inj() gfl_inj() gfl_inj()
-        sm_inj() gfm_inj() gfl_inj()]
+# cases = [sm_inj() sm_inj() gfl_inj()
+#         sm_inj() gfl_inj() gfl_inj()
+#         sm_inj() gfm_inj() gfl_inj()]
 
-cases = [sm_inj() sm_inj() gfl_inj()]
+# cases = [sm_inj() sm_inj() gfl_inj()]
 
-cases = [sm_inj() gfm_inj() gfm_inj()]
+# cases = [sm_inj() gfm_inj() gfm_inj()]
 
 gss = GridSearchSys(s, cases,
                         ["Bus1", "Bus 2", "Bus 3"]) # just make sure the busses are in the right order
 set_chunksize!(gss, 200)
 
-line_adders = Dict{String, Function}([
-    "dynpi"=>create_dynpi_system,
-])
-
 # line_adders = Dict{String, Function}([
-#     "statpi"=>create_statpi_system,
 #     "dynpi"=>create_dynpi_system,
-#     "MSSB"=>create_MSSB_system,
-#     "MSMB"=>create_MSMB_system,
 # ])
-load_scale_range = collect(0.5:0.5:0.5)
-line_scale_range = collect(1.0:0.5:1.0)
+
+line_adders = Dict{String, Function}([
+    "statpi"=>create_statpi_system,
+    "dynpi"=>create_dynpi_system,
+    "MSSB"=>create_MSSB_system,
+    "MSMB"=>create_MSMB_system,
+])
+load_scale_range = collect(0.5:0.5:1.5)
+line_scale_range = collect(1.0:0.5:3.0)
 
 add_lines_sweep!(gss, [line_params], line_adders)
 add_generic_sweep!(gss, "Load scale", set_power_setpt!, load_scale_range)
