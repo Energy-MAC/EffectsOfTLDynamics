@@ -182,4 +182,4 @@ add_generic_sweep!(gss, "Line scale", scale_line_impedance!, line_scale_range)
 # add_result!(gss, ["Load Voltage at $busname" for busname in get_name.(get_bus.(get_components(StandardLoad, gss.base)))], get_zipe_load_voltages)
 
 # add_result!(gss, "Eigs", PSE.get_eigenvalues)
-execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 5.5), dtmax=0.05, run_transient=true, log_path="data/gab_tests")
+execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 0.55), dtmax=0.05, run_transient=true, log_path="data/gab_tests")
