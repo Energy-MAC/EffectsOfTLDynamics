@@ -2006,7 +2006,7 @@ version = "3.3.0"
 
 [[deps.PowerSystemsExperiments]]
 deps = ["ArgCheck", "CSV", "Colors", "Combinatorics", "DataFrames", "DataFramesMeta", "DifferentialEquations", "Documenter", "InfrastructureSystems", "LaTeXStrings", "Logging", "PlotlyDocumenter", "PlotlyJS", "PowerFlows", "PowerSimulationsDynamics", "PowerSystems", "Serialization", "Sundials", "TLmodels", "ZIPE_loads"]
-git-tree-sha1 = "66c87c746aa2bab6d9d25bd58d83e2ebe5f94c1d"
+git-tree-sha1 = "629b7f0b7f990e9ad9608e7f001db1fa6a62e969"
 repo-rev = "main"
 repo-url = "https://github.com/reid23/PowerSystemsExperiments.jl.git"
 uuid = "f7cd195c-7e02-4c00-a42e-c9191315f753"

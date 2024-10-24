@@ -19,8 +19,6 @@ using ZIPE_loads
 
 using PowerSystemsExperiments
 const PSE = PowerSystemsExperiments
-# include("../../PowerSystemsExperiments.jl/src/sysbuilder.jl")
-# include("device_models.jl")
 
 s = System(joinpath(pwd(), "data/raw_data/WSCC_9bus.raw"))
 
@@ -117,10 +115,11 @@ function set_power_setpt!(sys::System, scale::Real)
 end
 
 ### Defining a function to scale the line impedance
-function scale_line_impedance!(sys::System, scale::Real)
+function scale_line_length!(sys::System, scale::Real)
     for line in get_components(Line, sys)
         line.r = line.r * scale
         line.x = line.x * scale
+        line.b = (from = line.b.from*scale, to = line.b.to*scale)
     end
     return sys
 end
@@ -140,21 +139,9 @@ cases = [sm_inj() sm_inj() gfl_inj()
         sm_inj() sm_inj() gfm_inj()
         sm_inj() gfm_inj() gfm_inj()]
 
-# cases = [sm_inj() sm_inj() gfl_inj()
-#         sm_inj() gfl_inj() gfl_inj()
-#         sm_inj() gfm_inj() gfl_inj()]
-
-# cases = [sm_inj() sm_inj() gfl_inj()]
-
-# cases = [sm_inj() gfm_inj() gfm_inj()]
-
 gss = GridSearchSys(s, cases,
                         ["Bus1", "Bus 2", "Bus 3"]) # just make sure the busses are in the right order
 set_chunksize!(gss, 200)
-
-# line_adders = Dict{String, Function}([
-#     "dynpi"=>create_dynpi_system,
-# ])
 
 line_adders = Dict{String, Function}([
     "statpi"=>create_statpi_system,
@@ -163,23 +150,28 @@ line_adders = Dict{String, Function}([
     "MSMB"=>create_MSMB_system,
 ])
 load_scale_range = collect(0.5:0.5:1.5)
-line_scale_range = collect(1.0:0.5:3.0)
+line_scale_range = collect(1.0:0.5:2.5)
 
-add_lines_sweep!(gss, [line_params], line_adders)
+line_params_list::Vector{LineModelParams} = []
+
+for scale in line_scale_range
+    params_copy = deepcopy(line_params)
+    params_copy.line_scale = scale
+    push!(line_params_list, params_copy)
+end
+
+add_lines_sweep!(gss, line_params_list, line_adders)
 add_generic_sweep!(gss, "Load scale", set_power_setpt!, load_scale_range)
-add_generic_sweep!(gss, "Line scale", scale_line_impedance!, line_scale_range)
+# add_generic_sweep!(gss, "Line scale", scale_line_length!, line_scale_range)
 
 # add_result!(gss,
 #     ["Bus 1 Injector Current", "Bus 2 Injector Current", "Bus 3 Injector Current"],
 #     PSE.get_injector_currents,
 # )
-# tell it to record the timestamps
 # add_result!(gss, "Time", PSE.get_time)
-
-# add_result!(gss, "initial_sm", get_sm)
-# add_result!(gss, "final_sm", small_signal_tripped)
-# add_result!(gss, "time", get_time)
+# add_result!(gss, "Eigs", PSE.get_eigenvalues)
+# add_result!(gss, "initial_sm", PSE.get_sm)
+# add_result!(gss, "final_sm", PSE.small_signal_tripped)
 # add_result!(gss, ["Load Voltage at $busname" for busname in get_name.(get_bus.(get_components(StandardLoad, gss.base)))], get_zipe_load_voltages)
 
-# add_result!(gss, "Eigs", PSE.get_eigenvalues)
-execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 0.55), dtmax=0.05, run_transient=true, log_path="data/gab_tests")
+execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 1.0), dtmax=0.05, run_transient=true, log_path="data/gab_tests")
