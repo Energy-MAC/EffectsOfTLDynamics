@@ -16,13 +16,16 @@ using Colors
 using PowerSystemsExperiments
 const PSE = PowerSystemsExperiments
 
-gss = load_serde_data("data/gab_tests")
+pathname = "../../../../data/gabrielecr/"*line_params.alg_line_name*" line trip/"*current_time_string
+gss = load_serde_data(pathname)
+
 function add_results_gss!()
     add_result!(gss,
         ["Bus 1 Injector Current", "Bus 2 Injector Current", "Bus 3 Injector Current"],
         PSE.get_injector_currents,
     )
     add_result!(gss, "Time", PSE.get_time)
+    add_result!(gss, ["Voltage at $busname" for busname in get_name.(get_components(ACBus, gss.base))], PSE.get_bus_voltages)
     add_result!(gss, "Eigs", PSE.get_eigenvalues)
 end
 add_results_gss!()
@@ -31,26 +34,21 @@ df = gss.df
 df.Case = df."injector at {Bus1}".*" ".*df."injector at {Bus 2}".*" ".*df."injector at {Bus 3}"
 df."Line scale" = (x->x.line_scale).(df."Line Params")
 df."Eigs"
-df."Real" = (x->real(x)).(df."Eigs")
-df."real" = map(x->x[1], df."Real")
-df."Imag" = (x->imag(x)).(df."Eigs")
-df."imag" = map(x->x[1], df."Imag")
+df."Real" = (x->real(x)[1]).(df."Eigs")
+df."Imag" = (x->imag(x)[1]).(df."Eigs")
+df."Max real part" = maximum.(df."Real")
+sort!(df, [:"Line scale", :"Load scale", :"Line Model"])
+
+# selected_df = df[:, [:"Line Model", :"Line scale", :"Load scale", :"Real", :"Imag", :"Max real part"]]
+# using CSV
+# CSV.write("output.csv", selected_df)
+
+# filter!(row -> row.Case == "SM SM GFL", df)
+
+# df."real" = map(x->x[1], df."Real")
+# df."imag" = map(x->x[1], df."Imag")
 # save_serde_data(gss, "data/gab_tests")
-
-# filter!(row -> row.sim.results != no(hing, df)
-# filter(row -> row."Line Model" == "statpi", df)
-# filter(row -> row."Line scale" >= 2.0 , df)
-# add_result!(gss,
-#     ["Bus 1 Injector Current", "Bus 2 Injector Current", "Bus 3 Injector Current"],
-#     PSE.get_injector_currents,
-# )
-# tell it to record the timestamps
-# add_result!(gss, "Time", PSE.get_time)
-# add_result!(gss, "initial_sm", PSE.get_sm)
-# add_result!(gss, "final_sm", PSE.small_signal_tripped)
-# add_result!(gss, ["Load Voltage at $busname" for busname in get_name.(get_bus.(get_components(StandardLoad, gss.base)))], get_zipe_load_voltages)
-
-sort!(df, [:Case, :"Line scale", :"Line Model"])
+# sort!(df, [:"Line scale", :"Load scale", :"Line Model"])
 
 p = makeplots(
     df, 
@@ -66,10 +64,11 @@ p = makeplots(
     color = "Line Model",
     scattermode = "lines",
     yaxis_home_range = (min=0.0, max=2.0),
-    xaxis_home_range = (min=0.48, max=0.55)  
+    xaxis_home_range = (min=0.48, max=2.0)  
 )
 
-savehtmlplot(p, "bus1.html")
+pathname2 = pathname*"/plots"
+savehtmlplot(p, pathname2)
 
 p = makeplots(df, 
     supertitle = "Transient results",
@@ -84,10 +83,10 @@ p = makeplots(df,
     color = "Line Model",
     scattermode = "lines",
     yaxis_home_range = (min=0.0, max=2.0),
-    xaxis_home_range = (min=0.48, max=0.55)  
+    xaxis_home_range = (min=0.48, max=2.0)  
 )
 
-savehtmlplot(p, "bus2.html")
+savehtmlplot(p, "i_bus2_2.html")
 
 p = makeplots(df, 
     supertitle = "Transient results",
@@ -102,15 +101,15 @@ p = makeplots(df,
     color = "Line Model",
     scattermode = "lines",
     yaxis_home_range = (min=0.0, max=2.0),
-    xaxis_home_range = (min=0.48, max=0.55)  
+    xaxis_home_range = (min=0.48, max=2.0)  
 )
 
-savehtmlplot(p, "bus3.html")
+savehtmlplot(p, "i_bus3_2.html")
 
 p = makeplots(df, 
     supertitle = "Small signal results",
-    x = "real",
-    y = "imag",
+    x = "Real",
+    y = "Imag",
     x_title = "Real",
     y_title = "Imag",
     rows = "Line scale",
@@ -118,9 +117,26 @@ p = makeplots(df,
     slider = "Load scale",
     legendgroup = "Line Model",
     color = "Line Model",
-    scattermode = "markers",
-    # yaxis_home_range = (min=0.0, max=2.0),
-    # xaxis_home_range = (min=0.48, max=0.55)  
+    #scattermode = "markers",
 )
 
-savehtmlplot(p, "eigs.html")
+savehtmlplot(p, "eigs_2.html")
+
+p = makeplots(
+    df, 
+    supertitle = "Transient results",
+    x = "Time",
+    y = "Voltage at Bus 5",
+    x_title = "Time [s]",
+    y_title = "Voltage at Bus 4",
+    rows = "Line scale",
+    cols = "Case",
+    slider = "Load scale",
+    legendgroup = "Line Model",
+    color = "Line Model",
+    scattermode = "lines",
+    yaxis_home_range = (min=0.0, max=2.0),
+    xaxis_home_range = (min=0.48, max=2.0)  
+)
+
+savehtmlplot(p, "v_bus5.html")

@@ -15,7 +15,7 @@ using DataFramesMeta
 using LaTeXStrings
 using Logging
 using ZIPE_loads
-# Logging.disable_logging(Logging.Error)
+using Dates
 
 using PowerSystemsExperiments
 const PSE = PowerSystemsExperiments
@@ -57,7 +57,7 @@ sm_inj() = DynamicGenerator(
     PSE.shaft_no_damping(), #shaft
     PSE.avr_type1(), #avr
     PSE.tg_none(), #tg
-    PSE. pss_none(), #pss
+    PSE.pss_none(), #pss
 )
 
 # taken from TLModels.jl `TLmodels_tutorial.ipynb`
@@ -83,11 +83,23 @@ line_params = LineModelParams(
     Z_c,
     M,
     line_length_dict,    
-    get_name(first(get_components(Line, s))),
+    "Bus 7-Bus 5-i_1",
     10.0,
     1.0,
     1.0
 )
+# line_params = LineModelParams(
+#     z_km, 
+#     y_km, 
+#     z_km_ω, 
+#     Z_c,
+#     M,
+#     line_length_dict,    
+#     "Bus 6-Bus 4-i_1",
+#     10.0,
+#     1.0,
+#     1.0
+# )
 
 function no_change(sys::System, params::LineModelParams)
     return sys
@@ -115,14 +127,14 @@ function set_power_setpt!(sys::System, scale::Real)
 end
 
 ### Defining a function to scale the line impedance
-function scale_line_length!(sys::System, scale::Real)
-    for line in get_components(Line, sys)
-        line.r = line.r * scale
-        line.x = line.x * scale
-        line.b = (from = line.b.from*scale, to = line.b.to*scale)
-    end
-    return sys
-end
+# function scale_line_length!(sys::System, scale::Real)
+#     for line in get_components(Line, sys)
+#         line.r = line.r * scale
+#         line.x = line.x * scale
+#         line.b = (from = line.b.from*scale, to = line.b.to*scale)
+#     end
+#     return sys
+# end
 
 function small_signal_tripped(gss::GridSearchSys, sim::Union{Simulation, Missing}, sm::Union{PSID.SmallSignalOutput, Missing}, error::Union{String, Missing})
     if isnothing(sim) return missing end
@@ -137,7 +149,8 @@ cases = [sm_inj() sm_inj() gfl_inj()
         sm_inj() gfl_inj() gfl_inj()
         sm_inj() gfm_inj() gfl_inj()                        
         sm_inj() sm_inj() gfm_inj()
-        sm_inj() gfm_inj() gfm_inj()]
+        sm_inj() gfm_inj() gfm_inj()
+        ]
 
 gss = GridSearchSys(s, cases,
                         ["Bus1", "Bus 2", "Bus 3"]) # just make sure the busses are in the right order
@@ -149,8 +162,8 @@ line_adders = Dict{String, Function}([
     "MSSB"=>create_MSSB_system,
     "MSMB"=>create_MSMB_system,
 ])
-load_scale_range = collect(0.5:0.5:1.5)
-line_scale_range = collect(1.0:0.5:2.5)
+load_scale_range = collect(0.5:0.5:2.0)
+line_scale_range = collect(1.0:0.5:3.0)
 
 line_params_list::Vector{LineModelParams} = []
 
@@ -174,4 +187,9 @@ add_generic_sweep!(gss, "Load scale", set_power_setpt!, load_scale_range)
 # add_result!(gss, "final_sm", PSE.small_signal_tripped)
 # add_result!(gss, ["Load Voltage at $busname" for busname in get_name.(get_bus.(get_components(StandardLoad, gss.base)))], get_zipe_load_voltages)
 
-execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 1.0), dtmax=0.05, run_transient=true, log_path="data/gab_tests")
+current_time_string = string(now())
+println(current_time_string)
+
+pathname = "../../../../data/gabrielecr/"*line_params.alg_line_name*" line trip/"*current_time_string
+
+execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 2.0), dtmax=0.05, run_transient=true, log_path=pathname)
