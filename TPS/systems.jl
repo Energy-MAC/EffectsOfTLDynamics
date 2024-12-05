@@ -148,7 +148,8 @@ for gen in get_components(Generator, sys_statpi)
 end
 
 using PowerFlows
-sol = solve_powerflow(ACPowerFlow(), sys_statpi)
+
+sol = solve_powerflow(ACPowerFlow(), s)
 sol["flow_results"]
 
 

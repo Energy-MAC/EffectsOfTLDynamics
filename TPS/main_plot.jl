@@ -16,7 +16,13 @@ using Colors
 using PowerSystemsExperiments
 const PSE = PowerSystemsExperiments
 
-pathname = "../../../../data/gabrielecr/"*line_params.alg_line_name*" line trip/"*current_time_string
+
+# pathname = "../../../../data/gabrielecr/Bus 5-Bus 4-i_1/2024-11-27T18:32:38.427"
+pathname = "../../../../data/gabrielecr/Bus 7-Bus 5-i_1/2024-11-27T17:20:32.588"
+
+pathname2 = pathname*"/plots"
+mkdir(pathname2)
+
 gss = load_serde_data(pathname)
 
 function add_results_gss!()
@@ -37,7 +43,7 @@ df."Eigs"
 df."Real" = (x->real(x)[1]).(df."Eigs")
 df."Imag" = (x->imag(x)[1]).(df."Eigs")
 df."Max real part" = maximum.(df."Real")
-sort!(df, [:"Line scale", :"Load scale", :"Line Model"])
+sort!(df, [:"Line scale", :"Load scale", :"Line Model", :"Case"])
 
 # selected_df = df[:, [:"Line Model", :"Line scale", :"Load scale", :"Real", :"Imag", :"Max real part"]]
 # using CSV
@@ -50,7 +56,7 @@ sort!(df, [:"Line scale", :"Load scale", :"Line Model"])
 # save_serde_data(gss, "data/gab_tests")
 # sort!(df, [:"Line scale", :"Load scale", :"Line Model"])
 
-p = makeplots(
+p1 = makeplots(
     df, 
     supertitle = "Transient results",
     x = "Time",
@@ -67,10 +73,9 @@ p = makeplots(
     xaxis_home_range = (min=0.48, max=2.0)  
 )
 
-pathname2 = pathname*"/plots"
-savehtmlplot(p, pathname2)
+savehtmlplot(p1, pathname2*"/i_bus1.html")
 
-p = makeplots(df, 
+p2 = makeplots(df, 
     supertitle = "Transient results",
     x = "Time",
     y = "Bus 2 Injector Current",
@@ -86,9 +91,9 @@ p = makeplots(df,
     xaxis_home_range = (min=0.48, max=2.0)  
 )
 
-savehtmlplot(p, "i_bus2_2.html")
+savehtmlplot(p2, pathname2*"/i_bus2.html")
 
-p = makeplots(df, 
+p3 = makeplots(df, 
     supertitle = "Transient results",
     x = "Time",
     y = "Bus 3 Injector Current",
@@ -104,9 +109,9 @@ p = makeplots(df,
     xaxis_home_range = (min=0.48, max=2.0)  
 )
 
-savehtmlplot(p, "i_bus3_2.html")
+savehtmlplot(p3, pathname2*"/i_bus3.html")
 
-p = makeplots(df, 
+pe = makeplots(df, 
     supertitle = "Small signal results",
     x = "Real",
     y = "Imag",
@@ -120,23 +125,4 @@ p = makeplots(df,
     #scattermode = "markers",
 )
 
-savehtmlplot(p, "eigs_2.html")
-
-p = makeplots(
-    df, 
-    supertitle = "Transient results",
-    x = "Time",
-    y = "Voltage at Bus 5",
-    x_title = "Time [s]",
-    y_title = "Voltage at Bus 4",
-    rows = "Line scale",
-    cols = "Case",
-    slider = "Load scale",
-    legendgroup = "Line Model",
-    color = "Line Model",
-    scattermode = "lines",
-    yaxis_home_range = (min=0.0, max=2.0),
-    xaxis_home_range = (min=0.48, max=2.0)  
-)
-
-savehtmlplot(p, "v_bus5.html")
+savehtmlplot(pe, pathname2*"/eigs.html")
