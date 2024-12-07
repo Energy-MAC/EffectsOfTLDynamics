@@ -194,4 +194,4 @@ println(current_time_string)
 pathname = "../../../../data/gabrielecr/"*line_params.alg_line_name*"/"*current_time_string
 mkdir(pathname)
 
-execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 2.0), dtmax=0.05, run_transient=true, log_path=pathname)
+execute_sims!(gss, BranchTrip(0.5, ACBranch, line_params.alg_line_name), tspan=(0.48, 2.0), dtmax=0.05, run_transient=false, log_path=pathname)

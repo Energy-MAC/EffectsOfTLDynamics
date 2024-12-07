@@ -20,13 +20,17 @@ using Dates
 using PowerSystemsExperiments
 const PSE = PowerSystemsExperiments
 
-s = System(joinpath(pwd(), "data/raw_data/WSCC_9bus.raw"))
+s = System(joinpath(pwd(), "data/raw_data/OMIB.raw"))
 
-for l in get_components(PSY.StandardLoad, s)
-    transform_load_to_constant_impedance(l)
-    l.impedance_active_power = l.impedance_active_power 
-    l.impedance_reactive_power = l.impedance_reactive_power 
-end
+# build static component for gen1
+gen2 = get_component(Generator, s, "generator-102-1")
+gen1 = deepcopy(gen2);
+gen1.name = "generator-101-1";
+bus1 = get_component(ACBus, s, "BUS 1")
+gen1.bus = bus1
+gen1.time_series_container = InfrastructureSystems.TimeSeriesContainer(); 
+# Add gen1 to sys
+add_component!(s, gen1)
 
 gfm_inj() = DynamicInverter(
     "GFM", # stands for "Inverter"
@@ -67,13 +71,40 @@ capacitance_csv = "data/cable_data/dommel_data_C.csv"
 M = 3
 z_km, y_km, z_km_ω, Z_c = get_line_parameters_from_data(impedance_csv, capacitance_csv, M)
 
+V_nom = 230 # kV
+Z_o = sqrt(z_km_ω/y_km)
+SIL = V_nom ^2/Z_o
+p_load = real(SIL)/100
+q_load = imag(SIL)/100
+
+load = StandardLoad(
+    name = "load1",
+    available = true,
+    bus = get_component(ACBus, s, "BUS 2"),
+    base_power = 100.0,
+    constant_active_power = 0.0,
+    constant_reactive_power = 0.0,
+    impedance_active_power = p_load,
+    impedance_reactive_power = q_load,
+    current_active_power = 0.0,
+    current_reactive_power = 0.0,
+    max_constant_active_power = 0.0,
+    max_constant_reactive_power = 0.0,
+    max_impedance_active_power = p_load,
+    max_impedance_reactive_power = q_load,
+    max_current_active_power = 0.0,
+    max_current_reactive_power = 0.0,
+)
+add_component!(s, load)
+
+line2 = deepcopy(first(get_components(Line, s)))
+line2.name = line2.name*"_static"
+line2.time_series_container = InfrastructureSystems.TimeSeriesContainer(); 
+add_component!(s, line2)
+
 line_length_dict = Dict(
-    "Bus 5-Bus 4-i_1" => 90,
-    "Bus 7-Bus 8-i_1" => 80,
-    "Bus 6-Bus 4-i_1" => 100,
-    "Bus 7-Bus 5-i_1" => 170,
-    "Bus 8-Bus 9-i_1" => 110,
-    "Bus 9-Bus 6-i_1" => 180,
+    "BUS 1-BUS 2-i_1" => 100,
+    "BUS 1-BUS 2-i_1_static" => 100,
 )
 
 line_params = LineModelParams(
@@ -83,23 +114,11 @@ line_params = LineModelParams(
     Z_c,
     M,
     line_length_dict,    
-    "Bus 5-Bus 4-i_1",
+    "BUS 1-BUS 2-i_1_static",
     10.0,
     1.0,
     1.0
 )
-# line_params = LineModelParams(
-#     z_km, 
-#     y_km, 
-#     z_km_ω, 
-#     Z_c,
-#     M,
-#     line_length_dict,    
-#     "Bus 6-Bus 4-i_1",
-#     10.0,
-#     1.0,
-#     1.0
-# )
 
 function no_change(sys::System, params::LineModelParams)
     return sys
@@ -136,16 +155,14 @@ function small_signal_tripped(gss::GridSearchSys, sim::Union{Simulation, Missing
     return sm
 end
                     
-cases = [sm_inj() sm_inj() gfl_inj()
-        sm_inj() gfl_inj() gfl_inj()
-        sm_inj() gfm_inj() gfl_inj()                        
-        sm_inj() sm_inj() gfm_inj()
-        sm_inj() gfm_inj() gfm_inj()
-        # gfm_inj() sm_inj() gfm_inj()
+cases = [sm_inj() sm_inj()
+        sm_inj() gfm_inj()                       
+        gfm_inj() sm_inj()
+        gfm_inj() gfm_inj()
         ]
 
 gss = GridSearchSys(s, cases,
-                        ["Bus1", "Bus 2", "Bus 3"]) # just make sure the busses are in the right order
+                        ["BUS 1", "BUS 2"]) # just make sure the busses are in the right order
 set_chunksize!(gss, 200)
 
 line_adders = Dict{String, Function}([
@@ -154,9 +171,11 @@ line_adders = Dict{String, Function}([
     "MSSB"=>create_MSSB_system,
     "MSMB"=>create_MSMB_system,
 ])
-# load_scale_range = collect(0.5:0.5:2.0)
-load_scale_range = collect(0.5:0.5:1.0)
-line_scale_range = collect(1.0:0.5:1.5)
+
+# load_scale_range = collect(0.5:0.5:0.5)
+# line_scale_range = collect(1.0:0.5:1.0)
+load_scale_range = collect(0.5:0.5:2.0)
+line_scale_range = collect(1.0:0.5:3.0)
 
 line_params_list::Vector{LineModelParams} = []
 
